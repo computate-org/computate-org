@@ -2,9 +2,6 @@
 - name: List github orgs
   uri: 
     url: https://api.github.com/user/orgs
-#    user: "{{ GITHUB_USER }}"
-#    password: "{{ GITHUB_PASSWORD }}"
-#    force_basic_auth: true
     headers: 
       Authorization: "token {{ GITHUB_TOKEN }}"
   ignore_errors: true
@@ -13,4 +10,61 @@
   debug: 
     msg: 'Make sure you have correctly configured a GITHUB_TOKEN: "..." in your ansible vault. \nYou will want to configure a github token with "admin:org" scope here" \nhttps://github.com/settings/tokens'
   when: GITHUB_ORGS.failed
+- name: List github repos
+  uri: 
+    url: "https://api.github.com/orgs/{{ GITHUB_ORG }}/repos"
+    return_content: true
+    headers: 
+      Authorization: "token {{ GITHUB_TOKEN }}"
+  ignore_errors: true
+  register: GITHUB_REPOS
+- name: Debug github repos
+  debug: 
+    msg: 'Make sure you have forked the computate-org-school repo into your Github organization GITHUB_ORG: {{ GITHUB_ORG }} in your ansible vault. \nYou will want to configure a github token with "admin:org" scope here" \nhttps://github.com/settings/tokens'
+  #when: "{{ (GITHUB_REPOS | from_json).json['name' == 'computate-org-school'] }}"
 
+####################################
+# OpenShift Cluster Administration #
+####################################
+
+# Task to decide where to setup OpenShift cluster
+
+#########################
+# OpenShift Development #
+#########################
+
+# Task to decide the project/namespace name
+# Task to deploy PostgreSQL database (default OpenShift app)
+# Task to deploy Zookeeper cluster manager (custom container from quay.io)
+# Task to deploy Apache Solr Search Engine (custom container from quay.io)
+# Task to deploy school application (s2i image)
+
+#############
+# SSO Admin #
+#############
+# Task to deploy Red Hat SSO (default OpenShift app)
+# Task to configure SSO Realm
+# Task to configure SSO client
+# Task to configure client service account and roles
+# Task to configure client redirect URIs
+# Task to configure client confidential access 
+# Task to configure client roles (SiteAdmin, SiteManager)
+# Task to configure your own user in SSO
+# Task to request access from SSO admin for roles (SiteAdmin or SiteManager)
+
+#####################
+# Application Admin #
+#####################
+# Import default school data into the application
+# Task to create school in the application
+# Task to create the school year in the application
+# Task to create the school ages in the application
+# Task to create the school block times in the application
+# Task to enroll some students 
+
+######################
+# HTML App Dev tasks #
+######################
+# Task to customize a homepage
+# Task to customize a enrollment form
+# 
