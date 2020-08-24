@@ -1,0 +1,10 @@
+---
+- name: Instructor tasks to setup a new organization to manage a school
+  hosts: computate_org_school
+  gather_facts: false
+  tasks: 
+    - import_role: 
+        name: computate_org_school
+  roles: 
+    - computate_org_school_github
+  

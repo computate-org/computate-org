@@ -1,0 +1,4 @@
+inventories/computate-*/**
+**/*.retry
+**/*.swp
+

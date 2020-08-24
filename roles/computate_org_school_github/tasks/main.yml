@@ -1,0 +1,16 @@
+---
+- name: List github orgs
+  uri: 
+    url: https://api.github.com/user/orgs
+#    user: "{{ GITHUB_USER }}"
+#    password: "{{ GITHUB_PASSWORD }}"
+#    force_basic_auth: true
+    headers: 
+      Authorization: "token {{ GITHUB_TOKEN }}"
+  ignore_errors: true
+  register: GITHUB_ORGS
+- name: Debug github orgs
+  debug: 
+    msg: 'Make sure you have correctly configured a GITHUB_TOKEN: "..." in your ansible vault. \nYou will want to configure a github token with "admin:org" scope here" \nhttps://github.com/settings/tokens'
+  when: GITHUB_ORGS.failed
+
