@@ -1,4 +1,5 @@
 inventories/computate-*/**
+inventories/*/key
 **/*.retry
 **/*.swp
 
