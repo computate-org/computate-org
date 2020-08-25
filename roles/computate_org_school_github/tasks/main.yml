@@ -1,27 +1,72 @@
 ---
-- name: List github orgs
+- name: Check for GITHUB_TOKEN var
+  fail: 
+    msg: "Make sure you have correctly configured a GITHUB_TOKEN: '...' in your ansible vault. You will want to configure a Github token with 'admin:org' and 'repo' scopes (https://github.com/settings/tokens). "
+  when: GITHUB_TOKEN is not defined
+  tags: github_token
+- name: Check for GITHUB_ORG var
+  fail: 
+    msg: "Make sure you have correctly configured a GITHUB_ORG: '...' in your ansible vault. This should be a Github organization that your user and token have access to (https://github.com/organizations/plan). "
+  when: GITHUB_ORG is not defined
+  tags: github_org
+- name: "Get Github org {{ GITHUB_ORG }}"
   uri: 
-    url: https://api.github.com/user/orgs
-    headers: 
-      Authorization: "token {{ GITHUB_TOKEN }}"
-  ignore_errors: true
-  register: GITHUB_ORGS
-- name: Debug github orgs
-  debug: 
-    msg: 'Make sure you have correctly configured a GITHUB_TOKEN: "..." in your ansible vault. \nYou will want to configure a github token with "admin:org" scope here" \nhttps://github.com/settings/tokens'
-  when: GITHUB_ORGS.failed
-- name: List github repos
-  uri: 
-    url: "https://api.github.com/orgs/{{ GITHUB_ORG }}/repos"
+    url: "https://api.github.com/orgs/{{ GITHUB_ORG }}"
     return_content: true
     headers: 
       Authorization: "token {{ GITHUB_TOKEN }}"
   ignore_errors: true
-  register: GITHUB_REPOS
-- name: Debug github repos
-  debug: 
-    msg: 'Make sure you have forked the computate-org-school repo into your Github organization GITHUB_ORG: {{ GITHUB_ORG }} in your ansible vault. \nYou will want to configure a github token with "admin:org" scope here" \nhttps://github.com/settings/tokens'
-  #when: "{{ (GITHUB_REPOS | from_json).json['name' == 'computate-org-school'] }}"
+  register: GITHUB_ORG_JSON
+  tags: github_org
+- name: Check Github token
+  fail: 
+    msg: "Make sure you have correctly configured a GITHUB_TOKEN: '...' in your ansible vault. You will want to configure a Github token with 'admin:org' and 'repo' scopes (https://github.com/settings/tokens). You are using GITHUB_TOKEN: {{ GITHUB_TOKEN }}"
+  when: GITHUB_ORG_JSON.failed and (GITHUB_ORG_JSON.status is not defined or GITHUB_ORG_JSON.status == 401)
+  tags: github_token
+- name: Check for Github org
+  fail: 
+    msg: "Make sure you have correctly configured a GITHUB_ORG: '...' in your ansible vault. This should be a Github organization that your user and token have access to (https://github.com/organizations/plan). You are using GITHUB_ORG: {{ GITHUB_ORG }}"
+  when: GITHUB_ORG_JSON.failed and GITHUB_ORG_JSON.status == 404
+  tags: github_org
+- name: "Get Github repo {{ GITHUB_REPO }}"
+  uri: 
+    url: "https://api.github.com/repos/{{ GITHUB_ORG }}/{{ GITHUB_REPO }}"
+    return_content: true
+    headers: 
+      Authorization: "token {{ GITHUB_TOKEN }}"
+  ignore_errors: true
+  register: GITHUB_REPO_JSON
+  tags: github_repo
+- name: "Fork Github repo {{ GITHUB_REPO }}"
+  uri: 
+    url: "https://api.github.com/repos/computate-org/computate-org-school/forks?organization={{ GITHUB_ORG | urlencode() }}"
+    method: POST
+    return_content: true
+    headers: 
+      Authorization: "token {{ GITHUB_TOKEN }}"
+  when: GITHUB_REPO_JSON.failed and GITHUB_REPO_JSON.status == 404
+  tags: github_repo
+- name: Check for Github repo
+  fail: 
+    msg: "Make sure you have correctly configured a GITHUB_REPO: '...' in your ansible vault. This should be a Github repository in your Github organization that your user and token have access to. You are using GITHUB_REPO: {{ GITHUB_REPO }}"
+  when: GITHUB_REPO_JSON.failed and GITHUB_REPO_JSON.status == 404
+  tags: github_repo
+
+- name: Create issue to setup OpenShift cluster
+  include_role: 
+    name: computate_org_school_issue
+  vars: 
+    ISSUE_LABEL: setup_openshift_cluster
+    ISSUE_TITLE: Setup OpenShift cluster
+    ISSUE_BODY: |
+      
+      # Register for the Red Hat OpenShift Administration I course
+
+      https://role.rhu.redhat.com/rol-rhu/app/courses/do280-4.2
+
+      Complete chapters 1 and 2 through configuring a lab environment. 
+
+  tags: issue_label
 
 ####################################
 # OpenShift Cluster Administration #
