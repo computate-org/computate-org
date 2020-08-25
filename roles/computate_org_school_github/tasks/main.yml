@@ -52,6 +52,10 @@
   when: GITHUB_REPO_JSON.failed and GITHUB_REPO_JSON.status == 404
   tags: github_repo
 
+####################################
+# OpenShift Cluster Administration #
+####################################
+
 - name: Create issue to setup OpenShift cluster
   include_role: 
     name: computate_org_school_issue
@@ -59,24 +63,71 @@
     ISSUE_LABEL: setup_openshift_cluster
     ISSUE_TITLE: Setup OpenShift cluster
     ISSUE_BODY: |
-      
-      # Register for the Red Hat OpenShift Administration I course
+      Red Hat employees can obtain a free OpenShift cluster with 4GiB RAM and 10 GiB storage with their people manager approval here: 
 
-      https://role.rhu.redhat.com/rol-rhu/app/courses/do280-4.2
+      https://employee.openshift.com/register/employee/introduction
 
-      Complete chapters 1 and 2 through configuring a lab environment. 
-
+      You may also obtain an OpenShift cluster by registering for a course that provisions a temporary OpenShift environment. 
   tags: issue_label
-
-####################################
-# OpenShift Cluster Administration #
-####################################
-
-# Task to decide where to setup OpenShift cluster
 
 #########################
 # OpenShift Development #
 #########################
+
+- name: Create issue to install ansible locally
+  include_role: 
+    name: computate_org_school_issue
+  vars: 
+    ISSUE_LABEL: install_ansible_locally
+    ISSUE_TITLE: Install Ansible Locally
+    ISSUE_BODY: |
+      The installation of the project for both development and production in containers is completely automated with Ansible.
+      Begin by installing both the ansible and python3 packages.
+      
+      ```bash
+      sudo yum install -y ansible python3 python3-pip
+      sudo pip3 install psycopg2
+      ```
+      
+      If psycopg2 does not install, run:
+      
+      ```bash
+      sudo pip3 install psycopg2-binary
+      ```
+      
+      ## Ansible on older operating systems.
+      
+      If you have an older operating system that does not yet support python3, you may struggle to deploy the application on OpenShift in the cloud. The OpenShift Ansible modules seem to require python3 as the system library, so I recommend updating your operating system to something more recent, for example CentOS8 or RHEL8.
+      
+      On older operating systems, to deploy the development applications you might want to configure ansible for python2.
+      
+      To deploy to OpenShift, you will want to configure ansible to point to python3.
+      
+      You might update your ansible configuration like this to make it work:
+      
+      ```
+      sudo vim /etc/ansible/ansible.cfg
+      ```
+      
+      ```
+      [defaults]
+      interpreter_python=/usr/bin/python3
+      ```
+      
+      Your dependencies might be different on an older operating system.
+      
+      ```bash
+      sudo yum install -y ansible python python-pip
+      sudo pip install psycopg2
+      ```
+      
+      ## Ansible training.
+      
+      For training on ansible and automation, I recommend the following Red Hat course.
+      By completing the course and taking the exam, you can be a Red Hat Certified Specialist in Ansible Automation.
+      
+      https://www.redhat.com/en/services/training/do407-automation-ansible-i
+  tags: issue_label
 
 # Task to decide the project/namespace name
 # Task to deploy PostgreSQL database (default OpenShift app)
