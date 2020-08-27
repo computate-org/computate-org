@@ -68,7 +68,9 @@
       https://employee.openshift.com/register/employee/introduction
 
       You may also obtain an OpenShift cluster by registering for a course that provisions a temporary OpenShift environment. 
-  tags: issue_label
+  tags: 
+    - issue_label
+    - issue_label_1
 
 #########################
 # OpenShift Development #
@@ -127,7 +129,91 @@
       By completing the course and taking the exam, you can be a Red Hat Certified Specialist in Ansible Automation.
       
       https://www.redhat.com/en/services/training/do407-automation-ansible-i
-  tags: issue_label
+  tags: 
+    - issue_label
+    - issue_label_2
+
+- name: "Create issue to clone computate-org-school repo"
+  include_role: 
+    name: computate_org_school_issue
+  vars: 
+    ISSUE_LABEL: clone_computate_org_school_repo
+    ISSUE_TITLE: "Clone the {{ GITHUB_REPO }} git repository"
+    ISSUE_BODY: |
+      Create a directory for the {{ GITHUB_REPO }} repository with the included ansible scripts.
+      
+      ```bash
+      sudo install -d -o $USER -g $USER {{ REPO_PATH }}
+      ```
+
+      Clone the git repository into the new directory. 
+
+      ```bash
+      git clone git@github.com:{{ GITHUB_ORG }}/{{ GITHUB_REPO }}.git {{ REPO_PATH }}
+      ```
+      
+      Create a directory for your development inventory.
+      
+      ```bash
+      install -d {{ REPO_PATH }}/inventories/$USER-$HOSTNAME
+      ```
+      
+      Create a hosts file for your development inventory.
+      
+      ```bash
+      echo '
+      [computate_org_school]
+      {{ HOST_NAME }}
+      ' > {{ REPO_PATH }}/inventories/$USER-$HOSTNAME/hosts
+      ```
+  tags: 
+    - issue_label
+    - issue_label_3
+
+- name: "Create issue to create an ansible vault"
+  include_role: 
+    name: computate_org_school_issue
+  vars: 
+    ISSUE_LABEL: create_local_dev_ansible_vault
+    ISSUE_TITLE: "Create an ansible vault for your local development"
+    ISSUE_BODY: |
+      ### Create an ansible vault for your local development.
+      
+      Create and edit an encrypted ansible vault with a password for the host secrets for your development inventory.
+      
+      ```bash
+      ansible-vault create {{ REPO_PATH }}/inventories/$USER-$HOSTNAME/host_vars/$HOSTNAME/vault
+      ansible-vault edit {{ REPO_PATH }}/inventories/$USER-$HOSTNAME/host_vars/$HOSTNAME/vault
+      ```
+      
+      The contents of the vault will contain the secrets needed to override any default values you want to change in the computate-scolaire defaults defined here.
+      
+      https://github.com/computate/computate/blob/master/ansible/roles/computate_scolaire/defaults/main.yml
+      
+      There are descriptions for each of the fields.
+      There are several sections of fields, including:
+      
+      - computate-scolaire system defaults
+      - Ansible defaults
+      - Zookeeper defaults
+      - Solr defaults
+      - PostgreSQL defaults
+      - computate-medical global defaults
+      - computate-scolaire US English defaults
+      - SMTP defaults
+      - OpenID Connect auth server defaults
+      - SSL/TLS defaults
+
+      Here is an example of the contents of the ansible vault for local development: 
+
+      ```yaml
+      {{ lookup('url', 'https://raw.githubusercontent.com/computate/computate/master/ansible/roles/computate_scolaire/defaults/main.yml', split_lines=false) }}
+      ```
+
+      Look for values to override, especially those like this: "...". 
+  tags: 
+    - issue_label
+    - issue_label_4
 
 # Task to decide the project/namespace name
 # Task to deploy PostgreSQL database (default OpenShift app)

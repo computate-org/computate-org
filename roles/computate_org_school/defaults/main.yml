@@ -1,6 +1,16 @@
 
-COMPUTATE_ORG_SCHOOL_PATH: /usr/local/src/computate-org-school
 GITHUB_ORG: "..."
 GITHUB_TOKEN: "..."
 GITHUB_REPO: computate-org-school
+REPO_PATH: "/usr/local/src/{{ GITHUB_REPO }}"
+
+HOST_NAME: "..."
+USER_NAME: "..."
+INVENTORY_NAME: "{{ USER_NAME }}-{{ HOST_NAME }}"
+USER_PASSWORD: "..."
+VAULT_PASSWORD: "..."
+ansible_user: "{{ USER_NAME }}"
+ansible_sudo_pass: "{{ USER_PASSWORD }}"
+ansible_become_pass: "{{ USER_PASSWORD }}"
+ansible_ssh_pass: "{{ USER_PASSWORD }}"
 
