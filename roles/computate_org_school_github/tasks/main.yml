@@ -122,6 +122,20 @@
       sudo yum install -y ansible python python-pip
       sudo pip install psycopg2
       ```
+
+      ## Setup ssh on your computer for ansible to connect
+
+      For ansible to run commands, it needs to be able to ssh and run commands as sudo. For that, make sure the sshd service is started and enabled after a reboot. Also test an ssh connection to your hostname to make sure the host is accepted. 
+
+      ```bash
+      systemctl status sshd
+      sudo systemctl start sshd
+      sudo systemctl enable sshd
+      systemctl status sshd
+      ssh $HOSTNAME
+      exit
+      ```
+
       
       ## Ansible training.
       
@@ -140,7 +154,7 @@
     ISSUE_LABEL: clone_computate_org_school_repo
     ISSUE_TITLE: "Clone the {{ GITHUB_REPO }} git repository"
     ISSUE_BODY: |
-      Create a directory for the {{ GITHUB_REPO }} repository with the included ansible scripts.
+      Create a directory for the {{ GITHUB_REPO }} repository with the included ansible scripts to setup issues in Github for the organization.
       
       ```bash
       sudo install -d -o $USER -g $USER {{ REPO_PATH }}
@@ -158,11 +172,38 @@
       install -d {{ REPO_PATH }}/inventories/$USER-$HOSTNAME
       ```
       
-      Create a hosts file for your development inventory.
+      Create a hosts file for your development inventory. Add your hostname to each of the following host groups so that ansible can run each of these playbooks on your host. 
       
       ```bash
       echo '
       [computate_org_school]
+      {{ HOST_NAME }}
+
+      [computate_postgres]
+      {{ HOST_NAME }}
+
+      [computate_zookeeper]
+      {{ HOST_NAME }}
+
+      [computate_solr]
+      {{ HOST_NAME }}
+
+      [computate_certbot]
+      {{ HOST_NAME }}
+
+      [computate_scolaire]
+      {{ HOST_NAME }}
+
+      [computate_scolaire_login]
+      {{ HOST_NAME }}
+
+      [computate_scolaire_refresh]
+      {{ HOST_NAME }}
+
+      [computate_scolaire_backup]
+      {{ HOST_NAME }}
+
+      [computate_scolaire_restore]
       {{ HOST_NAME }}
       ' > {{ REPO_PATH }}/inventories/$USER-$HOSTNAME/hosts
       ```
@@ -214,6 +255,28 @@
   tags: 
     - issue_label
     - issue_label_4
+
+- name: "Create issue to clone computate repo"
+  include_role: 
+    name: computate_org_school_issue
+  vars: 
+    ISSUE_LABEL: clone_computate_repo
+    ISSUE_TITLE: "Clone the computate git repository"
+    ISSUE_BODY: |
+      Create a directory for the computate repository with the included ansible scripts for installing the school applications for development and in OpenShift.
+      
+      ```bash
+      sudo install -d -o $USER -g $USER /usr/local/src/computate
+      ```
+
+      Clone the git repository into the new directory. 
+
+      ```bash
+      git clone git@github.com:computate/computate.git /usr/local/src/computate
+      ```
+  tags: 
+    - issue_label
+    - issue_label_5
 
 # Task to decide the project/namespace name
 # Task to deploy PostgreSQL database (default OpenShift app)
