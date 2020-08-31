@@ -1,5 +1,6 @@
 - name: "Get issue by label {{ ISSUE_LABEL }}"
   uri:
+    timeout: 90
     url: "https://api.github.com/repos/{{ GITHUB_ORG }}/{{ GITHUB_REPO }}/issues?labels={{ ISSUE_LABEL | urlencode() }}"
     return_content: true
     headers:
@@ -8,6 +9,7 @@
   tags: issue_label
 - name: "Create issue by label {{ ISSUE_LABEL }}"
   uri:
+    timeout: 90
     url: "https://api.github.com/repos/{{ GITHUB_ORG }}/{{ GITHUB_REPO }}/issues"
     method: POST
     headers:
@@ -19,11 +21,15 @@
         - "{{ ISSUE_LABEL }}"
       title: "{{ ISSUE_TITLE }}"
       body: "{{ ISSUE_BODY }}"
+    status_code: 
+      - 200
+      - 201
   when: ISSUE_LABEL_JSON.json | length == 0
   register: ISSUE_CREATE_JSON
   tags: issue_label
 - name: "Update issue by label {{ ISSUE_LABEL }}"
   uri:
+    timeout: 90
     url: "https://api.github.com/repos/{{ GITHUB_ORG }}/{{ GITHUB_REPO }}/issues/{{ ISSUE_LABEL_JSON.json[0].number }}"
     method: PATCH
     headers:

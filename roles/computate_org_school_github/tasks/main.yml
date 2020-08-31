@@ -175,54 +175,55 @@
       Create a hosts file for your development inventory. Add your hostname to each of the following host groups so that ansible can run each of these playbooks on your host. 
       
       ```bash
-      echo '
+      echo "
       [computate_org_school]
-      {{ HOST_NAME }}
+      $HOSTNAME
 
       [computate_postgres]
-      {{ HOST_NAME }}
+      $HOSTNAME
 
       [computate_zookeeper]
-      {{ HOST_NAME }}
+      $HOSTNAME
 
       [computate_solr]
-      {{ HOST_NAME }}
+      $HOSTNAME
 
       [computate_certbot]
-      {{ HOST_NAME }}
+      $HOSTNAME
 
       [computate_scolaire]
-      {{ HOST_NAME }}
+      $HOSTNAME
 
       [computate_scolaire_login]
-      {{ HOST_NAME }}
+      $HOSTNAME
 
       [computate_scolaire_refresh]
-      {{ HOST_NAME }}
+      $HOSTNAME
 
       [computate_scolaire_backup]
-      {{ HOST_NAME }}
+      $HOSTNAME
 
       [computate_scolaire_restore]
-      {{ HOST_NAME }}
-      ' > {{ REPO_PATH }}/inventories/$USER-$HOSTNAME/hosts
+      $HOSTNAME
+      " > {{ REPO_PATH }}/inventories/$USER-$HOSTNAME/hosts
       ```
   tags: 
     - issue_label
     - issue_label_3
 
-- name: "Create issue to create an ansible vault"
+- name: "Create issue to create an ansible vault for local development"
   include_role: 
     name: computate_org_school_issue
   vars: 
     ISSUE_LABEL: create_local_dev_ansible_vault
-    ISSUE_TITLE: "Create an ansible vault for your local development"
+    ISSUE_TITLE: "Create an ansible vault for local development"
     ISSUE_BODY: |
       ### Create an ansible vault for your local development.
       
-      Create and edit an encrypted ansible vault with a password for the host secrets for your development inventory.
+      Help each member of the team interested in local development to create and edit an encrypted ansible vault with a password for the host secrets for your development inventory.
       
       ```bash
+      install -d {{ REPO_PATH }}/inventories/$USER-$HOSTNAME/host_vars/$HOSTNAME/
       ansible-vault create {{ REPO_PATH }}/inventories/$USER-$HOSTNAME/host_vars/$HOSTNAME/vault
       ansible-vault edit {{ REPO_PATH }}/inventories/$USER-$HOSTNAME/host_vars/$HOSTNAME/vault
       ```
@@ -263,7 +264,7 @@
     ISSUE_LABEL: clone_computate_repo
     ISSUE_TITLE: "Clone the computate git repository"
     ISSUE_BODY: |
-      Create a directory for the computate repository with the included ansible scripts for installing the school applications for development and in OpenShift.
+      Help each member of the team create a directory for the computate repository with the included ansible scripts for installing the school applications for development and in OpenShift.
       
       ```bash
       sudo install -d -o $USER -g $USER /usr/local/src/computate
@@ -277,6 +278,248 @@
   tags: 
     - issue_label
     - issue_label_5
+
+- name: "Create issue to install a PostgreSQL database for local development"
+  include_role: 
+    name: computate_org_school_issue
+  vars: 
+    ISSUE_LABEL: install_postgres_server
+    ISSUE_TITLE: "Install a PostgreSQL database for local development"
+    ISSUE_BODY: |
+      Help each member of the team interested in local development of the project install a PostgreSQL database. 
+
+      #### Run the playbook to install a PostgreSQL database on your development computer.
+      
+      ```bash
+      (cd /usr/local/src/computate/ansible && ansible-playbook computate_postgres.yml -i {{ REPO_PATH }}/inventories/$USER-$HOSTNAME/hosts --vault-id @prompt)
+      ```
+  tags: 
+    - issue_label
+    - issue_label_6
+
+- name: "Create issue to install an Apache Zookeeper cluster manager for local development"
+  include_role: 
+    name: computate_org_school_issue
+  vars: 
+    ISSUE_LABEL: install_zookeeper_cluster_manager
+    ISSUE_TITLE: "Install an Apache Zookeeper cluster manager for local development"
+    ISSUE_BODY: |
+      Help each member of the team interested in local development of the project install an Apache Zookeeper cluster manager. 
+
+      #### Run the playbook to install an Apache Zookeeper cluster manager on your development computer.
+      
+      ```bash
+      (cd /usr/local/src/computate/ansible && ansible-playbook computate_zookeeper.yml -i {{ REPO_PATH }}/inventories/$USER-$HOSTNAME/hosts --vault-id @prompt)
+      ```
+  tags: 
+    - issue_label
+    - issue_label_7
+
+- name: "Create issue to install an Apache Solr search engine for local development"
+  include_role: 
+    name: computate_org_school_issue
+  vars: 
+    ISSUE_LABEL: install_solr_search_engine
+    ISSUE_TITLE: "Install an Apache Solr search engine for local development"
+    ISSUE_BODY: |
+      Help each member of the team interested in local development of the project install an Apache Solr search engine. 
+
+      #### Run the playbook to install an Apache Zookeeper cluster manager on your development computer.
+      
+      ```bash
+      (cd /usr/local/src/computate/ansible && ansible-playbook computate_solr.yml -i {{ REPO_PATH }}/inventories/$USER-$HOSTNAME/hosts --vault-id @prompt)
+      ```
+  tags: 
+    - issue_label
+    - issue_label_8
+
+- name: "Create issue to install the school application for local development"
+  include_role: 
+    name: computate_org_school_issue
+  vars: 
+    ISSUE_LABEL: install_school_app
+    ISSUE_TITLE: "Install the school application for local development"
+    ISSUE_BODY: |
+      #### Run the playbook to install the school application for development.
+      
+      ```bash
+      (cd /usr/local/src/computate/ansible && ansible-playbook computate_scolaire.yml -i {{ REPO_PATH }}/inventories/$USER-$HOSTNAME/hosts --vault-id @prompt)
+      ```
+  tags: 
+    - issue_label
+    - issue_label_9
+
+- name: "Create issue to create OpenShift ansible hosts file"
+  include_role: 
+    name: computate_org_school_issue
+  vars: 
+    ISSUE_LABEL: create_openshift_ansible_hosts
+    ISSUE_TITLE: "Create OpenShift ansible hosts file"
+    ISSUE_BODY: |
+      
+      Create a directory for your OpenShift inventory.
+      
+      ```bash
+      install -d {{ REPO_PATH }}/inventories/$USER-$HOSTNAME
+      ```
+      
+      Create a hosts file for your OpenShift inventory. Add "localhost" to each of the following host groups so that ansible can run each of these playbooks on your localhost. 
+      
+      ```bash
+      echo "
+
+      localhost
+
+      [redhat_sso_openshift]
+      localhost
+
+      [postgres_openshift]
+      localhost
+
+      [computate_zookeeper_openshift]
+      localhost
+
+      [computate_solr_openshift]
+      localhost
+
+      [computate_certbot]
+      localhost
+
+      [computate_scolaire_openshift_enUS]
+      localhost
+
+      [computate_scolaire_login]
+      localhost
+
+      [computate_scolaire_refresh]
+      localhost
+
+      [computate_scolaire_backup]
+      localhost
+
+      [computate_scolaire_restore]
+      localhost
+      " > {{ REPO_PATH }}/inventories/openshift/hosts
+      ```
+  tags: 
+    - issue_label
+    - issue_label_10
+
+- name: "Create issue to create an ansible vault for OpenShift"
+  include_role: 
+    name: computate_org_school_issue
+  vars: 
+    ISSUE_LABEL: create_openshift_ansible_vault
+    ISSUE_TITLE: "Create an ansible vault for OpenShift"
+    ISSUE_BODY: |
+      ### Create an ansible vault for your OpenShift.
+      
+      As a team, create and edit an encrypted ansible vault with a password for the host secrets for your shared OpenShift inventory.
+      
+      ```bash
+      install -d {{ REPO_PATH }}/inventories/openshift/host_vars/localhost/
+      ansible-vault create {{ REPO_PATH }}/inventories/openshift/host_vars/localhost/vault
+      ansible-vault edit {{ REPO_PATH }}/inventories/openshift/host_vars/localhost/vault
+      ```
+      
+      The contents of the vault will contain the secrets needed to override any default values you want to change in the computate-scolaire defaults defined here.
+      
+      https://github.com/computate/computate/blob/master/ansible/roles/computate_scolaire_openshift_enUS/defaults/main.yml
+      
+      There are descriptions for each of the fields.
+      There are several sections of fields, including:
+      
+      - computate-scolaire system defaults
+      - Ansible defaults
+      - Zookeeper defaults
+      - Solr defaults
+      - PostgreSQL defaults
+      - computate-medical global defaults
+      - computate-scolaire US English defaults
+      - SMTP defaults
+      - OpenID Connect auth server defaults
+      - SSL/TLS defaults
+
+      Here is an example of the contents of the ansible vault for local development: 
+
+      ```yaml
+      {{ lookup('url', 'https://raw.githubusercontent.com/computate/computate/master/ansible/roles/computate_scolaire_openshift_enUS/defaults/main.yml', split_lines=false) }}
+      ```
+
+      Look for values to override, especially those like this: "...". 
+  tags: 
+    - issue_label
+    - issue_label_11
+
+- name: "Create issue to install a PostgreSQL database to OpenShift"
+  include_role: 
+    name: computate_org_school_issue
+  vars: 
+    ISSUE_LABEL: install_openshift_postgres_database
+    ISSUE_TITLE: "Install a PostgreSQL database to OpenShift"
+    ISSUE_BODY: |
+      As a team, install a PostgreSQL database to OpenShift. 
+
+      #### Run the playbook to install a PostgreSQL database in OpenShift.
+      
+      ```bash
+      (cd /usr/local/src/computate/ansible && ansible-playbook postgres_openshift.yml -i {{ REPO_PATH }}/inventories/openshift/hosts --vault-id @prompt)
+      ```
+  tags: 
+    - issue_label
+    - issue_label_12
+
+- name: "Create issue to install an Apache Zookeeper cluster manager to OpenShift"
+  include_role: 
+    name: computate_org_school_issue
+  vars: 
+    ISSUE_LABEL: install_openshift_zookeeper_cluster_manager
+    ISSUE_TITLE: "Install an Apache Zookeeper cluster manager to OpenShift"
+    ISSUE_BODY: |
+      As a team, install an Apache Zookeeper cluster manager to OpenShift. 
+
+      #### Run the playbook to install an Apache Zookeeper cluster manager to OpenShift.
+      
+      ```bash
+      (cd /usr/local/src/computate/ansible && ansible-playbook computate_zookeeper_openshift.yml -i {{ REPO_PATH }}/inventories/openshift/hosts --vault-id @prompt)
+      ```
+  tags: 
+    - issue_label
+    - issue_label_13
+
+- name: "Create issue to install an Apache Solr search engine to OpenShift"
+  include_role: 
+    name: computate_org_school_issue
+  vars: 
+    ISSUE_LABEL: install_openshift_solr_search_engine
+    ISSUE_TITLE: "Install an Apache Solr search engine to OpenShift"
+    ISSUE_BODY: |
+      As a team, install an Apache Solr search engine to OpenShift. 
+
+      #### Run the playbook to install an Apache Zookeeper cluster manager to OpenShift.
+      
+      ```bash
+      (cd /usr/local/src/computate/ansible && ansible-playbook computate_solr_openshift.yml -i {{ REPO_PATH }}/inventories/openshift/hosts --vault-id @prompt)
+      ```
+  tags: 
+    - issue_label
+    - issue_label_14
+
+- name: "Create issue to install the school application to OpenShift"
+  include_role: 
+    name: computate_org_school_issue
+  vars: 
+    ISSUE_LABEL: install_openshift_school_app
+    ISSUE_TITLE: "Install the school application to OpenShift"
+    ISSUE_BODY: |
+      #### Run the playbook to install the school application to OpenShift.
+      
+      ```bash
+      (cd /usr/local/src/computate/ansible && ansible-playbook computate_scolaire_openshift_enUS.yml -i {{ REPO_PATH }}/inventories/openshift/hosts --vault-id @prompt)
+      ```
+  tags: 
+    - issue_label
+    - issue_label_15
 
 # Task to decide the project/namespace name
 # Task to deploy PostgreSQL database (default OpenShift app)
