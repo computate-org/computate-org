@@ -360,7 +360,7 @@
       Create a directory for your OpenShift inventory.
       
       ```bash
-      install -d {{ REPO_PATH }}/inventories/$USER-$HOSTNAME
+      install -d {{ REPO_PATH }}/inventories/openshift
       ```
       
       Create a hosts file for your OpenShift inventory. Add "localhost" to each of the following host groups so that ansible can run each of these playbooks on your localhost. 
