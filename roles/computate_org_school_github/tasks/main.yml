@@ -343,7 +343,7 @@
       - OpenID Connect auth server defaults
       - SSL/TLS defaults
 
-      Here is an example of the contents of the ansible vault for local development: 
+      Here is an example of the contents of the ansible vault for OpenShift: 
 
       ```yaml
       {{ lookup('url', 'https://raw.githubusercontent.com/computate/computate/master/ansible/roles/computate_scolaire_openshift_enUS/defaults/main.yml', split_lines=false) }}
@@ -354,6 +354,28 @@
     - issue_label
     - issue_label_6
 
+- name: "Create issue to clone computate repo"
+  include_role: 
+    name: computate_org_school_issue
+  vars: 
+    ISSUE_LABEL: clone_computate_repo
+    ISSUE_TITLE: "Clone the computate git repository"
+    ISSUE_BODY: |
+      Help each member of the team create a directory for the computate repository with the included ansible scripts for installing the school applications for development and in OpenShift.
+      
+      ```bash
+      sudo install -d -o $USER -g $USER /usr/local/src/computate
+      ```
+
+      Clone the git repository into the new directory. 
+
+      ```bash
+      git clone git@github.com:computate/computate.git /usr/local/src/computate
+      ```
+  tags: 
+    - issue_label
+    - issue_label_7
+
 - name: "Create issue to install a PostgreSQL database to OpenShift"
   include_role: 
     name: computate_org_school_issue
@@ -361,16 +383,29 @@
     ISSUE_LABEL: install_openshift_postgres_database
     ISSUE_TITLE: "Install a PostgreSQL database to OpenShift"
     ISSUE_BODY: |
-      As a team, install a PostgreSQL database to OpenShift. 
+      As a team, install a PostgreSQL database to OpenShift using the catalog. 
 
-      #### Run the playbook to install a PostgreSQL database in OpenShift.
+      * Login to your OpenShift environment here: {{ REDHAT_OPENSHIFT_HOST }}
+      * Open the project named: {{ REDHAT_OPENSHIFT_NAMESPACE }}
+      * Click [ Browse Catalog ]
+      * Search for: postgresql
+      * Select: PostgreSQL
+      * Click [ Next > ] to continue
+      * For the "PostgreSQL Connection Username", use the POSTGRES_DB_USER value that your team came up with in your openshift ansible vault
+      * For the "PostgreSQL Connection Password", use the POSTGRES_DB_PASSWORD value that your team came up with in your openshift ansible vault
+      * For the "PostgreSQL Database Name", use the POSTGRES_DB_NAME value that your team came up with in your openshift ansible vault
+      * For other values, you can leave them as the default, then click [ Create ]
+      * Verify that the output is correct, then click [ Close ] 
+      * Click [ Overview ] to verify that the PostgreSQL pod is running correctly. 
+      * Click on the pod, then click the "Terminal" tab. Verify that the database was created with the following command and entering the password: 
       
       ```bash
-      (cd /usr/local/src/computate/ansible && ansible-playbook postgres_openshift.yml -i {{ REPO_PATH }}/inventories/openshift/hosts --vault-id @prompt)
+      psql -U $POSTGRESQL_USER -W $POSTGRESQL_DATABASE
+      \q
       ```
   tags: 
     - issue_label
-    - issue_label_7
+    - issue_label_8
 
 - name: "Create issue to install an Apache Zookeeper cluster manager to OpenShift"
   include_role: 
@@ -388,7 +423,7 @@
       ```
   tags: 
     - issue_label
-    - issue_label_8
+    - issue_label_9
 
 - name: "Create issue to install an Apache Solr search engine to OpenShift"
   include_role: 
@@ -406,7 +441,7 @@
       ```
   tags: 
     - issue_label
-    - issue_label_9
+    - issue_label_10
 
 - name: "Create issue to install the school application to OpenShift"
   include_role: 
@@ -422,7 +457,11 @@
       ```
   tags: 
     - issue_label
-    - issue_label_10
+    - issue_label_11
+
+#####################
+# Local Development #
+#####################
 
 - name: "Create issue to create an ansible vault for local development"
   include_role: 
@@ -469,32 +508,6 @@
   tags: 
     - issue_label
     - issue_label_104
-
-- name: "Create issue to clone computate repo"
-  include_role: 
-    name: computate_org_school_issue
-  vars: 
-    ISSUE_LABEL: clone_computate_repo
-    ISSUE_TITLE: "Clone the computate git repository"
-    ISSUE_BODY: |
-      Help each member of the team create a directory for the computate repository with the included ansible scripts for installing the school applications for development and in OpenShift.
-      
-      ```bash
-      sudo install -d -o $USER -g $USER /usr/local/src/computate
-      ```
-
-      Clone the git repository into the new directory. 
-
-      ```bash
-      git clone git@github.com:computate/computate.git /usr/local/src/computate
-      ```
-  tags: 
-    - issue_label
-    - issue_label_105
-
-#####################
-# Local Development #
-#####################
 
 - name: "Create issue to install a PostgreSQL database for local development"
   include_role: 
