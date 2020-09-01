@@ -98,7 +98,7 @@
       {% endfor %}
       {% endif %}
       * Visit the OpenShift environment, click on your user name in the top right corner, and select "Copy Login Command" here: {{ REDHAT_OPENSHIFT_HOST }}
-      * Paste that login command into a terminal here: {{ REDHAT_OPENSHIFT_HOST }}
+      * Paste that login command into a terminal. 
       * Follow these steps to add the login IDs to the project: 
 
       ```bash
