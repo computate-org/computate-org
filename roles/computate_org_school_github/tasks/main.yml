@@ -70,7 +70,8 @@
       You may also obtain an OpenShift cluster by registering for a course that provisions a temporary OpenShift environment. 
   tags: 
     - issue_label
-    - issue_label_1
+    - issue_label_101
+    - day1
 
 - name: "Create issue to create an OpenShift project"
   include_role: 
@@ -111,11 +112,8 @@
       You can visit this site for more information: https://www.openshift.com/blog/add-collaborators-openshift-online-pro-account
   tags: 
     - issue_label
-    - issue_label_2
-
-#########################
-# OpenShift Development #
-#########################
+    - issue_label_102
+    - day1
 
 - name: Create issue to install ansible locally
   include_role: 
@@ -186,7 +184,8 @@
       https://www.redhat.com/en/services/training/do407-automation-ansible-i
   tags: 
     - issue_label
-    - issue_label_3
+    - issue_label_103
+    - day1
 
 - name: "Create issue to clone computate-org-school repo"
   include_role: 
@@ -250,63 +249,8 @@
       ```
   tags: 
     - issue_label
-    - issue_label_4
-
-- name: "Create issue to create OpenShift ansible hosts file"
-  include_role: 
-    name: computate_org_school_issue
-  vars: 
-    ISSUE_LABEL: create_openshift_ansible_hosts
-    ISSUE_TITLE: "Create OpenShift ansible hosts file"
-    ISSUE_BODY: |
-      
-      Create a directory for your OpenShift inventory.
-      
-      ```bash
-      install -d {{ REPO_PATH }}/inventories/openshift
-      ```
-      
-      Create a hosts file for your OpenShift inventory. Add "localhost" to each of the following host groups so that ansible can run each of these playbooks on your localhost. 
-      
-      ```bash
-      echo "
-
-      localhost
-
-      [redhat_sso_openshift]
-      localhost
-
-      [postgres_openshift]
-      localhost
-
-      [computate_zookeeper_openshift]
-      localhost
-
-      [computate_solr_openshift]
-      localhost
-
-      [computate_certbot]
-      localhost
-
-      [computate_scolaire_openshift_enUS]
-      localhost
-
-      [computate_scolaire_login]
-      localhost
-
-      [computate_scolaire_refresh]
-      localhost
-
-      [computate_scolaire_backup]
-      localhost
-
-      [computate_scolaire_restore]
-      localhost
-      " > {{ REPO_PATH }}/inventories/openshift/hosts
-      ```
-  tags: 
-    - issue_label
-    - issue_label_5
+    - issue_label_104
+    - day1
 
 - name: "Create issue to create an ansible vault for OpenShift"
   include_role: 
@@ -352,29 +296,12 @@
       Look for values to override, especially those like this: "...". 
   tags: 
     - issue_label
-    - issue_label_6
+    - issue_label_105
+    - day1
 
-- name: "Create issue to clone computate repo"
-  include_role: 
-    name: computate_org_school_issue
-  vars: 
-    ISSUE_LABEL: clone_computate_repo
-    ISSUE_TITLE: "Clone the computate git repository"
-    ISSUE_BODY: |
-      Help each member of the team create a directory for the computate repository with the included ansible scripts for installing the school applications for development and in OpenShift.
-      
-      ```bash
-      sudo install -d -o $USER -g $USER /usr/local/src/computate
-      ```
-
-      Clone the git repository into the new directory. 
-
-      ```bash
-      git clone git@github.com:computate/computate.git /usr/local/src/computate
-      ```
-  tags: 
-    - issue_label
-    - issue_label_7
+########################
+# OpenShift Deployment #
+########################
 
 - name: "Create issue to install a PostgreSQL database to OpenShift"
   include_role: 
@@ -405,7 +332,8 @@
       ```
   tags: 
     - issue_label
-    - issue_label_8
+    - issue_label_201
+    - day2
 
 - name: "Create issue to install an Apache Zookeeper cluster manager to OpenShift"
   include_role: 
@@ -497,45 +425,109 @@
       At this point, you should find the computate-zookeeper running with the pod no longer in an error state. 
   tags: 
     - issue_label
-    - issue_label_9
+    - issue_label_202
+    - day2
 
 - name: "Create issue to install an Apache Solr search engine to OpenShift"
   include_role: 
     name: computate_org_school_issue
   vars: 
-    ISSUE_LABEL: install_openshift_solr_search_engine
+    ISSUE_LABEL: install_openshift_solr_cluster_manager
     ISSUE_TITLE: "Install an Apache Solr search engine to OpenShift"
     ISSUE_BODY: |
       As a team, install an Apache Solr search engine to OpenShift. 
 
-      #### Run the playbook to install an Apache Zookeeper cluster manager to OpenShift.
-      
-      ```bash
-      (cd /usr/local/src/computate/ansible && ansible-playbook computate_solr_openshift.yml -i {{ REPO_PATH }}/inventories/openshift/hosts --vault-id @prompt)
-      ```
-  tags: 
-    - issue_label
-    - issue_label_10
+      ### Install an Apache Solr Container Image Stream
 
-- name: "Create issue to install the school application to OpenShift"
-  include_role: 
-    name: computate_org_school_issue
-  vars: 
-    ISSUE_LABEL: install_openshift_school_app
-    ISSUE_TITLE: "Install the school application to OpenShift"
-    ISSUE_BODY: |
-      #### Run the playbook to install the school application to OpenShift.
-      
-      ```bash
-      (cd /usr/local/src/computate/ansible && ansible-playbook computate_scolaire_openshift_enUS.yml -i {{ REPO_PATH }}/inventories/openshift/hosts --vault-id @prompt)
-      ```
+      * Login to your OpenShift environment here: {{ REDHAT_OPENSHIFT_HOST }}
+      * Open the project named: {{ REDHAT_OPENSHIFT_NAMESPACE }}
+      * Click the [ Add to Project ] button in the top right. 
+      * Click "Deploy Image"
+      * Select "Image Name" and enter: quay.io/computate/computate-solr
+      * For other values, you can leave them as the default, then click [ Create ]
+      * Click [ Close ] 
+
+      ### Install an Apache Solr Persistent Volume Claim
+
+      * Open the persistent volume claims of the OpenShift project by clicking [ Storage ]
+      * Click "Create Storage"
+      * For the config map "Storage Class", enter: gp2-encrypted
+      * For the config map "Name" enter: computate-solr
+      * For the config map "Size" in GiB, enter: 2
+      * For other values, you can leave them as the default, then click [ Create ]
+      * Click [ Create ]
+
+      ### Verify the Apache Solr Service
+
+      * Open the services of the OpenShift project by clicking [ Applications ] -> [ Services ]
+      * Notice that an apache-solr service already exists. Click on the "apache-solr" service. 
+      * Notice that it has a service with an assigned cluster IP address that proxies TCP traffic on port 8983 to a target port of 8983 on the pod. 8983 is the default port of Apache Solr. 
+      * You might notice a related pod that is not receiving traffic and is in a state of "Crash Loop Back-off". That is because the computate-solr application is not completely configured yet. 
+
+      ### Configure the Apache Solr Deployment Config
+      * Open the deployment configs of the OpenShift project by clicking [ Applications ] -> [ Deployments ]
+      * Notice that an apache-solr deployment config already exists. Click on the "apache-solr" deployment config, then click on the "Configuration" tab. 
+
+      #### Configure Apache Solr Recreate deployments
+
+      * On the apache-solr deployment config, click [ Actions ] -> Edit
+      * Change the Strategy Type to: Recreate
+      * to keep some existing rolling strategy parameters, click [ Yes ]
+      * Click [ Save ]
+
+      #### Configure an Apache Solr Resource Limit
+
+      * On the apache-solr deployment config, click [ Actions ] -> Edit Resource Limits
+      * For the "Memory" in MiB, enter: 2000
+      * For other values, you can leave them as the default, then click [ Save ]
+
+      #### Configure Apache Solr Data Volume Mount
+
+      * On the apache-solr deployment config, click [ Actions ] -> Add Storage
+      * Select the existing "computate-solr" persistent volume claim storage
+      * For the "Mount Path", enter: /opt/solr/data
+      * For the "Volume Name", enter: volume-computate-solr-data
+      * For other values, you can leave them as the default, then click [ Add ]
+
+      #### Configure Apache Solr Config Volume Mount
+
+      * On the apache-solr deployment config, click the "Environment" tab
+      * Configure a new environment variable with the "Name" of: ZK_HOSTNAME
+      * And the "Value" of: computate-zookeeper.{{ REDHAT_OPENSHIFT_NAMESPACE }}.svc
+      * Click [ Save ]
+
+      At this point, you should find the computate-solr running with the pod no longer in an error state. 
   tags: 
     - issue_label
-    - issue_label_11
+    - issue_label_203
+    - day2
 
 #####################
 # Local Development #
 #####################
+
+- name: "Create issue to clone computate repo"
+  include_role: 
+    name: computate_org_school_issue
+  vars: 
+    ISSUE_LABEL: clone_computate_repo
+    ISSUE_TITLE: "Clone the computate git repository"
+    ISSUE_BODY: |
+      Help each member of the team create a directory for the computate repository with the included ansible scripts for installing the school applications for development and in OpenShift.
+      
+      ```bash
+      sudo install -d -o $USER -g $USER /usr/local/src/computate
+      ```
+
+      Clone the git repository into the new directory. 
+
+      ```bash
+      git clone git@github.com:computate/computate.git /usr/local/src/computate
+      ```
+  tags: 
+    - issue_label
+    - issue_label_301
+    - day3
 
 - name: "Create issue to create an ansible vault for local development"
   include_role: 
@@ -581,7 +573,8 @@
       Look for values to override, especially those like this: "...". 
   tags: 
     - issue_label
-    - issue_label_104
+    - issue_label_302
+    - day3
 
 - name: "Create issue to install a PostgreSQL database for local development"
   include_role: 
@@ -599,7 +592,8 @@
       ```
   tags: 
     - issue_label
-    - issue_label_106
+    - issue_label_303
+    - day3
 
 - name: "Create issue to install an Apache Zookeeper cluster manager for local development"
   include_role: 
@@ -617,7 +611,8 @@
       ```
   tags: 
     - issue_label
-    - issue_label_107
+    - issue_label_304
+    - day3
 
 - name: "Create issue to install an Apache Solr search engine for local development"
   include_role: 
@@ -635,7 +630,8 @@
       ```
   tags: 
     - issue_label
-    - issue_label_108
+    - issue_label_305
+    - day3
 
 - name: "Create issue to install the school application for local development"
   include_role: 
@@ -651,7 +647,205 @@
       ```
   tags: 
     - issue_label
-    - issue_label_109
+    - issue_label_306
+    - day3
+
+###################################
+# Ansible Automation in OpenShift #
+###################################
+
+- name: "Create issue to delete and recreate an OpenShift project for ansible automation"
+  include_role: 
+    name: computate_org_school_issue
+  vars: 
+    ISSUE_LABEL: delete_and_recreate_openshift_project
+    ISSUE_TITLE: "Delete and recreate an OpenShift project"
+    ISSUE_BODY: |
+      As a team, create an OpenShift project and share the project with the team. 
+
+      * Login to your OpenShift environment here: {{ REDHAT_OPENSHIFT_HOST }}
+      * Click on the "..." next to your {{ REDHAT_OPENSHIFT_NAMESPACE }} project and select "Delete Project"
+      * Enter the name of your project "{{ REDHAT_OPENSHIFT_NAMESPACE }}" and then click [ Delete ]
+      * Recreate the OpenShift project named: {{ REDHAT_OPENSHIFT_NAMESPACE }}
+      
+      ### Share the OpenShift project with the other users
+
+      * You can find your Red Hat Login ID by logging into this site here: https://sso.redhat.com/auth/realms/redhat-external/account/
+      * You can add your Red Hat Login ID to your list of login IDs (REDHAT_OPENSHIFT_LOGIN_IDS) to the project here if you want to regenerate this issue in Github: {{ REPO_PATH }}/roles/computate_org_school_github/defaults/main.yml
+      {% if REDHAT_OPENSHIFT_MANAGE_HOST != 'https://employee.openshift.com' %}
+      * Now sign in to this site to add users to an OpenShift environment: {{ REDHAT_OPENSHIFT_MANAGE_HOST }}
+        * Click on "Manage Subscription" under the cluster you wish to add them to.
+        * Click the "Manage" link beside Collaborators. 
+        * On the collaborator page, enter the Red Hat Login ID for the user in the username field and click Add collaborator: 
+      {% for LOGIN_ID in REDHAT_OPENSHIFT_LOGIN_IDS %}
+        * {{ LOGIN_ID }}
+      {% endfor %}
+      {% endif %}
+      * Visit the OpenShift environment, click on your user name in the top right corner, and select "Copy Login Command" here: {{ REDHAT_OPENSHIFT_HOST }}
+      * Paste that login command into a terminal. 
+      * Follow these steps to add the login IDs to the project: 
+
+      ```bash
+      oc project {{ REDHAT_OPENSHIFT_NAMESPACE }}
+      {% for LOGIN_ID in REDHAT_OPENSHIFT_LOGIN_IDS %}
+      oc policy add-role-to-user view {{ LOGIN_ID }}
+      {% endfor %}
+      ```
+
+      You can visit this site for more information: https://www.openshift.com/blog/add-collaborators-openshift-online-pro-account
+  tags: 
+    - issue_label
+    - issue_label_401
+    - day4
+
+- name: "Create issue to create OpenShift ansible hosts file"
+  include_role: 
+    name: computate_org_school_issue
+  vars: 
+    ISSUE_LABEL: create_openshift_ansible_hosts
+    ISSUE_TITLE: "Create OpenShift ansible hosts file"
+    ISSUE_BODY: |
+      
+      Create a directory for your OpenShift inventory.
+      
+      ```bash
+      install -d {{ REPO_PATH }}/inventories/openshift
+      ```
+      
+      Create a hosts file for your OpenShift inventory. Add "localhost" to each of the following host groups so that ansible can run each of these playbooks on your localhost. 
+      
+      ```bash
+      echo "
+
+      localhost
+
+      [redhat_sso_openshift]
+      localhost
+
+      [postgres_openshift]
+      localhost
+
+      [computate_zookeeper_openshift]
+      localhost
+
+      [computate_solr_openshift]
+      localhost
+
+      [computate_certbot]
+      localhost
+
+      [computate_scolaire_openshift_enUS]
+      localhost
+
+      [computate_scolaire_login]
+      localhost
+
+      [computate_scolaire_refresh]
+      localhost
+
+      [computate_scolaire_backup]
+      localhost
+
+      [computate_scolaire_restore]
+      localhost
+      " > {{ REPO_PATH }}/inventories/openshift/hosts
+      ```
+  tags: 
+    - issue_label
+    - issue_label_402
+    - day4
+
+- name: "Create issue to automate the install of a Red Hat Single Sign On server to OpenShift"
+  include_role: 
+    name: computate_org_school_issue
+  vars: 
+    ISSUE_LABEL: automate_openshift_red_hat_sso
+    ISSUE_TITLE: "Automate the install of a Red Hat Single Sign On server to OpenShift"
+    ISSUE_BODY: |
+      As a team, automate the install of a PostgreSQL database to OpenShift. 
+      #### Run the playbook to install a PostgreSQL database in OpenShift.
+      
+      ```bash
+      (cd /usr/local/src/computate/ansible && ansible-playbook redhat_sso_openshift.yml -i {{ REPO_PATH }}/inventories/openshift/hosts --vault-id @prompt)
+      ```
+  tags: 
+    - issue_label
+    - issue_label_403
+    - day4
+
+- name: "Create issue to automate the install of a PostgreSQL database to OpenShift"
+  include_role: 
+    name: computate_org_school_issue
+  vars: 
+    ISSUE_LABEL: automate_openshift_postgres_database
+    ISSUE_TITLE: "Automate the install of a PostgreSQL database to OpenShift"
+    ISSUE_BODY: |
+      As a team, automate the install of a PostgreSQL database to OpenShift. 
+      #### Run the playbook to install a PostgreSQL database in OpenShift.
+      
+      ```bash
+      (cd /usr/local/src/computate/ansible && ansible-playbook postgres_openshift.yml -i {{ REPO_PATH }}/inventories/openshift/hosts --vault-id @prompt)
+      ```
+  tags: 
+    - issue_label
+    - issue_label_404
+    - day4
+
+- name: "Create issue to automate the install of an Apache Zookeeper cluster manager to OpenShift"
+  include_role: 
+    name: computate_org_school_issue
+  vars: 
+    ISSUE_LABEL: automate_openshift_zookeeper_cluster_manager
+    ISSUE_TITLE: "Automate the install of an Apache Zookeeper cluster manager to OpenShift"
+    ISSUE_BODY: |
+      As a team, automate the install of an Apache Zookeeper cluster manager to OpenShift. 
+      #### Run the playbook to install an Apache Zookeeper cluster manager to OpenShift.
+      
+      ```bash
+      (cd /usr/local/src/computate/ansible && ansible-playbook computate_zookeeper_openshift.yml -i {{ REPO_PATH }}/inventories/openshift/hosts --vault-id @prompt)
+      ```
+  tags: 
+    - issue_label
+    - issue_label_405
+    - day4
+
+- name: "Create issue to automate the install of an Apache Solr search engine to OpenShift"
+  include_role: 
+    name: computate_org_school_issue
+  vars: 
+    ISSUE_LABEL: automate_openshift_solr_search_engine
+    ISSUE_TITLE: "Automate the install of an Apache Solr search engine to OpenShift"
+    ISSUE_BODY: |
+      As a team, automate the install of an Apache Solr search engine to OpenShift. 
+
+      #### Run the playbook to install an Apache Zookeeper cluster manager to OpenShift.
+      
+      ```bash
+      (cd /usr/local/src/computate/ansible && ansible-playbook computate_solr_openshift.yml -i {{ REPO_PATH }}/inventories/openshift/hosts --vault-id @prompt)
+      ```
+  tags: 
+    - issue_label
+    - issue_label_406
+    - day4
+
+- name: "Create issue to automate the install of the school application to OpenShift"
+  include_role: 
+    name: computate_org_school_issue
+  vars: 
+    ISSUE_LABEL: automate_openshift_school_app
+    ISSUE_TITLE: "Automate the install of the school application to OpenShift"
+    ISSUE_BODY: |
+      As a team, automate the install of the school application to OpenShift. 
+
+      #### Run the playbook to install the school application to OpenShift.
+      
+      ```bash
+      (cd /usr/local/src/computate/ansible && ansible-playbook computate_scolaire_openshift_enUS.yml -i {{ REPO_PATH }}/inventories/openshift/hosts --vault-id @prompt)
+      ```
+  tags: 
+    - issue_label
+    - issue_label_407
+    - day4
 
 # Task to decide the project/namespace name
 # Task to deploy PostgreSQL database (default OpenShift app)
