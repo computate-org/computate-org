@@ -416,11 +416,85 @@
     ISSUE_BODY: |
       As a team, install an Apache Zookeeper cluster manager to OpenShift. 
 
-      #### Run the playbook to install an Apache Zookeeper cluster manager to OpenShift.
+      ### Install an Apache Zookeeper Container Image Stream
+
+      * Login to your OpenShift environment here: {{ REDHAT_OPENSHIFT_HOST }}
+      * Open the project named: {{ REDHAT_OPENSHIFT_NAMESPACE }}
+      * Click the [ Add to Project ] button in the top right. 
+      * Click "Deploy Image"
+      * Select "Image Name" and enter: quay.io/computate/computate-zookeeper
+      * For other values, you can leave them as the default, then click [ Create ]
+      * Click [ Close ] 
+
+      ### Install an Apache Zookeeper Config Map
+
+      * Open the config maps of the OpenShift project by clicking [ Resources ] -> [ Config Maps ]
+      * Click "Create Config Map"
+      * For the config map "Name" enter: computate-zookeeper
+      * For the config map "Key", enter the name of the main Zookeeper config file: zoo.cfg
+      * For the config map "Value", see the contents of the main Zookeeper config file below: 
+
+      ```properties
+      tickTime=2000
+      dataDir=/opt/zookeeper
+      clientPort=2181
+      admin.enableServer=false
       
-      ```bash
-      (cd /usr/local/src/computate/ansible && ansible-playbook computate_zookeeper_openshift.yml -i {{ REPO_PATH }}/inventories/openshift/hosts --vault-id @prompt)
       ```
+
+      * Click [ Create ]
+
+      ### Install an Apache Zookeeper Persistent Volume Claim
+
+      * Open the persistent volume claims of the OpenShift project by clicking [ Storage ]
+      * Click "Create Storage"
+      * For the config map "Storage Class", enter: gp2-encrypted
+      * For the config map "Name" enter: computate-zookeeper
+      * For the config map "Size" in GiB, enter: 1
+      * For other values, you can leave them as the default, then click [ Create ]
+      * Click [ Create ]
+
+      ### Verify the Apache Zookeeper Service
+
+      * Open the services of the OpenShift project by clicking [ Applications ] -> [ Services ]
+      * Notice that an apache-zookeeper service already exists. Click on the "apache-zookeeper" service. 
+      * Notice that it has a service with an assigned cluster IP address that proxies TCP traffic on port 2181 to a target port of 2181 on the pod. 2181 is the default port of Apache Zookeeper. 
+      * You might notice a related pod that is not receiving traffic and is in a state of "Crash Loop Back-off". That is because the computate-zookeeper application is not completely configured yet. 
+
+      ### Configure the Apache Zookeeper Deployment Config
+      * Open the deployment configs of the OpenShift project by clicking [ Applications ] -> [ Deployments ]
+      * Notice that an apache-zookeeper deployment config already exists. Click on the "apache-zookeeper" deployment config, then click on the "Configuration" tab. 
+
+      #### Configure Apache Zookeeper Recreate deployments
+
+      * On the apache-zookeeper deployment config, click [ Actions ] -> Edit
+      * Change the Strategy Type to: Recreate
+      * to keep some existing rolling strategy parameters, click [ Yes ]
+      * Click [ Save ]
+
+      #### Configure an Apache Zookeeper Resource Limit
+
+      * On the apache-zookeeper deployment config, click [ Actions ] -> Edit Resource Limits
+      * For the "Memory" in MiB, enter: 256
+      * For other values, you can leave them as the default, then click [ Save ]
+
+      #### Configure Apache Zookeeper Data Volume Mount
+
+      * On the apache-zookeeper deployment config, click [ Actions ] -> Add Storage
+      * Select the existing "computate-zookeeper" persistent volume claim storage
+      * For the "Mount Path", enter: /opt/zookeeper/data
+      * For the "Volume Name", enter: volume-computate-zookeeper-data
+      * For other values, you can leave them as the default, then click [ Add ]
+
+      #### Configure Apache Zookeeper Config Volume Mount
+
+      * On the apache-zookeeper deployment config, click the "Configuration" tab
+      * In the "Volumes" section, click "Add Config Files"
+      * For the "Source", select: computate-zookeeper
+      * For the "Mount Path", enter: /opt/zookeeper/conf
+      * For other values, you can leave them as the default, then click [ Add ]
+
+      At this point, you should find the computate-zookeeper running with the pod no longer in an error state. 
   tags: 
     - issue_label
     - issue_label_9
