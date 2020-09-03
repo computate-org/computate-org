@@ -12,7 +12,7 @@
     headers:
       Authorization: "token {{ GITHUB_TOKEN }}"
   register: ISSUE_LABEL_JSON
-  tags: issue_label
+  tags: always
 
 - block: 
     - name: "Create issue by label {{ ISSUE_LABEL }}"
@@ -35,12 +35,15 @@
           - 201
       register: ISSUE_CREATE_JSON
       tags: issue_label
+      tags: always
     - name: Create card
       include_role: 
         name: computate_org_school_card
       vars: 
         CARD_CONTENT_ID: "{{ ISSUE_CREATE_JSON.json.id }}"
+      tags: always
   when: COLUMN_NAME is defined and MILESTONE_TITLE_JSON is defined and (ISSUE_LABEL_JSON.json | length == 0)
+  tags: always
 - block: 
     - name: "Create issue by label {{ ISSUE_LABEL }}"
       uri:
@@ -61,12 +64,15 @@
           - 201
       register: ISSUE_CREATE_JSON
       tags: issue_label
+      tags: always
     - name: Create card
       include_role: 
         name: computate_org_school_card
       vars: 
         CARD_CONTENT_ID: "{{ ISSUE_CREATE_JSON.json.id }}"
+      tags: always
   when: COLUMN_NAME is defined and MILESTONE_TITLE_JSON is not defined and (ISSUE_LABEL_JSON.json | length == 0)
+  tags: always
 
 - block: 
     - name: "Update issue by label {{ ISSUE_LABEL }}"
@@ -86,12 +92,15 @@
           milestone: "{{ MILESTONE_TITLE_JSON.number | default(omit) }}"
       register: ISSUE_CREATE_JSON
       tags: issue_label
+      tags: always
     - name: Create card
       include_role: 
         name: computate_org_school_card
       vars: 
         CARD_CONTENT_ID: "{{ ISSUE_CREATE_JSON.json.id }}"
+      tags: always
   when: COLUMN_NAME is defined and MILESTONE_TITLE_JSON is defined and (ISSUE_LABEL_JSON.json | length > 0)
+  tags: always
 - block: 
     - name: "Update issue by label {{ ISSUE_LABEL }}"
       uri:
@@ -109,10 +118,13 @@
           body: "{{ ISSUE_BODY }}"
       register: ISSUE_CREATE_JSON
       tags: issue_label
+      tags: always
     - name: Create card
       include_role: 
         name: computate_org_school_card
       vars: 
         CARD_CONTENT_ID: "{{ ISSUE_CREATE_JSON.json.id }}"
+      tags: always
   when: COLUMN_NAME is defined and MILESTONE_TITLE_JSON is not defined and (ISSUE_LABEL_JSON.json | length > 0)
+  tags: always
 

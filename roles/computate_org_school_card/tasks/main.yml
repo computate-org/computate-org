@@ -3,7 +3,7 @@
     COLUMN_NAME_JSON: "{{ COLUMNS.json | json_query(column_query) | first }}"
   vars: 
     column_query: "[?name=='{{ COLUMN_NAME }}'].{name: name, id: id}"
-  tags: column_name
+  tags: always
 - name: "Get cards"
   uri:
     timeout: 90
@@ -16,11 +16,10 @@
   tags: always
 - name: "Get card by content_url"
   set_fact:
-    CARD_CONTENT_ID_JSON: "{{ CARDS.json | json_query(card_query) | first }}"
-  when: CARDS.json | json_query(card_query)
+    CARD_CONTENT_ID_JSON: "{{ CARDS.json | json_query(card_query) | first | default(omit) }}"
   vars: 
     card_query: "[?content_url=='https://api.github.com/repos/{{ GITHUB_ORG }}/{{ GITHUB_REPO }}/issues/{{ ISSUE_CREATE_JSON.json.number | default(omit) }}'].{note: note, id: id}"
-  tags: card_content_id
+  tags: always
 - name: "Create card by content_id {{ ISSUE_CREATE_JSON.json.id }}"
   uri:
     timeout: 90
@@ -37,7 +36,7 @@
       - 201
   when: CARD_CONTENT_ID_JSON is not defined
   register: CARD_CREATE_JSON
-  tags: card_content_id
+  tags: always
 #- name: "Update card by content_id {{ ISSUE_CREATE_JSON.json.id }}"
 #  uri:
 #    timeout: 90
