@@ -52,6 +52,133 @@
   when: GITHUB_REPO_JSON.failed and GITHUB_REPO_JSON.status == 404
   tags: github_repo
 
+############
+# Projects #
+############
+
+- name: "Get projects"
+  uri:
+    timeout: 90
+    url: "https://api.github.com/orgs/{{ GITHUB_ORG }}/projects"
+    return_content: true
+    headers:
+      Authorization: "token {{ GITHUB_TOKEN }}"
+      Accept: "application/vnd.github.inertia-preview+json"
+  register: PROJECTS
+  tags: always
+- name: "Get project by name {{ PROJECT_NAME | default(omit) }}"
+  set_fact:
+    PROJECT_NAME_JSON: "{{ PROJECTS.json | json_query(project_query) | first }}"
+  when: PROJECTS.json | json_query(project_query)
+  vars: 
+    project_query: "[?name=='{{ PROJECT_NAME | default(omit) }}'].{name: name, description: description, id: id}"
+  tags: always
+
+- name: Create project
+  include_role: 
+    name: computate_org_school_project
+  vars: 
+    PROJECT_NAME: School Mock Client Engagement
+    PROJECT_DESCRIPTION: |
+      A mock client engagement project to setup an online school enrollment software. 
+  tags: 
+    - project
+
+###########
+# Columns #
+###########
+
+- name: "Get columns"
+  uri:
+    timeout: 90
+    url: "https://api.github.com/projects/{{ PROJECT_NAME_JSON.id }}/columns"
+    return_content: true
+    headers:
+      Authorization: "token {{ GITHUB_TOKEN }}"
+      Accept: "application/vnd.github.inertia-preview+json"
+  register: COLUMNS
+  tags: always
+
+- name: Create column for setup issues
+  include_role: 
+    name: computate_org_school_column
+  vars: 
+    COLUMN_NAME: Setup Tasks
+  tags: 
+    - column
+- name: Create column for OpenShift Deployment issues
+  include_role: 
+    name: computate_org_school_column
+  vars: 
+    COLUMN_NAME: OpenShift Deployment
+  tags: 
+    - column
+- name: Create column for Local install issues
+  include_role: 
+    name: computate_org_school_column
+  vars: 
+    COLUMN_NAME: Development Installation
+  tags: 
+    - column
+- name: Create column for Ansible OpenShift Deployment issues
+  include_role: 
+    name: computate_org_school_column
+  vars: 
+    COLUMN_NAME: Ansible OpenShift Deployment
+  tags: 
+    - column
+
+##############
+# Milestones #
+##############
+
+- name: "Get milestones"
+  uri:
+    timeout: 90
+    url: "https://api.github.com/repos/{{ GITHUB_ORG }}/{{ GITHUB_REPO }}/milestones"
+    return_content: true
+    headers:
+      Authorization: "token {{ GITHUB_TOKEN }}"
+  register: MILESTONES
+  tags: always
+
+- name: Create milestone for setup issues
+  include_role: 
+    name: computate_org_school_milestone
+  vars: 
+    MILESTONE_TITLE: Setup Tasks
+    MILESTONE_DESCRIPTION: |
+      Setup Tasks issues including setting up the OpenShift cluster, installing Ansible locally, defining the ansible vault for the group and other setup tasks. 
+  tags: 
+    - milestone
+- name: Create milestone for OpenShift Deployment issues
+  include_role: 
+    name: computate_org_school_milestone
+  vars: 
+    MILESTONE_TITLE: OpenShift Deployment
+    MILESTONE_DESCRIPTION: |
+      Deploying applications to OpenShift manually. 
+  tags: 
+    - milestone
+- name: Create milestone for Local install issues
+  include_role: 
+    name: computate_org_school_milestone
+  vars: 
+    MILESTONE_TITLE: Development Installation
+    MILESTONE_DESCRIPTION: |
+      Deploying applications to a local development computer. 
+  tags: 
+    - milestone
+- name: Create milestone for Ansible OpenShift Deployment issues
+  include_role: 
+    name: computate_org_school_milestone
+  vars: 
+    MILESTONE_TITLE: Ansible OpenShift Deployment
+    MILESTONE_DESCRIPTION: |
+      Automating the deployment of applications to OpenShift using Ansible. 
+  tags: 
+    - milestone
+
 ####################################
 # OpenShift Cluster Administration #
 ####################################
@@ -62,6 +189,8 @@
   vars: 
     ISSUE_LABEL: setup_openshift_cluster
     ISSUE_TITLE: Setup OpenShift cluster
+    MILESTONE_TITLE: Setup Tasks
+    COLUMN_NAME: Setup Tasks
     ISSUE_BODY: |
       Red Hat employees can obtain a free OpenShift cluster with 4GiB RAM and 10 GiB storage with their people manager approval here: 
 
@@ -79,6 +208,8 @@
   vars: 
     ISSUE_LABEL: create_openshift_project
     ISSUE_TITLE: "Create an OpenShift project"
+    MILESTONE_TITLE: Setup Tasks
+    COLUMN_NAME: Setup Tasks
     ISSUE_BODY: |
       As a team, create an OpenShift project and share the project with the team. 
 
@@ -121,6 +252,8 @@
   vars: 
     ISSUE_LABEL: install_ansible_locally
     ISSUE_TITLE: Install Ansible Locally
+    MILESTONE_TITLE: Setup Tasks
+    COLUMN_NAME: Setup Tasks
     ISSUE_BODY: |
       The installation of the project for both development and production in containers is completely automated with Ansible.
       Begin by installing both the ansible and python3 packages.
@@ -193,6 +326,8 @@
   vars: 
     ISSUE_LABEL: clone_computate_org_school_repo
     ISSUE_TITLE: "Clone the {{ GITHUB_REPO }} git repository"
+    MILESTONE_TITLE: Setup Tasks
+    COLUMN_NAME: Setup Tasks
     ISSUE_BODY: |
       Create a directory for the {{ GITHUB_REPO }} repository with the included ansible scripts to setup issues in Github for the organization.
       
@@ -258,6 +393,8 @@
   vars: 
     ISSUE_LABEL: create_openshift_ansible_vault
     ISSUE_TITLE: "Create an ansible vault for OpenShift"
+    MILESTONE_TITLE: Setup Tasks
+    COLUMN_NAME: Setup Tasks
     ISSUE_BODY: |
       ### Create an ansible vault for your OpenShift.
       
@@ -303,12 +440,118 @@
 # OpenShift Deployment #
 ########################
 
+- name: "Create issue to install a Red Hat Single Sign On server to OpenShift"
+  include_role: 
+    name: computate_org_school_issue
+  vars: 
+    ISSUE_LABEL: install_openshift_red_hat_sso
+    ISSUE_TITLE: "Install a Red Hat Single Sign On server to OpenShift"
+    MILESTONE_TITLE: OpenShift Deployment
+    COLUMN_NAME: OpenShift Deployment
+    ISSUE_BODY: |
+      As a team, install a Red Hat Single Sign On server to OpenShift using the catalog. 
+
+      ### Obtain the Red Hat SSO PostgreSQL Persistent OpenShift template
+
+      Obtain the Red Hat SSO PostgreSQL Persistent OpenShift template to import into OpenShift: 
+
+      ```bash
+      curl https://raw.githubusercontent.com/jboss-container-images/redhat-sso-7-openshift-image/sso73-dev/templates/sso73-postgresql-persistent.json -o ~/Downloads/sso73-postgresql-persistent.json
+      ```
+
+      * Login to your OpenShift environment here: {{ REDHAT_OPENSHIFT_HOST }}
+      * Open the project named: {{ REDHAT_OPENSHIFT_NAMESPACE }}
+      * Click the [ Add to Project ] button in the top right. 
+      * Select "Import YAML/JSON"
+      * Browse to the template file you obtained: ~/Downloads/sso73-postgresql-persistent.json
+      * Click [ Create ]
+      * Check: Process the template
+      * Check: Save template
+      * Click [ Continue ]
+      * Application Name: sso
+      * Custom http Route Hostname: Leave blank
+      * Custom https Route Hostname: Use the SSO_SITE_HOST_NAME that your team came up with in your openshift ansible vault
+      * Custom RH-SSO Server Hostname: Use the SSO_SITE_HOST_NAME that your team came up with in your openshift ansible vault
+      * Database JNDI Name: java:jboss/datasources/KeycloakDS
+      * Database Name: root
+      * Server Keystore Secret Name: sso-keystore
+      * Server Keystore Filename: keystore.jks
+      * Server Keystore Type: JKS
+      * Server Certificate Name: Use the SSL_ALIAS that your team came up with in your openshift ansible vault
+      * Server Keystore Password: Use the SSL_JKS_PASSWORD that your team came up with in your openshift ansible vault
+      * Database Username: Use the POSTGRES_DB_USER value that your team came up with in your openshift ansible vault
+      * Database Password: Use the POSTGRES_DB_PASSWORD value that your team came up with in your openshift ansible vault
+      * JGroups Secret Name: sso-keystore
+      * JGroups Keystore Filename: jgroups.jceks
+      * JGroups Certificate Name: Use the SSO_JGROUPS_ENCRYPT_NAME that your team came up with in your openshift ansible vault
+      * JGroups Keystore Password: Use the SSO_JGROUPS_ENCRYPT_PASSWORD that your team came up with in your openshift ansible vault
+      * JGroups Cluster Password: Use the SSO_JGROUPS_CLUSTER_PASSWORD that your team came up with in your openshift ansible vault
+      * ImageStream Namespace: openshift
+      * RH-SSO Administrator Username: Use the SSO_ADMIN_USERNAME that your team came up with in your openshift ansible vault
+      * RH-SSO Administrator Password: Use the SSO_ADMIN_PASSWORD that your team came up with in your openshift ansible vault
+      * RH-SSO Realm: Use the SSO_REALM that your team came up with in your openshift ansible vault
+      * RH-SSO Service Username: Use the SSO_SERVICE_USERNAME that your team came up with in your openshift ansible vault
+      * RH-SSO Service Password: Use the SSO_SERVICE_PASSWORD that your team came up with in your openshift ansible vault
+      * RH-SSO Trust Store: keystore.jks
+      * RH-SSO Trust Store Password: Use the SSO_TRUSTSTORE_PASSWORD that your team came up with in your openshift ansible vault
+      * RH-SSO Trust Store Secret: sso-keystore
+      * For other values, you can leave them as the default, then click [ Create ]
+      * Verify that the output is correct, then click [ Close ] 
+
+      #### Create the sso-app-secret
+      * Open the secrets of the OpenShift project by clicking [ Resources ] -> [ Secrets ]
+      * Click "Create Secret"
+      * Secret Type: Generic
+      * Secret Name: sso-keystore
+      * Enter the name of the first key: https-keystore.jks 
+      * Even though the secret values have not been added, click [ Create ]
+      * Click on the "sso-keystore" secret
+      * Select [ Actions ] -> Edit YAML
+      * Update the "data section of the YAML with the following data: 
+
+      ```yaml
+      data:
+        https-keystore.jks: >-
+          Paste the SSL_JKS_BASE64 that your team came up with in your openshift ansible vault
+        jgroups.jceks: >-
+          Paste the SSL_JCEKS_BASE64 that your team came up with in your openshift ansible vault
+        keystore.jks: >-
+          Paste the SSL_JKS_BASE64 that your team came up with in your openshift ansible vault
+            
+      ```
+
+      #### Modify configuration
+
+      * On the sso deployment config, click the "Configuration" tab
+      * Remove the 
+      * JGROUPS_ENCRYPT_KEYSTORE_DIR: /etc/sso-secret-volume
+
+      #### Modify environment variables
+
+      * On the sso deployment config, click the "Environment" tab
+      * HTTPS_KEYSTORE_DIR: /etc/sso-secret-volume
+      * JGROUPS_ENCRYPT_KEYSTORE_DIR: /etc/sso-secret-volume
+
+      * Click [ Overview ] to verify that the PostgreSQL pod is running correctly. 
+      * Click on the pod, then click the "Terminal" tab. Verify that the database was created with the following command and entering the password: 
+      
+      ```bash
+      psql -U $POSTGRESQL_USER -W $POSTGRESQL_DATABASE
+      \q
+      ```
+  tags: 
+    - issue_label
+    - issue_label_202
+    - day2
+
 - name: "Create issue to install a PostgreSQL database to OpenShift"
   include_role: 
     name: computate_org_school_issue
   vars: 
     ISSUE_LABEL: install_openshift_postgres_database
     ISSUE_TITLE: "Install a PostgreSQL database to OpenShift"
+    MILESTONE_TITLE: OpenShift Deployment
+    COLUMN_NAME: OpenShift Deployment
     ISSUE_BODY: |
       As a team, install a PostgreSQL database to OpenShift using the catalog. 
 
@@ -332,7 +575,7 @@
       ```
   tags: 
     - issue_label
-    - issue_label_201
+    - issue_label_202
     - day2
 
 - name: "Create issue to install an Apache Zookeeper cluster manager to OpenShift"
@@ -341,6 +584,8 @@
   vars: 
     ISSUE_LABEL: install_openshift_zookeeper_cluster_manager
     ISSUE_TITLE: "Install an Apache Zookeeper cluster manager to OpenShift"
+    MILESTONE_TITLE: OpenShift Deployment
+    COLUMN_NAME: OpenShift Deployment
     ISSUE_BODY: |
       As a team, install an Apache Zookeeper cluster manager to OpenShift. 
 
@@ -425,7 +670,7 @@
       At this point, you should find the computate-zookeeper running with the pod no longer in an error state. 
   tags: 
     - issue_label
-    - issue_label_202
+    - issue_label_203
     - day2
 
 - name: "Create issue to install an Apache Solr search engine to OpenShift"
@@ -434,6 +679,8 @@
   vars: 
     ISSUE_LABEL: install_openshift_solr_cluster_manager
     ISSUE_TITLE: "Install an Apache Solr search engine to OpenShift"
+    MILESTONE_TITLE: OpenShift Deployment
+    COLUMN_NAME: OpenShift Deployment
     ISSUE_BODY: |
       As a team, install an Apache Solr search engine to OpenShift. 
 
@@ -499,7 +746,7 @@
       At this point, you should find the computate-solr running with the pod no longer in an error state. 
   tags: 
     - issue_label
-    - issue_label_203
+    - issue_label_204
     - day2
 
 #####################
@@ -512,6 +759,8 @@
   vars: 
     ISSUE_LABEL: clone_computate_repo
     ISSUE_TITLE: "Clone the computate git repository"
+    MILESTONE_TITLE: Development Installation
+    COLUMN_NAME: Development Installation
     ISSUE_BODY: |
       Help each member of the team create a directory for the computate repository with the included ansible scripts for installing the school applications for development and in OpenShift.
       
@@ -535,6 +784,8 @@
   vars: 
     ISSUE_LABEL: create_local_dev_ansible_vault
     ISSUE_TITLE: "Create an ansible vault for local development"
+    MILESTONE_TITLE: Development Installation
+    COLUMN_NAME: Development Installation
     ISSUE_BODY: |
       ### Create an ansible vault for your local development.
       
@@ -582,6 +833,8 @@
   vars: 
     ISSUE_LABEL: install_postgres_server
     ISSUE_TITLE: "Install a PostgreSQL database for local development"
+    MILESTONE_TITLE: Development Installation
+    COLUMN_NAME: Development Installation
     ISSUE_BODY: |
       Help each member of the team interested in local development of the project install a PostgreSQL database. 
 
@@ -601,6 +854,8 @@
   vars: 
     ISSUE_LABEL: install_zookeeper_cluster_manager
     ISSUE_TITLE: "Install an Apache Zookeeper cluster manager for local development"
+    MILESTONE_TITLE: Development Installation
+    COLUMN_NAME: Development Installation
     ISSUE_BODY: |
       Help each member of the team interested in local development of the project install an Apache Zookeeper cluster manager. 
 
@@ -620,6 +875,8 @@
   vars: 
     ISSUE_LABEL: install_solr_search_engine
     ISSUE_TITLE: "Install an Apache Solr search engine for local development"
+    MILESTONE_TITLE: Development Installation
+    COLUMN_NAME: Development Installation
     ISSUE_BODY: |
       Help each member of the team interested in local development of the project install an Apache Solr search engine. 
 
@@ -639,6 +896,8 @@
   vars: 
     ISSUE_LABEL: install_school_app
     ISSUE_TITLE: "Install the school application for local development"
+    MILESTONE_TITLE: Development Installation
+    COLUMN_NAME: Development Installation
     ISSUE_BODY: |
       #### Run the playbook to install the school application for development.
       
@@ -660,6 +919,8 @@
   vars: 
     ISSUE_LABEL: delete_and_recreate_openshift_project
     ISSUE_TITLE: "Delete and recreate an OpenShift project"
+    MILESTONE_TITLE: Ansible OpenShift Deployment
+    COLUMN_NAME: Ansible OpenShift Deployment
     ISSUE_BODY: |
       As a team, create an OpenShift project and share the project with the team. 
 
@@ -704,6 +965,8 @@
   vars: 
     ISSUE_LABEL: create_openshift_ansible_hosts
     ISSUE_TITLE: "Create OpenShift ansible hosts file"
+    MILESTONE_TITLE: Ansible OpenShift Deployment
+    COLUMN_NAME: Ansible OpenShift Deployment
     ISSUE_BODY: |
       
       Create a directory for your OpenShift inventory.
@@ -761,6 +1024,8 @@
   vars: 
     ISSUE_LABEL: automate_openshift_red_hat_sso
     ISSUE_TITLE: "Automate the install of a Red Hat Single Sign On server to OpenShift"
+    MILESTONE_TITLE: Ansible OpenShift Deployment
+    COLUMN_NAME: Ansible OpenShift Deployment
     ISSUE_BODY: |
       As a team, automate the install of a PostgreSQL database to OpenShift. 
       #### Run the playbook to install a PostgreSQL database in OpenShift.
@@ -779,6 +1044,8 @@
   vars: 
     ISSUE_LABEL: automate_openshift_postgres_database
     ISSUE_TITLE: "Automate the install of a PostgreSQL database to OpenShift"
+    MILESTONE_TITLE: Ansible OpenShift Deployment
+    COLUMN_NAME: Ansible OpenShift Deployment
     ISSUE_BODY: |
       As a team, automate the install of a PostgreSQL database to OpenShift. 
       #### Run the playbook to install a PostgreSQL database in OpenShift.
@@ -797,6 +1064,8 @@
   vars: 
     ISSUE_LABEL: automate_openshift_zookeeper_cluster_manager
     ISSUE_TITLE: "Automate the install of an Apache Zookeeper cluster manager to OpenShift"
+    MILESTONE_TITLE: Ansible OpenShift Deployment
+    COLUMN_NAME: Ansible OpenShift Deployment
     ISSUE_BODY: |
       As a team, automate the install of an Apache Zookeeper cluster manager to OpenShift. 
       #### Run the playbook to install an Apache Zookeeper cluster manager to OpenShift.
@@ -815,6 +1084,8 @@
   vars: 
     ISSUE_LABEL: automate_openshift_solr_search_engine
     ISSUE_TITLE: "Automate the install of an Apache Solr search engine to OpenShift"
+    MILESTONE_TITLE: Ansible OpenShift Deployment
+    COLUMN_NAME: Ansible OpenShift Deployment
     ISSUE_BODY: |
       As a team, automate the install of an Apache Solr search engine to OpenShift. 
 
@@ -834,6 +1105,8 @@
   vars: 
     ISSUE_LABEL: automate_openshift_school_app
     ISSUE_TITLE: "Automate the install of the school application to OpenShift"
+    MILESTONE_TITLE: Ansible OpenShift Deployment
+    COLUMN_NAME: Ansible OpenShift Deployment
     ISSUE_BODY: |
       As a team, automate the install of the school application to OpenShift. 
 

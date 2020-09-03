@@ -1,3 +1,9 @@
+- name: "Get milestone by title"
+  set_fact:
+    MILESTONE_TITLE_JSON: "{{ MILESTONES.json | json_query(milestone_query) | first | default(omit) }}"
+  vars: 
+    milestone_query: "[?title=='{{ MILESTONE_TITLE | default(omit) }}'].{title: title, description: description, number: number}"
+  tags: always
 - name: "Get issue by label {{ ISSUE_LABEL }}"
   uri:
     timeout: 90
@@ -7,41 +13,106 @@
       Authorization: "token {{ GITHUB_TOKEN }}"
   register: ISSUE_LABEL_JSON
   tags: issue_label
-- name: "Create issue by label {{ ISSUE_LABEL }}"
-  uri:
-    timeout: 90
-    url: "https://api.github.com/repos/{{ GITHUB_ORG }}/{{ GITHUB_REPO }}/issues"
-    method: POST
-    headers:
-      Content-Type: "application/json"
-      Authorization: "token {{ GITHUB_TOKEN }}"
-    body_format: json
-    body: 
-      labels: 
-        - "{{ ISSUE_LABEL }}"
-      title: "{{ ISSUE_TITLE }}"
-      body: "{{ ISSUE_BODY }}"
-    status_code: 
-      - 200
-      - 201
-  when: ISSUE_LABEL_JSON.json | length == 0
-  register: ISSUE_CREATE_JSON
-  tags: issue_label
-- name: "Update issue by label {{ ISSUE_LABEL }}"
-  uri:
-    timeout: 90
-    url: "https://api.github.com/repos/{{ GITHUB_ORG }}/{{ GITHUB_REPO }}/issues/{{ ISSUE_LABEL_JSON.json[0].number }}"
-    method: PATCH
-    headers:
-      Content-Type: "application/json"
-      Authorization: "token {{ GITHUB_TOKEN }}"
-    body_format: json
-    body: 
-      labels: 
-        - "{{ ISSUE_LABEL }}"
-      title: "{{ ISSUE_TITLE }}"
-      body: "{{ ISSUE_BODY }}"
-  when: ISSUE_LABEL_JSON.json | length > 0
-  register: ISSUE_CREATE_JSON
-  tags: issue_label
+
+- block: 
+    - name: "Create issue by label {{ ISSUE_LABEL }}"
+      uri:
+        timeout: 90
+        url: "https://api.github.com/repos/{{ GITHUB_ORG }}/{{ GITHUB_REPO }}/issues"
+        method: POST
+        headers:
+          Content-Type: "application/json"
+          Authorization: "token {{ GITHUB_TOKEN }}"
+        body_format: json
+        body: 
+          labels: 
+            - "{{ ISSUE_LABEL }}"
+          title: "{{ ISSUE_TITLE }}"
+          body: "{{ ISSUE_BODY }}"
+          milestone: "{{ MILESTONE_TITLE_JSON.number | default(omit) }}"
+        status_code: 
+          - 200
+          - 201
+      register: ISSUE_CREATE_JSON
+      tags: issue_label
+    - name: Create card
+      include_role: 
+        name: computate_org_school_card
+      vars: 
+        CARD_CONTENT_ID: "{{ ISSUE_CREATE_JSON.json.id }}"
+  when: COLUMN_NAME is defined and MILESTONE_TITLE_JSON is defined and (ISSUE_LABEL_JSON.json | length == 0)
+- block: 
+    - name: "Create issue by label {{ ISSUE_LABEL }}"
+      uri:
+        timeout: 90
+        url: "https://api.github.com/repos/{{ GITHUB_ORG }}/{{ GITHUB_REPO }}/issues"
+        method: POST
+        headers:
+          Content-Type: "application/json"
+          Authorization: "token {{ GITHUB_TOKEN }}"
+        body_format: json
+        body: 
+          labels: 
+            - "{{ ISSUE_LABEL }}"
+          title: "{{ ISSUE_TITLE }}"
+          body: "{{ ISSUE_BODY }}"
+        status_code: 
+          - 200
+          - 201
+      register: ISSUE_CREATE_JSON
+      tags: issue_label
+    - name: Create card
+      include_role: 
+        name: computate_org_school_card
+      vars: 
+        CARD_CONTENT_ID: "{{ ISSUE_CREATE_JSON.json.id }}"
+  when: COLUMN_NAME is defined and MILESTONE_TITLE_JSON is not defined and (ISSUE_LABEL_JSON.json | length == 0)
+
+- block: 
+    - name: "Update issue by label {{ ISSUE_LABEL }}"
+      uri:
+        timeout: 90
+        url: "https://api.github.com/repos/{{ GITHUB_ORG }}/{{ GITHUB_REPO }}/issues/{{ ISSUE_LABEL_JSON.json[0].number }}"
+        method: PATCH
+        headers:
+          Content-Type: "application/json"
+          Authorization: "token {{ GITHUB_TOKEN }}"
+        body_format: json
+        body: 
+          labels: 
+            - "{{ ISSUE_LABEL }}"
+          title: "{{ ISSUE_TITLE }}"
+          body: "{{ ISSUE_BODY }}"
+          milestone: "{{ MILESTONE_TITLE_JSON.number | default(omit) }}"
+      register: ISSUE_CREATE_JSON
+      tags: issue_label
+    - name: Create card
+      include_role: 
+        name: computate_org_school_card
+      vars: 
+        CARD_CONTENT_ID: "{{ ISSUE_CREATE_JSON.json.id }}"
+  when: COLUMN_NAME is defined and MILESTONE_TITLE_JSON is defined and (ISSUE_LABEL_JSON.json | length > 0)
+- block: 
+    - name: "Update issue by label {{ ISSUE_LABEL }}"
+      uri:
+        timeout: 90
+        url: "https://api.github.com/repos/{{ GITHUB_ORG }}/{{ GITHUB_REPO }}/issues/{{ ISSUE_LABEL_JSON.json[0].number }}"
+        method: PATCH
+        headers:
+          Content-Type: "application/json"
+          Authorization: "token {{ GITHUB_TOKEN }}"
+        body_format: json
+        body: 
+          labels: 
+            - "{{ ISSUE_LABEL }}"
+          title: "{{ ISSUE_TITLE }}"
+          body: "{{ ISSUE_BODY }}"
+      register: ISSUE_CREATE_JSON
+      tags: issue_label
+    - name: Create card
+      include_role: 
+        name: computate_org_school_card
+      vars: 
+        CARD_CONTENT_ID: "{{ ISSUE_CREATE_JSON.json.id }}"
+  when: COLUMN_NAME is defined and MILESTONE_TITLE_JSON is not defined and (ISSUE_LABEL_JSON.json | length > 0)
 

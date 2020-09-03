@@ -1,0 +1,37 @@
+- name: "Create project by name {{ PROJECT_NAME }}"
+  uri:
+    timeout: 90
+    url: "https://api.github.com/orgs/{{ GITHUB_ORG }}/projects"
+    method: POST
+    headers:
+      Content-Type: "application/json"
+      Authorization: "token {{ GITHUB_TOKEN }}"
+      Accept: "application/vnd.github.inertia-preview+json"
+    body_format: json
+    body: 
+      name: "{{ PROJECT_NAME }}"
+      description: "{{ PROJECT_DESCRIPTION }}"
+    status_code: 
+      - 200
+      - 201
+  when: PROJECT_NAME_JSON is not defined
+  register: PROJECT_CREATE_JSON
+  tags: project_name
+- name: "Update project by name {{ PROJECT_NAME }}"
+  uri:
+    timeout: 90
+    url: "https://api.github.com/projects/{{ PROJECT_NAME_JSON.id }}"
+    method: PATCH
+    headers:
+      Content-Type: "application/json"
+      Authorization: "token {{ GITHUB_TOKEN }}"
+      Accept: "application/vnd.github.inertia-preview+json"
+    body_format: json
+    body: 
+      name: "{{ PROJECT_NAME }}"
+      description: "{{ PROJECT_DESCRIPTION }}"
+      private: false
+  when: PROJECT_NAME_JSON is defined
+  register: PROJECT_CREATE_JSON
+  tags: project_name
+

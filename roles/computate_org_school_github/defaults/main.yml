@@ -3,6 +3,8 @@ GITHUB_ORG: "..."
 GITHUB_TOKEN: "..."
 GITHUB_REPO: computate-org-school
 REPO_PATH: "/usr/local/src/{{ GITHUB_REPO }}"
+PROJECT_NAME: "School Mock Client Engagement"
+TEAM_ID: "mce1"
 
 REDHAT_OPENSHIFT_HOST: https://console.rh-us-east-1.openshift.com
 REDHAT_OPENSHIFT_MANAGE_HOST: https://employee.openshift.com
