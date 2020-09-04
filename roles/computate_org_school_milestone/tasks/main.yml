@@ -1,7 +1,6 @@
 - name: "Get milestone by title {{ MILESTONE_TITLE | default(omit) }}"
   set_fact:
-    MILESTONE_TITLE_JSON: "{{ MILESTONES.json | json_query(milestone_query) | first }}"
-  when: MILESTONES.json | json_query(milestone_query)
+    MILESTONE_TITLE_JSON: "{{ MILESTONES.json | json_query(milestone_query) | first | default(None) }}"
   vars: 
     milestone_query: "[?title=='{{ MILESTONE_TITLE | default(omit) }}'].{title: title, description: description, number: number}"
   tags: milestone_title
@@ -20,7 +19,7 @@
     status_code: 
       - 200
       - 201
-  when: MILESTONE_TITLE_JSON is not defined
+  when: MILESTONE_TITLE_JSON is not defined or MILESTONE_TITLE_JSON == ""
   register: MILESTONE_CREATE_JSON
   tags: milestone_title
 - name: "Update milestone by title {{ MILESTONE_TITLE }}"
@@ -35,7 +34,7 @@
     body: 
       title: "{{ MILESTONE_TITLE }}"
       description: "{{ MILESTONE_DESCRIPTION }}"
-  when: MILESTONE_TITLE_JSON is defined
+  when: MILESTONE_TITLE_JSON is defined and MILESTONE_TITLE_JSON != ""
   register: MILESTONE_CREATE_JSON
   tags: milestone_title
 

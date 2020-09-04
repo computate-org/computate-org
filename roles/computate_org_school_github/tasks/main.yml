@@ -106,11 +106,25 @@
     COLUMN_NAME: Setup Tasks
   tags: 
     - column
+- name: Create column for Configure Authentication
+  include_role: 
+    name: computate_org_school_column
+  vars: 
+    COLUMN_NAME: Configure Authentication
+  tags: 
+    - column
 - name: Create column for OpenShift Deployment issues
   include_role: 
     name: computate_org_school_column
   vars: 
     COLUMN_NAME: OpenShift Deployment
+  tags: 
+    - column
+- name: Create column for Ansible OpenShift Deployment issues
+  include_role: 
+    name: computate_org_school_column
+  vars: 
+    COLUMN_NAME: Ansible OpenShift Deployment
   tags: 
     - column
 - name: Create column for Local install issues
@@ -120,11 +134,11 @@
     COLUMN_NAME: Development Installation
   tags: 
     - column
-- name: Create column for Ansible OpenShift Deployment issues
+- name: Create column for Ansible Optional OpenShift Deployment issues
   include_role: 
     name: computate_org_school_column
   vars: 
-    COLUMN_NAME: Ansible OpenShift Deployment
+    COLUMN_NAME: Optional Ansible OpenShift Deployment
   tags: 
     - column
 
@@ -151,6 +165,15 @@
       Setup Tasks issues including setting up the OpenShift cluster, installing Ansible locally, defining the ansible vault for the group and other setup tasks. 
   tags: 
     - milestone
+- name: Create milestone for Configure Authentication issues
+  include_role: 
+    name: computate_org_school_milestone
+  vars: 
+    MILESTONE_TITLE: Configure Authentication
+    MILESTONE_DESCRIPTION: |
+      Configuring authentication and authorization in the Red Hat Single Sign-On server. 
+  tags: 
+    - milestone
 - name: Create milestone for OpenShift Deployment issues
   include_role: 
     name: computate_org_school_milestone
@@ -158,6 +181,15 @@
     MILESTONE_TITLE: OpenShift Deployment
     MILESTONE_DESCRIPTION: |
       Deploying applications to OpenShift manually. 
+  tags: 
+    - milestone
+- name: Create milestone for Ansible OpenShift Deployment issues
+  include_role: 
+    name: computate_org_school_milestone
+  vars: 
+    MILESTONE_TITLE: Ansible OpenShift Deployment
+    MILESTONE_DESCRIPTION: |
+      Automating the deployment of applications to OpenShift using Ansible. 
   tags: 
     - milestone
 - name: Create milestone for Local install issues
@@ -169,13 +201,13 @@
       Deploying applications to a local development computer. 
   tags: 
     - milestone
-- name: Create milestone for Ansible OpenShift Deployment issues
+- name: Create milestone for Optional Ansible OpenShift Deployment issues
   include_role: 
     name: computate_org_school_milestone
   vars: 
-    MILESTONE_TITLE: Ansible OpenShift Deployment
+    MILESTONE_TITLE: Optional Ansible OpenShift Deployment
     MILESTONE_DESCRIPTION: |
-      Automating the deployment of applications to OpenShift using Ansible. 
+      Optional scripts for Automating the deployment of applications to OpenShift using Ansible. 
   tags: 
     - milestone
 
@@ -200,7 +232,6 @@
   tags: 
     - issue_label
     - issue_label_101
-    - day1
 
 - name: "Create issue to create an OpenShift project"
   include_role: 
@@ -244,7 +275,6 @@
   tags: 
     - issue_label
     - issue_label_102
-    - day1
 
 - name: Create issue to install ansible locally
   include_role: 
@@ -318,7 +348,6 @@
   tags: 
     - issue_label
     - issue_label_103
-    - day1
 
 - name: "Create issue to clone computate-org-school repo"
   include_role: 
@@ -385,7 +414,6 @@
   tags: 
     - issue_label
     - issue_label_104
-    - day1
 
 - name: "Create issue to create an ansible vault for OpenShift"
   include_role: 
@@ -434,11 +462,10 @@
   tags: 
     - issue_label
     - issue_label_105
-    - day1
 
-########################
-# OpenShift Deployment #
-########################
+############################
+# Configure Authentication #
+############################
 
 - name: "Create issue to install a Red Hat Single Sign On server to OpenShift"
   include_role: 
@@ -446,10 +473,32 @@
   vars: 
     ISSUE_LABEL: install_openshift_red_hat_sso
     ISSUE_TITLE: "Install a Red Hat Single Sign On server to OpenShift"
-    MILESTONE_TITLE: OpenShift Deployment
-    COLUMN_NAME: OpenShift Deployment
+    MILESTONE_TITLE: Configure Authentication
+    COLUMN_NAME: Configure Authentication
     ISSUE_BODY: |
       As a team, install a Red Hat Single Sign On server to OpenShift using the catalog. 
+
+      ### Create the sso-keystore secret
+      * Open the secrets of the OpenShift project by clicking [ Resources ] -> [ Secrets ]
+      * Click "Create Secret"
+      * Secret Type: Generic
+      * Secret Name: sso-keystore
+      * Enter the name of the first key: https-keystore.jks 
+      * Even though the secret values have not been added, click [ Create ]
+      * Click on the "sso-keystore" secret
+      * Select [ Actions ] -> Edit YAML
+      * Update the "data section of the YAML with the following data: 
+
+      ```yaml
+      data:
+        https-keystore.jks: >-
+          Paste the SSL_JKS_BASE64 that your team came up with in your openshift ansible vault
+        jgroups.jceks: >-
+          Paste the SSL_JCEKS_BASE64 that your team came up with in your openshift ansible vault
+        keystore.jks: >-
+          Paste the SSL_JKS_BASE64 that your team came up with in your openshift ansible vault
+            
+      ```
 
       ### Obtain the Red Hat SSO PostgreSQL Persistent OpenShift template
 
@@ -473,14 +522,19 @@
       * Custom https Route Hostname: Use the SSO_SITE_HOST_NAME that your team came up with in your openshift ansible vault
       * Custom RH-SSO Server Hostname: Use the SSO_SITE_HOST_NAME that your team came up with in your openshift ansible vault
       * Database JNDI Name: java:jboss/datasources/KeycloakDS
-      * Database Name: root
+      * Database Name: Use the SSO_DB_DATABASE value that your team came up with in your openshift ansible vault
       * Server Keystore Secret Name: sso-keystore
       * Server Keystore Filename: keystore.jks
       * Server Keystore Type: JKS
       * Server Certificate Name: Use the SSL_ALIAS that your team came up with in your openshift ansible vault
       * Server Keystore Password: Use the SSL_JKS_PASSWORD that your team came up with in your openshift ansible vault
-      * Database Username: Use the POSTGRES_DB_USER value that your team came up with in your openshift ansible vault
-      * Database Password: Use the POSTGRES_DB_PASSWORD value that your team came up with in your openshift ansible vault
+      * Datasource Minimum Pool Size: Leave blank
+      * Datasource Maximum Pool Size: Leave blank
+      * Datasource Transaction Isolation: Leave blank
+      * PostgreSQL Maximum number of connections: Leave blank
+      * PostgreSQL Shared Buffers: Leave blank
+      * Database Username: Use the SSO_DB_USERNAME value that your team came up with in your openshift ansible vault
+      * Database Password: Use the SSO_DB_PASSWORD value that your team came up with in your openshift ansible vault
       * JGroups Secret Name: sso-keystore
       * JGroups Keystore Filename: jgroups.jceks
       * JGroups Certificate Name: Use the SSO_JGROUPS_ENCRYPT_NAME that your team came up with in your openshift ansible vault
@@ -497,52 +551,114 @@
       * RH-SSO Trust Store Secret: sso-keystore
       * For other values, you can leave them as the default, then click [ Create ]
       * Verify that the output is correct, then click [ Close ] 
+  tags: 
+    - issue_label
+    - issue_label_201
 
-      #### Create the sso-app-secret
-      * Open the secrets of the OpenShift project by clicking [ Resources ] -> [ Secrets ]
-      * Click "Create Secret"
-      * Secret Type: Generic
-      * Secret Name: sso-keystore
-      * Enter the name of the first key: https-keystore.jks 
-      * Even though the secret values have not been added, click [ Create ]
-      * Click on the "sso-keystore" secret
-      * Select [ Actions ] -> Edit YAML
-      * Update the "data section of the YAML with the following data: 
+- name: "Create issue to configure the Red Hat Single Sign On server"
+  include_role: 
+    name: computate_org_school_issue
+  vars: 
+    ISSUE_LABEL: configure_red_hat_sso
+    ISSUE_TITLE: "Configure the Red Hat Single Sign On server"
+    MILESTONE_TITLE: Configure Authentication
+    COLUMN_NAME: Configure Authentication
+    ISSUE_BODY: |
 
-      ```yaml
-      data:
-        https-keystore.jks: >-
-          Paste the SSL_JKS_BASE64 that your team came up with in your openshift ansible vault
-        jgroups.jceks: >-
-          Paste the SSL_JCEKS_BASE64 that your team came up with in your openshift ansible vault
-        keystore.jks: >-
-          Paste the SSL_JKS_BASE64 that your team came up with in your openshift ansible vault
-            
-      ```
+      ### Log in to Red Hat SSO as the admin
 
-      #### Modify configuration
+      * Visit your newly deployed Red Hat SSO server at the SSO_SITE_HOST_NAME that your team came up with in your openshift ansible vault
+      * Click on "Administration Console"
+      * Username: Use the SSO_ADMIN_USERNAME that your team came up with in your openshift ansible vault
+      * Password: Use the SSO_ADMIN_PASSWORD that your team came up with in your openshift ansible vault
+      * Click "Log In"
+      * Click on the newly created realm that was created during the installation defined in the SSO_REALM that your team came up with in your openshift ansible vault
 
-      * On the sso deployment config, click the "Configuration" tab
-      * Remove the 
-      * JGROUPS_ENCRYPT_KEYSTORE_DIR: /etc/sso-secret-volume
+      #### Create SiteAdmin application role in Red Hat SSO
 
-      #### Modify environment variables
+      * In your realm, click "Roles" on the left
+      * Click [ Add Role ] on the right
+      * Role Name: SiteAdmin
+      * Click [ Save ]
 
-      * On the sso deployment config, click the "Environment" tab
-      * HTTPS_KEYSTORE_DIR: /etc/sso-secret-volume
-      * JGROUPS_ENCRYPT_KEYSTORE_DIR: /etc/sso-secret-volume
+      Users with the SiteAdmin role will have all privileges in the application. 
 
-      * Click [ Overview ] to verify that the PostgreSQL pod is running correctly. 
-      * Click on the pod, then click the "Terminal" tab. Verify that the database was created with the following command and entering the password: 
+      #### Create SiteManager application role in Red Hat SSO
+
+      * In your realm, click "Roles" on the left
+      * Click [ Add Role ] on the right
+      * Role Name: SiteManager
+      * Click [ Save ]
+
+      Users with the SiteManager role will have limited access to payments and other items, and no access to page content. 
+
+      #### Create a default User application role in Red Hat SSO
+
+      * In your realm, click "Roles" on the left
+      * Click [ Add Role ] on the right
+      * Role Name: User
+      * Click [ Save ]
+      * Click "Roles" on the left
+      * Click the "Default Roles" tab
+      * Select "User" in the top list
+      * Click [ Add Selected » ]
+
+      Users will have this role by default. 
+
+      #### Create a client application in Red Hat SSO
+
+      * In your realm, click "Clients" on the left
+      * Click [ Create ] on the right
+      * Client ID: Use the AUTH_RESOURCE that your team came up with in your openshift ansible vault
+      * Client Protocol: openid-connect
+      * Root URL: You can leave this blank
+      * Click [ Save ]
+
+      #### Set client access type to confidential
+
+      This will setup a client that requires a secret. 
+
+      * Set "Access Type": confidential
+
+      #### Enable service accounts
+
+      This will allow authentication for a service like Ansible to connect to the application securely to backup, restore and make changes through the API. 
+
+      * Set "Service Accounts Enabled": ON
+
+      #### Create callback redirect URI
+
+      A client redirect URI is required at certain application URLs, like the callback URL, for requests to redirect properly from Red Hat SSO, and back to the application. 
+
+      * Valid Redirect URIs: 
+        * Use the COMPUTATE_SCOLAIRE_SITE_BASE_URL_ENUS that your team came up with in your openshift ansible vault
+        * For example: https://littleorchardpreschool.us/callback
+
+      #### Create logout redirect URI
+
+      A client redirect URI is required at certain application URLs, like the logout URL, for requests to redirect properly from Red Hat SSO, and back to the application. 
+
+      * Valid Redirect URIs: 
+        * Use the COMPUTATE_SCOLAIRE_SITE_BASE_URL_ENUS that your team came up with in your openshift ansible vault
+        * For example: https://littleorchardpreschool.us/logout
+
+      #### Save your client configuration
+
+      Make sure you save your client configuration changes by clicking [ Save ]. 
+
+      #### Obtain the SSO client secret
+
+      On your SSO client page in your realm, click the "Credentials" tab. 
       
-      ```bash
-      psql -U $POSTGRESQL_USER -W $POSTGRESQL_DATABASE
-      \q
-      ```
+      Your client secret is there for you to copy and update in your ansible vault. 
+
   tags: 
     - issue_label
     - issue_label_202
-    - day2
+
+########################
+# OpenShift Deployment #
+########################
 
 - name: "Create issue to install a PostgreSQL database to OpenShift"
   include_role: 
@@ -575,8 +691,7 @@
       ```
   tags: 
     - issue_label
-    - issue_label_202
-    - day2
+    - issue_label_301
 
 - name: "Create issue to install an Apache Zookeeper cluster manager to OpenShift"
   include_role: 
@@ -670,8 +785,7 @@
       At this point, you should find the computate-zookeeper running with the pod no longer in an error state. 
   tags: 
     - issue_label
-    - issue_label_203
-    - day2
+    - issue_label_302
 
 - name: "Create issue to install an Apache Solr search engine to OpenShift"
   include_role: 
@@ -746,218 +860,11 @@
       At this point, you should find the computate-solr running with the pod no longer in an error state. 
   tags: 
     - issue_label
-    - issue_label_204
-    - day2
-
-#####################
-# Local Development #
-#####################
-
-- name: "Create issue to clone computate repo"
-  include_role: 
-    name: computate_org_school_issue
-  vars: 
-    ISSUE_LABEL: clone_computate_repo
-    ISSUE_TITLE: "Clone the computate git repository"
-    MILESTONE_TITLE: Development Installation
-    COLUMN_NAME: Development Installation
-    ISSUE_BODY: |
-      Help each member of the team create a directory for the computate repository with the included ansible scripts for installing the school applications for development and in OpenShift.
-      
-      ```bash
-      sudo install -d -o $USER -g $USER /usr/local/src/computate
-      ```
-
-      Clone the git repository into the new directory. 
-
-      ```bash
-      git clone git@github.com:computate/computate.git /usr/local/src/computate
-      ```
-  tags: 
-    - issue_label
-    - issue_label_301
-    - day3
-
-- name: "Create issue to create an ansible vault for local development"
-  include_role: 
-    name: computate_org_school_issue
-  vars: 
-    ISSUE_LABEL: create_local_dev_ansible_vault
-    ISSUE_TITLE: "Create an ansible vault for local development"
-    MILESTONE_TITLE: Development Installation
-    COLUMN_NAME: Development Installation
-    ISSUE_BODY: |
-      ### Create an ansible vault for your local development.
-      
-      Help each member of the team interested in local development to create and edit an encrypted ansible vault with a password for the host secrets for your development inventory.
-      
-      ```bash
-      install -d {{ REPO_PATH }}/inventories/$USER-$HOSTNAME/host_vars/$HOSTNAME/
-      ansible-vault create {{ REPO_PATH }}/inventories/$USER-$HOSTNAME/host_vars/$HOSTNAME/vault
-      ansible-vault edit {{ REPO_PATH }}/inventories/$USER-$HOSTNAME/host_vars/$HOSTNAME/vault
-      ```
-      
-      The contents of the vault will contain the secrets needed to override any default values you want to change in the computate-scolaire defaults defined here.
-      
-      https://github.com/computate/computate/blob/master/ansible/roles/computate_scolaire/defaults/main.yml
-      
-      There are descriptions for each of the fields.
-      There are several sections of fields, including:
-      
-      - computate-scolaire system defaults
-      - Ansible defaults
-      - Zookeeper defaults
-      - Solr defaults
-      - PostgreSQL defaults
-      - computate-medical global defaults
-      - computate-scolaire US English defaults
-      - SMTP defaults
-      - OpenID Connect auth server defaults
-      - SSL/TLS defaults
-
-      Here is an example of the contents of the ansible vault for local development: 
-
-      ```yaml
-      {{ lookup('url', 'https://raw.githubusercontent.com/computate/computate/master/ansible/roles/computate_scolaire/defaults/main.yml', split_lines=false) }}
-      ```
-
-      Look for values to override, especially those like this: "...". 
-  tags: 
-    - issue_label
-    - issue_label_302
-    - day3
-
-- name: "Create issue to install a PostgreSQL database for local development"
-  include_role: 
-    name: computate_org_school_issue
-  vars: 
-    ISSUE_LABEL: install_postgres_server
-    ISSUE_TITLE: "Install a PostgreSQL database for local development"
-    MILESTONE_TITLE: Development Installation
-    COLUMN_NAME: Development Installation
-    ISSUE_BODY: |
-      Help each member of the team interested in local development of the project install a PostgreSQL database. 
-
-      #### Run the playbook to install a PostgreSQL database on your development computer.
-      
-      ```bash
-      (cd /usr/local/src/computate/ansible && ansible-playbook computate_postgres.yml -i {{ REPO_PATH }}/inventories/$USER-$HOSTNAME/hosts --vault-id @prompt)
-      ```
-  tags: 
-    - issue_label
     - issue_label_303
-    - day3
-
-- name: "Create issue to install an Apache Zookeeper cluster manager for local development"
-  include_role: 
-    name: computate_org_school_issue
-  vars: 
-    ISSUE_LABEL: install_zookeeper_cluster_manager
-    ISSUE_TITLE: "Install an Apache Zookeeper cluster manager for local development"
-    MILESTONE_TITLE: Development Installation
-    COLUMN_NAME: Development Installation
-    ISSUE_BODY: |
-      Help each member of the team interested in local development of the project install an Apache Zookeeper cluster manager. 
-
-      #### Run the playbook to install an Apache Zookeeper cluster manager on your development computer.
-      
-      ```bash
-      (cd /usr/local/src/computate/ansible && ansible-playbook computate_zookeeper.yml -i {{ REPO_PATH }}/inventories/$USER-$HOSTNAME/hosts --vault-id @prompt)
-      ```
-  tags: 
-    - issue_label
-    - issue_label_304
-    - day3
-
-- name: "Create issue to install an Apache Solr search engine for local development"
-  include_role: 
-    name: computate_org_school_issue
-  vars: 
-    ISSUE_LABEL: install_solr_search_engine
-    ISSUE_TITLE: "Install an Apache Solr search engine for local development"
-    MILESTONE_TITLE: Development Installation
-    COLUMN_NAME: Development Installation
-    ISSUE_BODY: |
-      Help each member of the team interested in local development of the project install an Apache Solr search engine. 
-
-      #### Run the playbook to install an Apache Zookeeper cluster manager on your development computer.
-      
-      ```bash
-      (cd /usr/local/src/computate/ansible && ansible-playbook computate_solr.yml -i {{ REPO_PATH }}/inventories/$USER-$HOSTNAME/hosts --vault-id @prompt)
-      ```
-  tags: 
-    - issue_label
-    - issue_label_305
-    - day3
-
-- name: "Create issue to install the school application for local development"
-  include_role: 
-    name: computate_org_school_issue
-  vars: 
-    ISSUE_LABEL: install_school_app
-    ISSUE_TITLE: "Install the school application for local development"
-    MILESTONE_TITLE: Development Installation
-    COLUMN_NAME: Development Installation
-    ISSUE_BODY: |
-      #### Run the playbook to install the school application for development.
-      
-      ```bash
-      (cd /usr/local/src/computate/ansible && ansible-playbook computate_scolaire.yml -i {{ REPO_PATH }}/inventories/$USER-$HOSTNAME/hosts --vault-id @prompt)
-      ```
-  tags: 
-    - issue_label
-    - issue_label_306
-    - day3
 
 ###################################
 # Ansible Automation in OpenShift #
 ###################################
-
-- name: "Create issue to delete and recreate an OpenShift project for ansible automation"
-  include_role: 
-    name: computate_org_school_issue
-  vars: 
-    ISSUE_LABEL: delete_and_recreate_openshift_project
-    ISSUE_TITLE: "Delete and recreate an OpenShift project"
-    MILESTONE_TITLE: Ansible OpenShift Deployment
-    COLUMN_NAME: Ansible OpenShift Deployment
-    ISSUE_BODY: |
-      As a team, create an OpenShift project and share the project with the team. 
-
-      * Login to your OpenShift environment here: {{ REDHAT_OPENSHIFT_HOST }}
-      * Click on the "..." next to your {{ REDHAT_OPENSHIFT_NAMESPACE }} project and select "Delete Project"
-      * Enter the name of your project "{{ REDHAT_OPENSHIFT_NAMESPACE }}" and then click [ Delete ]
-      * Recreate the OpenShift project named: {{ REDHAT_OPENSHIFT_NAMESPACE }}
-      
-      ### Share the OpenShift project with the other users
-
-      * You can find your Red Hat Login ID by logging into this site here: https://sso.redhat.com/auth/realms/redhat-external/account/
-      * You can add your Red Hat Login ID to your list of login IDs (REDHAT_OPENSHIFT_LOGIN_IDS) to the project here if you want to regenerate this issue in Github: {{ REPO_PATH }}/roles/computate_org_school_github/defaults/main.yml
-      {% if REDHAT_OPENSHIFT_MANAGE_HOST != 'https://employee.openshift.com' %}
-      * Now sign in to this site to add users to an OpenShift environment: {{ REDHAT_OPENSHIFT_MANAGE_HOST }}
-        * Click on "Manage Subscription" under the cluster you wish to add them to.
-        * Click the "Manage" link beside Collaborators. 
-        * On the collaborator page, enter the Red Hat Login ID for the user in the username field and click Add collaborator: 
-      {% for LOGIN_ID in REDHAT_OPENSHIFT_LOGIN_IDS %}
-        * {{ LOGIN_ID }}
-      {% endfor %}
-      {% endif %}
-      * Visit the OpenShift environment, click on your user name in the top right corner, and select "Copy Login Command" here: {{ REDHAT_OPENSHIFT_HOST }}
-      * Paste that login command into a terminal. 
-      * Follow these steps to add the login IDs to the project: 
-
-      ```bash
-      oc project {{ REDHAT_OPENSHIFT_NAMESPACE }}
-      {% for LOGIN_ID in REDHAT_OPENSHIFT_LOGIN_IDS %}
-      oc policy add-role-to-user view {{ LOGIN_ID }}
-      {% endfor %}
-      ```
-
-      You can visit this site for more information: https://www.openshift.com/blog/add-collaborators-openshift-online-pro-account
-  tags: 
-    - issue_label
-    - issue_label_401
-    - day4
 
 - name: "Create issue to create OpenShift ansible hosts file"
   include_role: 
@@ -1015,89 +922,7 @@
       ```
   tags: 
     - issue_label
-    - issue_label_402
-    - day4
-
-- name: "Create issue to automate the install of a Red Hat Single Sign On server to OpenShift"
-  include_role: 
-    name: computate_org_school_issue
-  vars: 
-    ISSUE_LABEL: automate_openshift_red_hat_sso
-    ISSUE_TITLE: "Automate the install of a Red Hat Single Sign On server to OpenShift"
-    MILESTONE_TITLE: Ansible OpenShift Deployment
-    COLUMN_NAME: Ansible OpenShift Deployment
-    ISSUE_BODY: |
-      As a team, automate the install of a PostgreSQL database to OpenShift. 
-      #### Run the playbook to install a PostgreSQL database in OpenShift.
-      
-      ```bash
-      (cd /usr/local/src/computate/ansible && ansible-playbook redhat_sso_openshift.yml -i {{ REPO_PATH }}/inventories/openshift/hosts --vault-id @prompt)
-      ```
-  tags: 
-    - issue_label
-    - issue_label_403
-    - day4
-
-- name: "Create issue to automate the install of a PostgreSQL database to OpenShift"
-  include_role: 
-    name: computate_org_school_issue
-  vars: 
-    ISSUE_LABEL: automate_openshift_postgres_database
-    ISSUE_TITLE: "Automate the install of a PostgreSQL database to OpenShift"
-    MILESTONE_TITLE: Ansible OpenShift Deployment
-    COLUMN_NAME: Ansible OpenShift Deployment
-    ISSUE_BODY: |
-      As a team, automate the install of a PostgreSQL database to OpenShift. 
-      #### Run the playbook to install a PostgreSQL database in OpenShift.
-      
-      ```bash
-      (cd /usr/local/src/computate/ansible && ansible-playbook postgres_openshift.yml -i {{ REPO_PATH }}/inventories/openshift/hosts --vault-id @prompt)
-      ```
-  tags: 
-    - issue_label
-    - issue_label_404
-    - day4
-
-- name: "Create issue to automate the install of an Apache Zookeeper cluster manager to OpenShift"
-  include_role: 
-    name: computate_org_school_issue
-  vars: 
-    ISSUE_LABEL: automate_openshift_zookeeper_cluster_manager
-    ISSUE_TITLE: "Automate the install of an Apache Zookeeper cluster manager to OpenShift"
-    MILESTONE_TITLE: Ansible OpenShift Deployment
-    COLUMN_NAME: Ansible OpenShift Deployment
-    ISSUE_BODY: |
-      As a team, automate the install of an Apache Zookeeper cluster manager to OpenShift. 
-      #### Run the playbook to install an Apache Zookeeper cluster manager to OpenShift.
-      
-      ```bash
-      (cd /usr/local/src/computate/ansible && ansible-playbook computate_zookeeper_openshift.yml -i {{ REPO_PATH }}/inventories/openshift/hosts --vault-id @prompt)
-      ```
-  tags: 
-    - issue_label
-    - issue_label_405
-    - day4
-
-- name: "Create issue to automate the install of an Apache Solr search engine to OpenShift"
-  include_role: 
-    name: computate_org_school_issue
-  vars: 
-    ISSUE_LABEL: automate_openshift_solr_search_engine
-    ISSUE_TITLE: "Automate the install of an Apache Solr search engine to OpenShift"
-    MILESTONE_TITLE: Ansible OpenShift Deployment
-    COLUMN_NAME: Ansible OpenShift Deployment
-    ISSUE_BODY: |
-      As a team, automate the install of an Apache Solr search engine to OpenShift. 
-
-      #### Run the playbook to install an Apache Zookeeper cluster manager to OpenShift.
-      
-      ```bash
-      (cd /usr/local/src/computate/ansible && ansible-playbook computate_solr_openshift.yml -i {{ REPO_PATH }}/inventories/openshift/hosts --vault-id @prompt)
-      ```
-  tags: 
-    - issue_label
-    - issue_label_406
-    - day4
+    - issue_label_401
 
 - name: "Create issue to automate the install of the school application to OpenShift"
   include_role: 
@@ -1117,8 +942,287 @@
       ```
   tags: 
     - issue_label
-    - issue_label_407
-    - day4
+    - issue_label_402
+
+#####################
+# Local Development #
+#####################
+
+- name: "Create issue to clone computate repo"
+  include_role: 
+    name: computate_org_school_issue
+  vars: 
+    ISSUE_LABEL: clone_computate_repo
+    ISSUE_TITLE: "Clone the computate git repository"
+    MILESTONE_TITLE: Development Installation
+    COLUMN_NAME: Development Installation
+    ISSUE_BODY: |
+      Help each member of the team create a directory for the computate repository with the included ansible scripts for installing the school applications for development and in OpenShift.
+      
+      ```bash
+      sudo install -d -o $USER -g $USER /usr/local/src/computate
+      ```
+
+      Clone the git repository into the new directory. 
+
+      ```bash
+      git clone git@github.com:computate/computate.git /usr/local/src/computate
+      ```
+  tags: 
+    - issue_label
+    - issue_label_501
+
+- name: "Create issue to create an ansible vault for local development"
+  include_role: 
+    name: computate_org_school_issue
+  vars: 
+    ISSUE_LABEL: create_local_dev_ansible_vault
+    ISSUE_TITLE: "Create an ansible vault for local development"
+    MILESTONE_TITLE: Development Installation
+    COLUMN_NAME: Development Installation
+    ISSUE_BODY: |
+      ### Create an ansible vault for your local development.
+      
+      Help each member of the team interested in local development to create and edit an encrypted ansible vault with a password for the host secrets for your development inventory.
+      
+      ```bash
+      install -d {{ REPO_PATH }}/inventories/$USER-$HOSTNAME/host_vars/$HOSTNAME/
+      ansible-vault create {{ REPO_PATH }}/inventories/$USER-$HOSTNAME/host_vars/$HOSTNAME/vault
+      ansible-vault edit {{ REPO_PATH }}/inventories/$USER-$HOSTNAME/host_vars/$HOSTNAME/vault
+      ```
+      
+      The contents of the vault will contain the secrets needed to override any default values you want to change in the computate-scolaire defaults defined here.
+      
+      https://github.com/computate/computate/blob/master/ansible/roles/computate_scolaire/defaults/main.yml
+      
+      There are descriptions for each of the fields.
+      There are several sections of fields, including:
+      
+      - computate-scolaire system defaults
+      - Ansible defaults
+      - Zookeeper defaults
+      - Solr defaults
+      - PostgreSQL defaults
+      - computate-medical global defaults
+      - computate-scolaire US English defaults
+      - SMTP defaults
+      - OpenID Connect auth server defaults
+      - SSL/TLS defaults
+
+      Here is an example of the contents of the ansible vault for local development: 
+
+      ```yaml
+      {{ lookup('url', 'https://raw.githubusercontent.com/computate/computate/master/ansible/roles/computate_scolaire/defaults/main.yml', split_lines=false) }}
+      ```
+
+      Look for values to override, especially those like this: "...". 
+  tags: 
+    - issue_label
+    - issue_label_502
+
+- name: "Create issue to install a PostgreSQL database for local development"
+  include_role: 
+    name: computate_org_school_issue
+  vars: 
+    ISSUE_LABEL: install_postgres_server
+    ISSUE_TITLE: "Install a PostgreSQL database for local development"
+    MILESTONE_TITLE: Development Installation
+    COLUMN_NAME: Development Installation
+    ISSUE_BODY: |
+      Help each member of the team interested in local development of the project install a PostgreSQL database. 
+
+      #### Run the playbook to install a PostgreSQL database on your development computer.
+      
+      ```bash
+      (cd /usr/local/src/computate/ansible && ansible-playbook computate_postgres.yml -i {{ REPO_PATH }}/inventories/$USER-$HOSTNAME/hosts --vault-id @prompt)
+      ```
+  tags: 
+    - issue_label
+    - issue_label_503
+
+- name: "Create issue to install an Apache Zookeeper cluster manager for local development"
+  include_role: 
+    name: computate_org_school_issue
+  vars: 
+    ISSUE_LABEL: install_zookeeper_cluster_manager
+    ISSUE_TITLE: "Install an Apache Zookeeper cluster manager for local development"
+    MILESTONE_TITLE: Development Installation
+    COLUMN_NAME: Development Installation
+    ISSUE_BODY: |
+      Help each member of the team interested in local development of the project install an Apache Zookeeper cluster manager. 
+
+      #### Run the playbook to install an Apache Zookeeper cluster manager on your development computer.
+      
+      ```bash
+      (cd /usr/local/src/computate/ansible && ansible-playbook computate_zookeeper.yml -i {{ REPO_PATH }}/inventories/$USER-$HOSTNAME/hosts --vault-id @prompt)
+      ```
+  tags: 
+    - issue_label
+    - issue_label_504
+
+- name: "Create issue to install an Apache Solr search engine for local development"
+  include_role: 
+    name: computate_org_school_issue
+  vars: 
+    ISSUE_LABEL: install_solr_search_engine
+    ISSUE_TITLE: "Install an Apache Solr search engine for local development"
+    MILESTONE_TITLE: Development Installation
+    COLUMN_NAME: Development Installation
+    ISSUE_BODY: |
+      Help each member of the team interested in local development of the project install an Apache Solr search engine. 
+
+      #### Run the playbook to install an Apache Zookeeper cluster manager on your development computer.
+      
+      ```bash
+      (cd /usr/local/src/computate/ansible && ansible-playbook computate_solr.yml -i {{ REPO_PATH }}/inventories/$USER-$HOSTNAME/hosts --vault-id @prompt)
+      ```
+  tags: 
+    - issue_label
+    - issue_label_505
+
+- name: "Create issue to install the school application for local development"
+  include_role: 
+    name: computate_org_school_issue
+  vars: 
+    ISSUE_LABEL: install_school_app
+    ISSUE_TITLE: "Install the school application for local development"
+    MILESTONE_TITLE: Development Installation
+    COLUMN_NAME: Development Installation
+    ISSUE_BODY: |
+      #### Run the playbook to install the school application for development.
+      
+      ```bash
+      (cd /usr/local/src/computate/ansible && ansible-playbook computate_scolaire.yml -i {{ REPO_PATH }}/inventories/$USER-$HOSTNAME/hosts --vault-id @prompt)
+      ```
+  tags: 
+    - issue_label
+    - issue_label_506
+
+###################################
+# Ansible Automation in OpenShift #
+###################################
+#
+#- name: "Create issue to delete and recreate an OpenShift project for ansible automation"
+#  include_role: 
+#    name: computate_org_school_issue
+#  vars: 
+#    ISSUE_LABEL: delete_and_recreate_openshift_project
+#    ISSUE_TITLE: "Delete and recreate an OpenShift project"
+#    MILESTONE_TITLE: Optional Ansible OpenShift Deployment
+#    COLUMN_NAME: Optional Ansible OpenShift Deployment
+#    ISSUE_BODY: |
+#      As a team, create an OpenShift project and share the project with the team. 
+#
+#      * Login to your OpenShift environment here: {{ REDHAT_OPENSHIFT_HOST }}
+#      * Click on the "..." next to your {{ REDHAT_OPENSHIFT_NAMESPACE }} project and select "Delete Project"
+#      * Enter the name of your project "{{ REDHAT_OPENSHIFT_NAMESPACE }}" and then click [ Delete ]
+#      * Recreate the OpenShift project named: {{ REDHAT_OPENSHIFT_NAMESPACE }}
+#      
+#      ### Share the OpenShift project with the other users
+#
+#      * You can find your Red Hat Login ID by logging into this site here: https://sso.redhat.com/auth/realms/redhat-external/account/
+#      * You can add your Red Hat Login ID to your list of login IDs (REDHAT_OPENSHIFT_LOGIN_IDS) to the project here if you want to regenerate this issue in Github: {{ REPO_PATH }}/roles/computate_org_school_github/defaults/main.yml
+#      {% if REDHAT_OPENSHIFT_MANAGE_HOST != 'https://employee.openshift.com' %}
+#      * Now sign in to this site to add users to an OpenShift environment: {{ REDHAT_OPENSHIFT_MANAGE_HOST }}
+#        * Click on "Manage Subscription" under the cluster you wish to add them to.
+#        * Click the "Manage" link beside Collaborators. 
+#        * On the collaborator page, enter the Red Hat Login ID for the user in the username field and click Add collaborator: 
+#      {% for LOGIN_ID in REDHAT_OPENSHIFT_LOGIN_IDS %}
+#        * {{ LOGIN_ID }}
+#      {% endfor %}
+#      {% endif %}
+#      * Visit the OpenShift environment, click on your user name in the top right corner, and select "Copy Login Command" here: {{ REDHAT_OPENSHIFT_HOST }}
+#      * Paste that login command into a terminal. 
+#      * Follow these steps to add the login IDs to the project: 
+#
+#      ```bash
+#      oc project {{ REDHAT_OPENSHIFT_NAMESPACE }}
+#      {% for LOGIN_ID in REDHAT_OPENSHIFT_LOGIN_IDS %}
+#      oc policy add-role-to-user view {{ LOGIN_ID }}
+#      {% endfor %}
+#      ```
+#
+#      You can visit this site for more information: https://www.openshift.com/blog/add-collaborators-openshift-online-pro-account
+#  tags: 
+#    - issue_label
+#    - issue_label_601
+
+- name: "Create issue to automate the install of a Red Hat Single Sign On server to OpenShift"
+  include_role: 
+    name: computate_org_school_issue
+  vars: 
+    ISSUE_LABEL: automate_openshift_red_hat_sso
+    ISSUE_TITLE: "Automate the install of a Red Hat Single Sign On server to OpenShift"
+    MILESTONE_TITLE: Optional Ansible OpenShift Deployment
+    COLUMN_NAME: Optional Ansible OpenShift Deployment
+    ISSUE_BODY: |
+      As a team, automate the install of a PostgreSQL database to OpenShift. 
+      #### Run the playbook to install a PostgreSQL database in OpenShift.
+      
+      ```bash
+      (cd /usr/local/src/computate/ansible && ansible-playbook redhat_sso_openshift.yml -i {{ REPO_PATH }}/inventories/openshift/hosts --vault-id @prompt)
+      ```
+  tags: 
+    - issue_label
+    - issue_label_602
+
+- name: "Create issue to automate the install of a PostgreSQL database to OpenShift"
+  include_role: 
+    name: computate_org_school_issue
+  vars: 
+    ISSUE_LABEL: automate_openshift_postgres_database
+    ISSUE_TITLE: "Automate the install of a PostgreSQL database to OpenShift"
+    MILESTONE_TITLE: Optional Ansible OpenShift Deployment
+    COLUMN_NAME: Optional Ansible OpenShift Deployment
+    ISSUE_BODY: |
+      As a team, automate the install of a PostgreSQL database to OpenShift. 
+      #### Run the playbook to install a PostgreSQL database in OpenShift.
+      
+      ```bash
+      (cd /usr/local/src/computate/ansible && ansible-playbook postgres_openshift.yml -i {{ REPO_PATH }}/inventories/openshift/hosts --vault-id @prompt)
+      ```
+  tags: 
+    - issue_label
+    - issue_label_603
+
+- name: "Create issue to automate the install of an Apache Zookeeper cluster manager to OpenShift"
+  include_role: 
+    name: computate_org_school_issue
+  vars: 
+    ISSUE_LABEL: automate_openshift_zookeeper_cluster_manager
+    ISSUE_TITLE: "Automate the install of an Apache Zookeeper cluster manager to OpenShift"
+    MILESTONE_TITLE: Optional Ansible OpenShift Deployment
+    COLUMN_NAME: Optional Ansible OpenShift Deployment
+    ISSUE_BODY: |
+      As a team, automate the install of an Apache Zookeeper cluster manager to OpenShift. 
+      #### Run the playbook to install an Apache Zookeeper cluster manager to OpenShift.
+      
+      ```bash
+      (cd /usr/local/src/computate/ansible && ansible-playbook computate_zookeeper_openshift.yml -i {{ REPO_PATH }}/inventories/openshift/hosts --vault-id @prompt)
+      ```
+  tags: 
+    - issue_label
+    - issue_label_604
+
+- name: "Create issue to automate the install of an Apache Solr search engine to OpenShift"
+  include_role: 
+    name: computate_org_school_issue
+  vars: 
+    ISSUE_LABEL: automate_openshift_solr_search_engine
+    ISSUE_TITLE: "Automate the install of an Apache Solr search engine to OpenShift"
+    MILESTONE_TITLE: Optional Ansible OpenShift Deployment
+    COLUMN_NAME: Optional Ansible OpenShift Deployment
+    ISSUE_BODY: |
+      As a team, automate the install of an Apache Solr search engine to OpenShift. 
+
+      #### Run the playbook to install an Apache Zookeeper cluster manager to OpenShift.
+      
+      ```bash
+      (cd /usr/local/src/computate/ansible && ansible-playbook computate_solr_openshift.yml -i {{ REPO_PATH }}/inventories/openshift/hosts --vault-id @prompt)
+      ```
+  tags: 
+    - issue_label
+    - issue_label_605
 
 # Task to decide the project/namespace name
 # Task to deploy PostgreSQL database (default OpenShift app)

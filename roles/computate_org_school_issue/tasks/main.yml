@@ -34,7 +34,6 @@
           - 200
           - 201
       register: ISSUE_CREATE_JSON
-      tags: issue_label
       tags: always
     - name: Create card
       include_role: 
@@ -63,7 +62,6 @@
           - 200
           - 201
       register: ISSUE_CREATE_JSON
-      tags: issue_label
       tags: always
     - name: Create card
       include_role: 
@@ -91,7 +89,6 @@
           body: "{{ ISSUE_BODY }}"
           milestone: "{{ MILESTONE_TITLE_JSON.number | default(omit) }}"
       register: ISSUE_CREATE_JSON
-      tags: issue_label
       tags: always
     - name: Create card
       include_role: 
@@ -117,7 +114,6 @@
           title: "{{ ISSUE_TITLE }}"
           body: "{{ ISSUE_BODY }}"
       register: ISSUE_CREATE_JSON
-      tags: issue_label
       tags: always
     - name: Create card
       include_role: 
