@@ -3,4 +3,5 @@ inventories/*/key
 **/*.retry
 **/*.swp
 .project
+.settings
 

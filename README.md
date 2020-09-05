@@ -1,5 +1,5 @@
 
-# computate-org-school installation
+# computate-org installation
 
 The installation of the project for both development and production in containers is completely automated with Ansible.
 Begin by installing both the ansible and python3 packages.
@@ -53,7 +53,7 @@ https://www.redhat.com/en/services/training/do407-automation-ansible-i
 The instructor of the ACE course will want to setup a github organization for the team to get started on their training. The Ansible command below will step through each step. 
 
 ```bash
-cd /usr/local/src/computate-org-school
+cd /usr/local/src/computate-org
 ansible-playbook instructor.yml -i inventories/$USER-$HOSTNAME/hosts --vault-password-file=inventories/$USER-$HOSTNAME/key
 ```
 

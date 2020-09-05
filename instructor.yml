@@ -1,7 +1,7 @@
 ---
 - name: Instructor tasks to setup a new organization to manage a school
-  hosts: computate_org_school
+  hosts: computate_org
   gather_facts: false
   roles: 
-    - computate_org_school_github
+    - computate_org_github
   

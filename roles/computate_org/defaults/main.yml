@@ -1,7 +1,7 @@
 
 GITHUB_ORG: "..."
 GITHUB_TOKEN: "..."
-GITHUB_REPO: computate-org-school
+GITHUB_REPO: computate-org
 REPO_PATH: "/usr/local/src/{{ GITHUB_REPO }}"
 
 HOST_NAME: "..."

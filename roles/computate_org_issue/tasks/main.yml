@@ -37,7 +37,7 @@
       tags: always
     - name: Create card
       include_role: 
-        name: computate_org_school_card
+        name: computate_org_card
       vars: 
         CARD_CONTENT_ID: "{{ ISSUE_CREATE_JSON.json.id }}"
       tags: always
@@ -65,7 +65,7 @@
       tags: always
     - name: Create card
       include_role: 
-        name: computate_org_school_card
+        name: computate_org_card
       vars: 
         CARD_CONTENT_ID: "{{ ISSUE_CREATE_JSON.json.id }}"
       tags: always
@@ -92,7 +92,7 @@
       tags: always
     - name: Create card
       include_role: 
-        name: computate_org_school_card
+        name: computate_org_card
       vars: 
         CARD_CONTENT_ID: "{{ ISSUE_CREATE_JSON.json.id }}"
       tags: always
@@ -117,7 +117,7 @@
       tags: always
     - name: Create card
       include_role: 
-        name: computate_org_school_card
+        name: computate_org_card
       vars: 
         CARD_CONTENT_ID: "{{ ISSUE_CREATE_JSON.json.id }}"
       tags: always

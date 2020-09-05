@@ -39,7 +39,7 @@
   tags: github_repo
 - name: "Fork Github repo {{ GITHUB_REPO }}"
   uri: 
-    url: "https://api.github.com/repos/computate-org/computate-org-school/forks?organization={{ GITHUB_ORG | urlencode() }}"
+    url: "https://api.github.com/repos/computate-org/computate-org/forks?organization={{ GITHUB_ORG | urlencode() }}"
     method: POST
     return_content: true
     headers: 
@@ -76,7 +76,7 @@
 
 - name: Create project
   include_role: 
-    name: computate_org_school_project
+    name: computate_org_project
   vars: 
     PROJECT_NAME: School Mock Client Engagement
     PROJECT_DESCRIPTION: |
@@ -101,42 +101,42 @@
 
 - name: Create column for setup issues
   include_role: 
-    name: computate_org_school_column
+    name: computate_org_column
   vars: 
     COLUMN_NAME: Setup Tasks
   tags: 
     - column
 - name: Create column for Configure Authentication
   include_role: 
-    name: computate_org_school_column
+    name: computate_org_column
   vars: 
     COLUMN_NAME: Configure Authentication
   tags: 
     - column
 - name: Create column for OpenShift Deployment issues
   include_role: 
-    name: computate_org_school_column
+    name: computate_org_column
   vars: 
     COLUMN_NAME: OpenShift Deployment
   tags: 
     - column
 - name: Create column for Ansible OpenShift Deployment issues
   include_role: 
-    name: computate_org_school_column
+    name: computate_org_column
   vars: 
     COLUMN_NAME: Ansible OpenShift Deployment
   tags: 
     - column
 - name: Create column for Local install issues
   include_role: 
-    name: computate_org_school_column
+    name: computate_org_column
   vars: 
     COLUMN_NAME: Development Installation
   tags: 
     - column
 - name: Create column for Ansible Optional OpenShift Deployment issues
   include_role: 
-    name: computate_org_school_column
+    name: computate_org_column
   vars: 
     COLUMN_NAME: Optional Ansible OpenShift Deployment
   tags: 
@@ -158,7 +158,7 @@
 
 - name: Create milestone for setup issues
   include_role: 
-    name: computate_org_school_milestone
+    name: computate_org_milestone
   vars: 
     MILESTONE_TITLE: Setup Tasks
     MILESTONE_DESCRIPTION: |
@@ -167,7 +167,7 @@
     - milestone
 - name: Create milestone for Configure Authentication issues
   include_role: 
-    name: computate_org_school_milestone
+    name: computate_org_milestone
   vars: 
     MILESTONE_TITLE: Configure Authentication
     MILESTONE_DESCRIPTION: |
@@ -176,7 +176,7 @@
     - milestone
 - name: Create milestone for OpenShift Deployment issues
   include_role: 
-    name: computate_org_school_milestone
+    name: computate_org_milestone
   vars: 
     MILESTONE_TITLE: OpenShift Deployment
     MILESTONE_DESCRIPTION: |
@@ -185,7 +185,7 @@
     - milestone
 - name: Create milestone for Ansible OpenShift Deployment issues
   include_role: 
-    name: computate_org_school_milestone
+    name: computate_org_milestone
   vars: 
     MILESTONE_TITLE: Ansible OpenShift Deployment
     MILESTONE_DESCRIPTION: |
@@ -194,7 +194,7 @@
     - milestone
 - name: Create milestone for Local install issues
   include_role: 
-    name: computate_org_school_milestone
+    name: computate_org_milestone
   vars: 
     MILESTONE_TITLE: Development Installation
     MILESTONE_DESCRIPTION: |
@@ -203,7 +203,7 @@
     - milestone
 - name: Create milestone for Optional Ansible OpenShift Deployment issues
   include_role: 
-    name: computate_org_school_milestone
+    name: computate_org_milestone
   vars: 
     MILESTONE_TITLE: Optional Ansible OpenShift Deployment
     MILESTONE_DESCRIPTION: |
@@ -217,7 +217,7 @@
 
 - name: Create issue to setup OpenShift cluster
   include_role: 
-    name: computate_org_school_issue
+    name: computate_org_issue
   vars: 
     ISSUE_LABEL: setup_openshift_cluster
     ISSUE_TITLE: Setup OpenShift cluster
@@ -235,7 +235,7 @@
 
 - name: "Create issue to create an OpenShift project"
   include_role: 
-    name: computate_org_school_issue
+    name: computate_org_issue
   vars: 
     ISSUE_LABEL: create_openshift_project
     ISSUE_TITLE: "Create an OpenShift project"
@@ -250,7 +250,7 @@
       ### Share the OpenShift project with the other users
 
       * You can find your Red Hat Login ID by logging into this site here: https://sso.redhat.com/auth/realms/redhat-external/account/
-      * You can add your Red Hat Login ID to your list of login IDs (REDHAT_OPENSHIFT_LOGIN_IDS) to the project here if you want to regenerate this issue in Github: {{ REPO_PATH }}/roles/computate_org_school_github/defaults/main.yml
+      * You can add your Red Hat Login ID to your list of login IDs (REDHAT_OPENSHIFT_LOGIN_IDS) to the project here if you want to regenerate this issue in Github: {{ REPO_PATH }}/roles/computate_org_github/defaults/main.yml
       {% if REDHAT_OPENSHIFT_MANAGE_HOST != 'https://employee.openshift.com' %}
       * Now sign in to this site to add users to an OpenShift environment: {{ REDHAT_OPENSHIFT_MANAGE_HOST }}
         * Click on "Manage Subscription" under the cluster you wish to add them to.
@@ -278,7 +278,7 @@
 
 - name: Create issue to install ansible locally
   include_role: 
-    name: computate_org_school_issue
+    name: computate_org_issue
   vars: 
     ISSUE_LABEL: install_ansible_locally
     ISSUE_TITLE: Install Ansible Locally
@@ -349,11 +349,11 @@
     - issue_label
     - issue_label_103
 
-- name: "Create issue to clone computate-org-school repo"
+- name: "Create issue to clone computate-org repo"
   include_role: 
-    name: computate_org_school_issue
+    name: computate_org_issue
   vars: 
-    ISSUE_LABEL: clone_computate_org_school_repo
+    ISSUE_LABEL: clone_computate_org_repo
     ISSUE_TITLE: "Clone the {{ GITHUB_REPO }} git repository"
     MILESTONE_TITLE: Setup Tasks
     COLUMN_NAME: Setup Tasks
@@ -380,7 +380,7 @@
       
       ```bash
       echo "
-      [computate_org_school]
+      [computate_org]
       $HOSTNAME
 
       [computate_postgres]
@@ -417,7 +417,7 @@
 
 - name: "Create issue to create an ansible vault for OpenShift"
   include_role: 
-    name: computate_org_school_issue
+    name: computate_org_issue
   vars: 
     ISSUE_LABEL: create_openshift_ansible_vault
     ISSUE_TITLE: "Create an ansible vault for OpenShift"
@@ -469,7 +469,7 @@
 
 - name: "Create issue to install a Red Hat Single Sign On server to OpenShift"
   include_role: 
-    name: computate_org_school_issue
+    name: computate_org_issue
   vars: 
     ISSUE_LABEL: install_openshift_red_hat_sso
     ISSUE_TITLE: "Install a Red Hat Single Sign On server to OpenShift"
@@ -557,7 +557,7 @@
 
 - name: "Create issue to configure the Red Hat Single Sign On server"
   include_role: 
-    name: computate_org_school_issue
+    name: computate_org_issue
   vars: 
     ISSUE_LABEL: configure_red_hat_sso
     ISSUE_TITLE: "Configure the Red Hat Single Sign On server"
@@ -662,7 +662,7 @@
 
 - name: "Create issue to install a PostgreSQL database to OpenShift"
   include_role: 
-    name: computate_org_school_issue
+    name: computate_org_issue
   vars: 
     ISSUE_LABEL: install_openshift_postgres_database
     ISSUE_TITLE: "Install a PostgreSQL database to OpenShift"
@@ -695,7 +695,7 @@
 
 - name: "Create issue to install an Apache Zookeeper cluster manager to OpenShift"
   include_role: 
-    name: computate_org_school_issue
+    name: computate_org_issue
   vars: 
     ISSUE_LABEL: install_openshift_zookeeper_cluster_manager
     ISSUE_TITLE: "Install an Apache Zookeeper cluster manager to OpenShift"
@@ -789,7 +789,7 @@
 
 - name: "Create issue to install an Apache Solr search engine to OpenShift"
   include_role: 
-    name: computate_org_school_issue
+    name: computate_org_issue
   vars: 
     ISSUE_LABEL: install_openshift_solr_cluster_manager
     ISSUE_TITLE: "Install an Apache Solr search engine to OpenShift"
@@ -868,7 +868,7 @@
 
 - name: "Create issue to create OpenShift ansible hosts file"
   include_role: 
-    name: computate_org_school_issue
+    name: computate_org_issue
   vars: 
     ISSUE_LABEL: create_openshift_ansible_hosts
     ISSUE_TITLE: "Create OpenShift ansible hosts file"
@@ -926,7 +926,7 @@
 
 - name: "Create issue to automate the install of the school application to OpenShift"
   include_role: 
-    name: computate_org_school_issue
+    name: computate_org_issue
   vars: 
     ISSUE_LABEL: automate_openshift_school_app
     ISSUE_TITLE: "Automate the install of the school application to OpenShift"
@@ -950,7 +950,7 @@
 
 - name: "Create issue to clone computate repo"
   include_role: 
-    name: computate_org_school_issue
+    name: computate_org_issue
   vars: 
     ISSUE_LABEL: clone_computate_repo
     ISSUE_TITLE: "Clone the computate git repository"
@@ -974,7 +974,7 @@
 
 - name: "Create issue to create an ansible vault for local development"
   include_role: 
-    name: computate_org_school_issue
+    name: computate_org_issue
   vars: 
     ISSUE_LABEL: create_local_dev_ansible_vault
     ISSUE_TITLE: "Create an ansible vault for local development"
@@ -1022,7 +1022,7 @@
 
 - name: "Create issue to install a PostgreSQL database for local development"
   include_role: 
-    name: computate_org_school_issue
+    name: computate_org_issue
   vars: 
     ISSUE_LABEL: install_postgres_server
     ISSUE_TITLE: "Install a PostgreSQL database for local development"
@@ -1042,7 +1042,7 @@
 
 - name: "Create issue to install an Apache Zookeeper cluster manager for local development"
   include_role: 
-    name: computate_org_school_issue
+    name: computate_org_issue
   vars: 
     ISSUE_LABEL: install_zookeeper_cluster_manager
     ISSUE_TITLE: "Install an Apache Zookeeper cluster manager for local development"
@@ -1062,7 +1062,7 @@
 
 - name: "Create issue to install an Apache Solr search engine for local development"
   include_role: 
-    name: computate_org_school_issue
+    name: computate_org_issue
   vars: 
     ISSUE_LABEL: install_solr_search_engine
     ISSUE_TITLE: "Install an Apache Solr search engine for local development"
@@ -1082,7 +1082,7 @@
 
 - name: "Create issue to install the school application for local development"
   include_role: 
-    name: computate_org_school_issue
+    name: computate_org_issue
   vars: 
     ISSUE_LABEL: install_school_app
     ISSUE_TITLE: "Install the school application for local development"
@@ -1104,7 +1104,7 @@
 #
 #- name: "Create issue to delete and recreate an OpenShift project for ansible automation"
 #  include_role: 
-#    name: computate_org_school_issue
+#    name: computate_org_issue
 #  vars: 
 #    ISSUE_LABEL: delete_and_recreate_openshift_project
 #    ISSUE_TITLE: "Delete and recreate an OpenShift project"
@@ -1121,7 +1121,7 @@
 #      ### Share the OpenShift project with the other users
 #
 #      * You can find your Red Hat Login ID by logging into this site here: https://sso.redhat.com/auth/realms/redhat-external/account/
-#      * You can add your Red Hat Login ID to your list of login IDs (REDHAT_OPENSHIFT_LOGIN_IDS) to the project here if you want to regenerate this issue in Github: {{ REPO_PATH }}/roles/computate_org_school_github/defaults/main.yml
+#      * You can add your Red Hat Login ID to your list of login IDs (REDHAT_OPENSHIFT_LOGIN_IDS) to the project here if you want to regenerate this issue in Github: {{ REPO_PATH }}/roles/computate_org_github/defaults/main.yml
 #      {% if REDHAT_OPENSHIFT_MANAGE_HOST != 'https://employee.openshift.com' %}
 #      * Now sign in to this site to add users to an OpenShift environment: {{ REDHAT_OPENSHIFT_MANAGE_HOST }}
 #        * Click on "Manage Subscription" under the cluster you wish to add them to.
@@ -1149,7 +1149,7 @@
 
 - name: "Create issue to automate the install of a Red Hat Single Sign On server to OpenShift"
   include_role: 
-    name: computate_org_school_issue
+    name: computate_org_issue
   vars: 
     ISSUE_LABEL: automate_openshift_red_hat_sso
     ISSUE_TITLE: "Automate the install of a Red Hat Single Sign On server to OpenShift"
@@ -1168,7 +1168,7 @@
 
 - name: "Create issue to automate the install of a PostgreSQL database to OpenShift"
   include_role: 
-    name: computate_org_school_issue
+    name: computate_org_issue
   vars: 
     ISSUE_LABEL: automate_openshift_postgres_database
     ISSUE_TITLE: "Automate the install of a PostgreSQL database to OpenShift"
@@ -1187,7 +1187,7 @@
 
 - name: "Create issue to automate the install of an Apache Zookeeper cluster manager to OpenShift"
   include_role: 
-    name: computate_org_school_issue
+    name: computate_org_issue
   vars: 
     ISSUE_LABEL: automate_openshift_zookeeper_cluster_manager
     ISSUE_TITLE: "Automate the install of an Apache Zookeeper cluster manager to OpenShift"
@@ -1206,7 +1206,7 @@
 
 - name: "Create issue to automate the install of an Apache Solr search engine to OpenShift"
   include_role: 
-    name: computate_org_school_issue
+    name: computate_org_issue
   vars: 
     ISSUE_LABEL: automate_openshift_solr_search_engine
     ISSUE_TITLE: "Automate the install of an Apache Solr search engine to OpenShift"
