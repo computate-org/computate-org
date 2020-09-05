@@ -11,6 +11,7 @@
     body: 
       name: "{{ PROJECT_NAME }}"
       description: "{{ PROJECT_DESCRIPTION }}"
+    return_content: true
     status_code: 
       - 200
       - 201
@@ -27,6 +28,7 @@
       Authorization: "token {{ GITHUB_TOKEN }}"
       Accept: "application/vnd.github.inertia-preview+json"
     body_format: json
+    return_content: true
     body: 
       name: "{{ PROJECT_NAME }}"
       description: "{{ PROJECT_DESCRIPTION }}"

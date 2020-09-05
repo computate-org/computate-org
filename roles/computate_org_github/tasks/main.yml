@@ -74,13 +74,9 @@
     project_query: "[?name=='{{ PROJECT_NAME | default(omit) }}'].{name: name, description: description, id: id}"
   tags: always
 
-- name: Create project
+- name: "Create project {{ PROJECT_NAME }}"
   include_role: 
     name: computate_org_project
-  vars: 
-    PROJECT_NAME: School Mock Client Engagement
-    PROJECT_DESCRIPTION: |
-      A mock client engagement project to setup an online school enrollment software. 
   tags: 
     - project
 
@@ -141,6 +137,17 @@
     COLUMN_NAME: Optional Ansible OpenShift Deployment
   tags: 
     - column
+
+- name: "Get columns"
+  uri:
+    timeout: 90
+    url: "https://api.github.com/projects/{{ PROJECT_NAME_JSON.id }}/columns"
+    return_content: true
+    headers:
+      Authorization: "token {{ GITHUB_TOKEN }}"
+      Accept: "application/vnd.github.inertia-preview+json"
+  register: COLUMNS
+  tags: always
 
 ##############
 # Milestones #
@@ -210,6 +217,16 @@
       Optional scripts for Automating the deployment of applications to OpenShift using Ansible. 
   tags: 
     - milestone
+
+- name: "Get milestones"
+  uri:
+    timeout: 90
+    url: "https://api.github.com/repos/{{ GITHUB_ORG }}/{{ GITHUB_REPO }}/milestones"
+    return_content: true
+    headers:
+      Authorization: "token {{ GITHUB_TOKEN }}"
+  register: MILESTONES
+  tags: always
 
 ####################################
 # OpenShift Cluster Administration #
@@ -395,19 +412,19 @@
       [computate_certbot]
       $HOSTNAME
 
-      [computate_scolaire]
+      [{{ APP_NAME_ANSIBLE }}]
       $HOSTNAME
 
-      [computate_scolaire_login]
+      [{{ APP_NAME_ANSIBLE }}_login]
       $HOSTNAME
 
-      [computate_scolaire_refresh]
+      [{{ APP_NAME_ANSIBLE }}_refresh]
       $HOSTNAME
 
-      [computate_scolaire_backup]
+      [{{ APP_NAME_ANSIBLE }}_backup]
       $HOSTNAME
 
-      [computate_scolaire_restore]
+      [{{ APP_NAME_ANSIBLE }}_restore]
       $HOSTNAME
       " > {{ REPO_PATH }}/inventories/$USER-$HOSTNAME/hosts
       ```
@@ -434,20 +451,20 @@
       ansible-vault edit {{ REPO_PATH }}/inventories/openshift/host_vars/localhost/vault
       ```
       
-      The contents of the vault will contain the secrets needed to override any default values you want to change in the computate-scolaire defaults defined here.
+      The contents of the vault will contain the secrets needed to override any default values you want to change in the app defaults defined here.
       
-      https://github.com/computate/computate/blob/master/ansible/roles/computate_scolaire_openshift_enUS/defaults/main.yml
+      https://github.com/computate/computate/blob/master/ansible/roles/{{ APP_NAME_ANSIBLE }}_openshift_enUS/defaults/main.yml
       
       There are descriptions for each of the fields.
       There are several sections of fields, including:
       
-      - computate-scolaire system defaults
+      - app system defaults
       - Ansible defaults
       - Zookeeper defaults
       - Solr defaults
       - PostgreSQL defaults
       - computate-medical global defaults
-      - computate-scolaire US English defaults
+      - app US English defaults
       - SMTP defaults
       - OpenID Connect auth server defaults
       - SSL/TLS defaults
@@ -455,7 +472,7 @@
       Here is an example of the contents of the ansible vault for OpenShift: 
 
       ```yaml
-      {{ lookup('url', 'https://raw.githubusercontent.com/computate/computate/master/ansible/roles/computate_scolaire_openshift_enUS/defaults/main.yml', split_lines=false) }}
+      {{ lookup('url', 'https://raw.githubusercontent.com/computate/computate/master/ansible/roles/{{ APP_NAME_ANSIBLE }}_openshift_enUS/defaults/main.yml', split_lines=false) }}
       ```
 
       Look for values to override, especially those like this: "...". 
@@ -904,19 +921,19 @@
       [computate_certbot]
       localhost
 
-      [computate_scolaire_openshift_enUS]
+      [{{ APP_NAME_ANSIBLE }}_openshift_enUS]
       localhost
 
-      [computate_scolaire_login]
+      [{{ APP_NAME_ANSIBLE }}_login]
       localhost
 
-      [computate_scolaire_refresh]
+      [{{ APP_NAME_ANSIBLE }}_refresh]
       localhost
 
-      [computate_scolaire_backup]
+      [{{ APP_NAME_ANSIBLE }}_backup]
       localhost
 
-      [computate_scolaire_restore]
+      [{{ APP_NAME_ANSIBLE }}_restore]
       localhost
       " > {{ REPO_PATH }}/inventories/openshift/hosts
       ```
@@ -924,21 +941,21 @@
     - issue_label
     - issue_label_401
 
-- name: "Create issue to automate the install of the school application to OpenShift"
+- name: "Create issue to automate the install of the application to OpenShift"
   include_role: 
     name: computate_org_issue
   vars: 
-    ISSUE_LABEL: automate_openshift_school_app
-    ISSUE_TITLE: "Automate the install of the school application to OpenShift"
+    ISSUE_LABEL: automate_openshift_app
+    ISSUE_TITLE: "Automate the install of the application to OpenShift"
     MILESTONE_TITLE: Ansible OpenShift Deployment
     COLUMN_NAME: Ansible OpenShift Deployment
     ISSUE_BODY: |
-      As a team, automate the install of the school application to OpenShift. 
+      As a team, automate the install of the application to OpenShift. 
 
-      #### Run the playbook to install the school application to OpenShift.
+      #### Run the playbook to install the application to OpenShift.
       
       ```bash
-      (cd /usr/local/src/computate/ansible && ansible-playbook computate_scolaire_openshift_enUS.yml -i {{ REPO_PATH }}/inventories/openshift/hosts --vault-id @prompt)
+      (cd /usr/local/src/computate/ansible && ansible-playbook {{ APP_NAME_ANSIBLE }}_openshift_enUS.yml -i {{ REPO_PATH }}/inventories/openshift/hosts --vault-id @prompt)
       ```
   tags: 
     - issue_label
@@ -957,7 +974,7 @@
     MILESTONE_TITLE: Development Installation
     COLUMN_NAME: Development Installation
     ISSUE_BODY: |
-      Help each member of the team create a directory for the computate repository with the included ansible scripts for installing the school applications for development and in OpenShift.
+      Help each member of the team create a directory for the computate repository with the included ansible scripts for installing the applications for development and in OpenShift.
       
       ```bash
       sudo install -d -o $USER -g $USER /usr/local/src/computate
@@ -991,20 +1008,20 @@
       ansible-vault edit {{ REPO_PATH }}/inventories/$USER-$HOSTNAME/host_vars/$HOSTNAME/vault
       ```
       
-      The contents of the vault will contain the secrets needed to override any default values you want to change in the computate-scolaire defaults defined here.
+      The contents of the vault will contain the secrets needed to override any default values you want to change in the app defaults defined here.
       
-      https://github.com/computate/computate/blob/master/ansible/roles/computate_scolaire/defaults/main.yml
+      https://github.com/computate/computate/blob/master/ansible/roles/{{ APP_NAME_ANSIBLE }}/defaults/main.yml
       
       There are descriptions for each of the fields.
       There are several sections of fields, including:
       
-      - computate-scolaire system defaults
+      - app system defaults
       - Ansible defaults
       - Zookeeper defaults
       - Solr defaults
       - PostgreSQL defaults
       - computate-medical global defaults
-      - computate-scolaire US English defaults
+      - app US English defaults
       - SMTP defaults
       - OpenID Connect auth server defaults
       - SSL/TLS defaults
@@ -1012,7 +1029,7 @@
       Here is an example of the contents of the ansible vault for local development: 
 
       ```yaml
-      {{ lookup('url', 'https://raw.githubusercontent.com/computate/computate/master/ansible/roles/computate_scolaire/defaults/main.yml', split_lines=false) }}
+      {{ lookup('url', 'https://raw.githubusercontent.com/computate/computate/master/ansible/roles/{{ APP_NAME_ANSIBLE }}/defaults/main.yml', split_lines=false) }}
       ```
 
       Look for values to override, especially those like this: "...". 
@@ -1080,19 +1097,19 @@
     - issue_label
     - issue_label_505
 
-- name: "Create issue to install the school application for local development"
+- name: "Create issue to install the application for local development"
   include_role: 
     name: computate_org_issue
   vars: 
-    ISSUE_LABEL: install_school_app
-    ISSUE_TITLE: "Install the school application for local development"
+    ISSUE_LABEL: install_app
+    ISSUE_TITLE: "Install the application for local development"
     MILESTONE_TITLE: Development Installation
     COLUMN_NAME: Development Installation
     ISSUE_BODY: |
-      #### Run the playbook to install the school application for development.
+      #### Run the playbook to install the application for development.
       
       ```bash
-      (cd /usr/local/src/computate/ansible && ansible-playbook computate_scolaire.yml -i {{ REPO_PATH }}/inventories/$USER-$HOSTNAME/hosts --vault-id @prompt)
+      (cd /usr/local/src/computate/ansible && ansible-playbook {{ APP_NAME_ANSIBLE }}.yml -i {{ REPO_PATH }}/inventories/$USER-$HOSTNAME/hosts --vault-id @prompt)
       ```
   tags: 
     - issue_label
@@ -1228,7 +1245,7 @@
 # Task to deploy PostgreSQL database (default OpenShift app)
 # Task to deploy Zookeeper cluster manager (custom container from quay.io)
 # Task to deploy Apache Solr Search Engine (custom container from quay.io)
-# Task to deploy school application (s2i image)
+# Task to deploy application (s2i image)
 
 #############
 # SSO Admin #

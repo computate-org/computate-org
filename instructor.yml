@@ -1,5 +1,5 @@
 ---
-- name: Instructor tasks to setup a new organization to manage a school
+- name: Instructor tasks to setup a new organization to manage the app
   hosts: computate_org
   gather_facts: false
   roles: 
