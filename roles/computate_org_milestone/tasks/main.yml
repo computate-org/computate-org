@@ -1,10 +1,12 @@
 - name: "Get milestone by title {{ MILESTONE_TITLE | default(omit) }}"
+  connection: local
   set_fact:
     MILESTONE_TITLE_JSON: "{{ MILESTONES.json | json_query(milestone_query) | first | default(None) }}"
   vars: 
     milestone_query: "[?title=='{{ MILESTONE_TITLE | default(omit) }}'].{title: title, description: description, number: number}"
   tags: milestone_title
 - name: "Create milestone by title {{ MILESTONE_TITLE }}"
+  connection: local
   uri:
     timeout: 90
     url: "https://api.github.com/repos/{{ GITHUB_ORG }}/{{ GITHUB_REPO }}/milestones"
@@ -23,6 +25,7 @@
   register: MILESTONE_CREATE_JSON
   tags: milestone_title
 - name: "Update milestone by title {{ MILESTONE_TITLE }}"
+  connection: local
   uri:
     timeout: 90
     url: "https://api.github.com/repos/{{ GITHUB_ORG }}/{{ GITHUB_REPO }}/milestones/{{ MILESTONE_TITLE_JSON.number }}"

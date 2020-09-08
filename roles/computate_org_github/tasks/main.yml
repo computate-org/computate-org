@@ -5,11 +5,13 @@
   when: GITHUB_TOKEN is not defined
   tags: github_token
 - name: Check for GITHUB_ORG var
+  connection: local
   fail: 
     msg: "Make sure you have correctly configured a GITHUB_ORG: '...' in your ansible vault. This should be a Github organization that your user and token have access to (https://github.com/organizations/plan). "
   when: GITHUB_ORG is not defined
   tags: github_org
 - name: "Get Github org {{ GITHUB_ORG }}"
+  connection: local
   uri: 
     url: "https://api.github.com/orgs/{{ GITHUB_ORG }}"
     return_content: true
@@ -19,16 +21,19 @@
   register: GITHUB_ORG_JSON
   tags: github_org
 - name: Check Github token
+  connection: local
   fail: 
     msg: "Make sure you have correctly configured a GITHUB_TOKEN: '...' in your ansible vault. You will want to configure a Github token with 'admin:org' and 'repo' scopes (https://github.com/settings/tokens). You are using GITHUB_TOKEN: {{ GITHUB_TOKEN }}"
   when: GITHUB_ORG_JSON.failed and (GITHUB_ORG_JSON.status is not defined or GITHUB_ORG_JSON.status == 401)
   tags: github_token
 - name: Check for Github org
+  connection: local
   fail: 
     msg: "Make sure you have correctly configured a GITHUB_ORG: '...' in your ansible vault. This should be a Github organization that your user and token have access to (https://github.com/organizations/plan). You are using GITHUB_ORG: {{ GITHUB_ORG }}"
   when: GITHUB_ORG_JSON.failed and GITHUB_ORG_JSON.status == 404
   tags: github_org
 - name: "Get Github repo {{ GITHUB_REPO }}"
+  connection: local
   uri: 
     url: "https://api.github.com/repos/{{ GITHUB_ORG }}/{{ GITHUB_REPO }}"
     return_content: true
@@ -38,6 +43,7 @@
   register: GITHUB_REPO_JSON
   tags: github_repo
 - name: "Fork Github repo {{ GITHUB_REPO }}"
+  connection: local
   uri: 
     url: "https://api.github.com/repos/computate-org/computate-org/forks?organization={{ GITHUB_ORG | urlencode() }}"
     method: POST
@@ -47,6 +53,7 @@
   when: GITHUB_REPO_JSON.failed and GITHUB_REPO_JSON.status == 404
   tags: github_repo
 - name: Check for Github repo
+  connection: local
   fail: 
     msg: "Make sure you have correctly configured a GITHUB_REPO: '...' in your ansible vault. This should be a Github repository in your Github organization that your user and token have access to. You are using GITHUB_REPO: {{ GITHUB_REPO }}"
   when: GITHUB_REPO_JSON.failed and GITHUB_REPO_JSON.status == 404
@@ -57,6 +64,7 @@
 ############
 
 - name: "Get projects"
+  connection: local
   uri:
     timeout: 90
     url: "https://api.github.com/orgs/{{ GITHUB_ORG }}/projects"
@@ -67,6 +75,7 @@
   register: PROJECTS
   tags: always
 - name: "Get project by name {{ PROJECT_NAME | default(omit) }}"
+  connection: local
   set_fact:
     PROJECT_NAME_JSON: "{{ PROJECTS.json | json_query(project_query) | first }}"
   when: PROJECTS.json | json_query(project_query)
@@ -75,16 +84,38 @@
   tags: always
 
 - name: "Create project {{ PROJECT_NAME }}"
+  connection: local
   include_role: 
     name: computate_org_project
   tags: 
     - project
+
+- name: "Get projects"
+  connection: local
+  uri:
+    timeout: 90
+    url: "https://api.github.com/orgs/{{ GITHUB_ORG }}/projects"
+    return_content: true
+    headers:
+      Authorization: "token {{ GITHUB_TOKEN }}"
+      Accept: "application/vnd.github.inertia-preview+json"
+  register: PROJECTS
+  tags: always
+- name: "Get project by name {{ PROJECT_NAME | default(omit) }}"
+  connection: local
+  set_fact:
+    PROJECT_NAME_JSON: "{{ PROJECTS.json | json_query(project_query) | first }}"
+  when: PROJECTS.json | json_query(project_query)
+  vars: 
+    project_query: "[?name=='{{ PROJECT_NAME | default(omit) }}'].{name: name, description: description, id: id}"
+  tags: always
 
 ###########
 # Columns #
 ###########
 
 - name: "Get columns"
+  connection: local
   uri:
     timeout: 90
     url: "https://api.github.com/projects/{{ PROJECT_NAME_JSON.id }}/columns"
@@ -96,6 +127,7 @@
   tags: always
 
 - name: Create column for setup issues
+  connection: local
   include_role: 
     name: computate_org_column
   vars: 
@@ -103,6 +135,7 @@
   tags: 
     - column
 - name: Create column for Configure Authentication
+  connection: local
   include_role: 
     name: computate_org_column
   vars: 
@@ -110,6 +143,7 @@
   tags: 
     - column
 - name: Create column for OpenShift Deployment issues
+  connection: local
   include_role: 
     name: computate_org_column
   vars: 
@@ -117,13 +151,23 @@
   tags: 
     - column
 - name: Create column for Ansible OpenShift Deployment issues
+  connection: local
   include_role: 
     name: computate_org_column
   vars: 
     COLUMN_NAME: Ansible OpenShift Deployment
   tags: 
     - column
+- name: Create column for Data Development issues
+  connection: local
+  include_role: 
+    name: computate_org_column
+  vars: 
+    COLUMN_NAME: Data Development
+  tags: 
+    - column
 - name: Create column for Local install issues
+  connection: local
   include_role: 
     name: computate_org_column
   vars: 
@@ -131,6 +175,7 @@
   tags: 
     - column
 - name: Create column for Ansible Optional OpenShift Deployment issues
+  connection: local
   include_role: 
     name: computate_org_column
   vars: 
@@ -138,7 +183,65 @@
   tags: 
     - column
 
+- name: Create column for Backlog
+  connection: local
+  include_role: 
+    name: computate_org_column
+  vars: 
+    COLUMN_NAME: Backlog
+  tags: 
+    - column
+- name: Create column for Committed
+  connection: local
+  include_role: 
+    name: computate_org_column
+  vars: 
+    COLUMN_NAME: Committed
+  tags: 
+    - column
+- name: Create column for In progress
+  connection: local
+  include_role: 
+    name: computate_org_column
+  vars: 
+    COLUMN_NAME: In progress
+  tags: 
+    - column
+- name: Create column for Dev Complete
+  connection: local
+  include_role: 
+    name: computate_org_column
+  vars: 
+    COLUMN_NAME: Dev Complete
+  tags: 
+    - column
+- name: Create column for In QA
+  connection: local
+  include_role: 
+    name: computate_org_column
+  vars: 
+    COLUMN_NAME: In QA
+  tags: 
+    - column
+- name: Create column for QA complete
+  connection: local
+  include_role: 
+    name: computate_org_column
+  vars: 
+    COLUMN_NAME: QA complete
+  tags: 
+    - column
+- name: Create column for PO Accepted
+  connection: local
+  include_role: 
+    name: computate_org_column
+  vars: 
+    COLUMN_NAME: PO Accepted
+  tags: 
+    - column
+
 - name: "Get columns"
+  connection: local
   uri:
     timeout: 90
     url: "https://api.github.com/projects/{{ PROJECT_NAME_JSON.id }}/columns"
@@ -154,6 +257,7 @@
 ##############
 
 - name: "Get milestones"
+  connection: local
   uri:
     timeout: 90
     url: "https://api.github.com/repos/{{ GITHUB_ORG }}/{{ GITHUB_REPO }}/milestones"
@@ -164,6 +268,7 @@
   tags: always
 
 - name: Create milestone for setup issues
+  connection: local
   include_role: 
     name: computate_org_milestone
   vars: 
@@ -173,6 +278,7 @@
   tags: 
     - milestone
 - name: Create milestone for Configure Authentication issues
+  connection: local
   include_role: 
     name: computate_org_milestone
   vars: 
@@ -182,6 +288,7 @@
   tags: 
     - milestone
 - name: Create milestone for OpenShift Deployment issues
+  connection: local
   include_role: 
     name: computate_org_milestone
   vars: 
@@ -191,6 +298,7 @@
   tags: 
     - milestone
 - name: Create milestone for Ansible OpenShift Deployment issues
+  connection: local
   include_role: 
     name: computate_org_milestone
   vars: 
@@ -199,7 +307,18 @@
       Automating the deployment of applications to OpenShift using Ansible. 
   tags: 
     - milestone
+- name: Create milestone for Data Development issues
+  connection: local
+  include_role: 
+    name: computate_org_milestone
+  vars: 
+    MILESTONE_TITLE: Data Development
+    MILESTONE_DESCRIPTION: |
+      Creating, restoring and backing up data in the site. 
+  tags: 
+    - milestone
 - name: Create milestone for Local install issues
+  connection: local
   include_role: 
     name: computate_org_milestone
   vars: 
@@ -209,6 +328,7 @@
   tags: 
     - milestone
 - name: Create milestone for Optional Ansible OpenShift Deployment issues
+  connection: local
   include_role: 
     name: computate_org_milestone
   vars: 
@@ -219,6 +339,7 @@
     - milestone
 
 - name: "Get milestones"
+  connection: local
   uri:
     timeout: 90
     url: "https://api.github.com/repos/{{ GITHUB_ORG }}/{{ GITHUB_REPO }}/milestones"
@@ -233,6 +354,7 @@
 ####################################
 
 - name: Create issue to setup OpenShift cluster
+  connection: local
   include_role: 
     name: computate_org_issue
   vars: 
@@ -251,6 +373,7 @@
     - issue_label_101
 
 - name: "Create issue to create an OpenShift project"
+  connection: local
   include_role: 
     name: computate_org_issue
   vars: 
@@ -294,6 +417,7 @@
     - issue_label_102
 
 - name: Create issue to install ansible locally
+  connection: local
   include_role: 
     name: computate_org_issue
   vars: 
@@ -367,6 +491,7 @@
     - issue_label_103
 
 - name: "Create issue to clone computate-org repo"
+  connection: local
   include_role: 
     name: computate_org_issue
   vars: 
@@ -433,6 +558,7 @@
     - issue_label_104
 
 - name: "Create issue to create an ansible vault for OpenShift"
+  connection: local
   include_role: 
     name: computate_org_issue
   vars: 
@@ -485,6 +611,7 @@
 ############################
 
 - name: "Create issue to install a Red Hat Single Sign On server to OpenShift"
+  connection: local
   include_role: 
     name: computate_org_issue
   vars: 
@@ -573,6 +700,7 @@
     - issue_label_201
 
 - name: "Create issue to configure the Red Hat Single Sign On server"
+  connection: local
   include_role: 
     name: computate_org_issue
   vars: 
@@ -678,6 +806,7 @@
 ########################
 
 - name: "Create issue to install a PostgreSQL database to OpenShift"
+  connection: local
   include_role: 
     name: computate_org_issue
   vars: 
@@ -711,6 +840,7 @@
     - issue_label_301
 
 - name: "Create issue to install an Apache Zookeeper cluster manager to OpenShift"
+  connection: local
   include_role: 
     name: computate_org_issue
   vars: 
@@ -805,6 +935,7 @@
     - issue_label_302
 
 - name: "Create issue to install an Apache Solr search engine to OpenShift"
+  connection: local
   include_role: 
     name: computate_org_issue
   vars: 
@@ -884,6 +1015,7 @@
 ###################################
 
 - name: "Create issue to create OpenShift ansible hosts file"
+  connection: local
   include_role: 
     name: computate_org_issue
   vars: 
@@ -942,6 +1074,7 @@
     - issue_label_401
 
 - name: "Create issue to automate the install of the application to OpenShift"
+  connection: local
   include_role: 
     name: computate_org_issue
   vars: 
@@ -961,11 +1094,48 @@
     - issue_label
     - issue_label_402
 
+####################
+# Data Development #
+####################
+
+- name: "Create issue to automate the restore of the data to the application in OpenShift"
+  connection: local
+  include_role: 
+    name: computate_org_issue
+  vars: 
+    ISSUE_LABEL: data_restore
+    ISSUE_TITLE: "Automate the restore of the data to the application in OpenShift"
+    MILESTONE_TITLE: Data Development
+    COLUMN_NAME: Data Development
+    ISSUE_BODY: |
+      Create a directory for the {{ GITHUB_REPO }} repository with the included ansible scripts to setup issues in Github for the organization.
+      
+      ```bash
+      sudo install -d -o $USER -g $USER {{ REPO_PATH }}
+      ```
+
+      Clone the git repository into the new directory. 
+
+      ```bash
+      git clone git@github.com:{{ GITHUB_ORG }}/{{ GITHUB_REPO }}.git {{ REPO_PATH }}
+      ```
+      As a team, automate the restore of the data to the application in OpenShift. 
+
+      #### Run the playbook to install the application to OpenShift.
+      
+      ```bash
+      (cd /usr/local/src/computate/ansible && ansible-playbook {{ APP_NAME_ANSIBLE }}_restore_enUS.yml -i {{ REPO_PATH }}/inventories/openshift/hosts --vault-id @prompt)
+      ```
+  tags: 
+    - issue_label
+    - issue_label_402
+
 #####################
 # Local Development #
 #####################
 
 - name: "Create issue to clone computate repo"
+  connection: local
   include_role: 
     name: computate_org_issue
   vars: 
@@ -983,13 +1153,14 @@
       Clone the git repository into the new directory. 
 
       ```bash
-      git clone git@github.com:computate/computate.git /usr/local/src/computate
+      git clone git@github.com:computate-org/computate.git /usr/local/src/computate
       ```
   tags: 
     - issue_label
     - issue_label_501
 
 - name: "Create issue to create an ansible vault for local development"
+  connection: local
   include_role: 
     name: computate_org_issue
   vars: 
@@ -1038,6 +1209,7 @@
     - issue_label_502
 
 - name: "Create issue to install a PostgreSQL database for local development"
+  connection: local
   include_role: 
     name: computate_org_issue
   vars: 
@@ -1058,6 +1230,7 @@
     - issue_label_503
 
 - name: "Create issue to install an Apache Zookeeper cluster manager for local development"
+  connection: local
   include_role: 
     name: computate_org_issue
   vars: 
@@ -1078,6 +1251,7 @@
     - issue_label_504
 
 - name: "Create issue to install an Apache Solr search engine for local development"
+  connection: local
   include_role: 
     name: computate_org_issue
   vars: 
@@ -1098,6 +1272,7 @@
     - issue_label_505
 
 - name: "Create issue to install the application for local development"
+  connection: local
   include_role: 
     name: computate_org_issue
   vars: 
@@ -1165,6 +1340,7 @@
 #    - issue_label_601
 
 - name: "Create issue to automate the install of a Red Hat Single Sign On server to OpenShift"
+  connection: local
   include_role: 
     name: computate_org_issue
   vars: 
@@ -1184,6 +1360,7 @@
     - issue_label_602
 
 - name: "Create issue to automate the install of a PostgreSQL database to OpenShift"
+  connection: local
   include_role: 
     name: computate_org_issue
   vars: 
@@ -1203,6 +1380,7 @@
     - issue_label_603
 
 - name: "Create issue to automate the install of an Apache Zookeeper cluster manager to OpenShift"
+  connection: local
   include_role: 
     name: computate_org_issue
   vars: 
@@ -1222,6 +1400,7 @@
     - issue_label_604
 
 - name: "Create issue to automate the install of an Apache Solr search engine to OpenShift"
+  connection: local
   include_role: 
     name: computate_org_issue
   vars: 

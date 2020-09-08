@@ -1,10 +1,12 @@
 - name: "Get milestone by title"
+  connection: local
   set_fact:
     MILESTONE_TITLE_JSON: "{{ MILESTONES.json | json_query(milestone_query) | first | default(omit) }}"
   vars: 
     milestone_query: "[?title=='{{ MILESTONE_TITLE | default(omit) }}'].{title: title, description: description, number: number}"
   tags: always
 - name: "Get issue by label {{ ISSUE_LABEL }}"
+  connection: local
   uri:
     timeout: 90
     url: "https://api.github.com/repos/{{ GITHUB_ORG }}/{{ GITHUB_REPO }}/issues?labels={{ ISSUE_LABEL | urlencode() }}"
@@ -41,6 +43,7 @@
       vars: 
         CARD_CONTENT_ID: "{{ ISSUE_CREATE_JSON.json.id }}"
       tags: always
+  connection: local
   when: COLUMN_NAME is defined and MILESTONE_TITLE_JSON is defined and (ISSUE_LABEL_JSON.json | length == 0)
   tags: always
 - block: 
@@ -69,6 +72,7 @@
       vars: 
         CARD_CONTENT_ID: "{{ ISSUE_CREATE_JSON.json.id }}"
       tags: always
+  connection: local
   when: COLUMN_NAME is defined and MILESTONE_TITLE_JSON is not defined and (ISSUE_LABEL_JSON.json | length == 0)
   tags: always
 
@@ -96,6 +100,7 @@
       vars: 
         CARD_CONTENT_ID: "{{ ISSUE_CREATE_JSON.json.id }}"
       tags: always
+  connection: local
   when: COLUMN_NAME is defined and MILESTONE_TITLE_JSON is defined and (ISSUE_LABEL_JSON.json | length > 0)
   tags: always
 - block: 
@@ -121,6 +126,7 @@
       vars: 
         CARD_CONTENT_ID: "{{ ISSUE_CREATE_JSON.json.id }}"
       tags: always
+  connection: local
   when: COLUMN_NAME is defined and MILESTONE_TITLE_JSON is not defined and (ISSUE_LABEL_JSON.json | length > 0)
   tags: always
 

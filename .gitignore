@@ -1,4 +1,6 @@
 inventories/computate-*/**
+inventories/southerncoalition-*/**
+inventories/opendatapolicing-*/**
 inventories/*/key
 **/*.retry
 **/*.swp

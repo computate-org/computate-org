@@ -1,10 +1,12 @@
 - name: "Get column by name {{ COLUMN_NAME | default(omit) }}"
+  connection: local
   set_fact:
     COLUMN_NAME_JSON: "{{ COLUMNS.json | json_query(column_query) | first | default(None) }}"
   vars: 
     column_query: "[?name=='{{ COLUMN_NAME | default(omit) }}'].{name: name, description: description, id: id}"
   tags: column_name
 - name: "Create column by name {{ COLUMN_NAME }}"
+  connection: local
   uri:
     timeout: 90
     url: "https://api.github.com/projects/{{ PROJECT_NAME_JSON.id }}/columns"
@@ -23,6 +25,7 @@
   register: COLUMN_CREATE_JSON
   tags: column_name
 - name: "Update column by name {{ COLUMN_NAME }}"
+  connection: local
   uri:
     timeout: 90
     url: "https://api.github.com/projects/columns/{{ COLUMN_NAME_JSON.id }}"
