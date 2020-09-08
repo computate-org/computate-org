@@ -84,7 +84,6 @@
   tags: always
 
 - name: "Create project {{ PROJECT_NAME }}"
-  connection: local
   include_role: 
     name: computate_org_project
   tags: 
@@ -127,7 +126,6 @@
   tags: always
 
 - name: Create column for setup issues
-  connection: local
   include_role: 
     name: computate_org_column
   vars: 
@@ -135,7 +133,6 @@
   tags: 
     - column
 - name: Create column for Configure Authentication
-  connection: local
   include_role: 
     name: computate_org_column
   vars: 
@@ -143,7 +140,6 @@
   tags: 
     - column
 - name: Create column for OpenShift Deployment issues
-  connection: local
   include_role: 
     name: computate_org_column
   vars: 
@@ -151,7 +147,6 @@
   tags: 
     - column
 - name: Create column for Ansible OpenShift Deployment issues
-  connection: local
   include_role: 
     name: computate_org_column
   vars: 
@@ -159,7 +154,6 @@
   tags: 
     - column
 - name: Create column for Data Development issues
-  connection: local
   include_role: 
     name: computate_org_column
   vars: 
@@ -167,7 +161,6 @@
   tags: 
     - column
 - name: Create column for Local install issues
-  connection: local
   include_role: 
     name: computate_org_column
   vars: 
@@ -175,7 +168,6 @@
   tags: 
     - column
 - name: Create column for Ansible Optional OpenShift Deployment issues
-  connection: local
   include_role: 
     name: computate_org_column
   vars: 
@@ -184,7 +176,6 @@
     - column
 
 - name: Create column for Backlog
-  connection: local
   include_role: 
     name: computate_org_column
   vars: 
@@ -192,7 +183,6 @@
   tags: 
     - column
 - name: Create column for Committed
-  connection: local
   include_role: 
     name: computate_org_column
   vars: 
@@ -200,7 +190,6 @@
   tags: 
     - column
 - name: Create column for In progress
-  connection: local
   include_role: 
     name: computate_org_column
   vars: 
@@ -208,7 +197,6 @@
   tags: 
     - column
 - name: Create column for Dev Complete
-  connection: local
   include_role: 
     name: computate_org_column
   vars: 
@@ -216,7 +204,6 @@
   tags: 
     - column
 - name: Create column for In QA
-  connection: local
   include_role: 
     name: computate_org_column
   vars: 
@@ -224,7 +211,6 @@
   tags: 
     - column
 - name: Create column for QA complete
-  connection: local
   include_role: 
     name: computate_org_column
   vars: 
@@ -232,7 +218,6 @@
   tags: 
     - column
 - name: Create column for PO Accepted
-  connection: local
   include_role: 
     name: computate_org_column
   vars: 
@@ -268,7 +253,6 @@
   tags: always
 
 - name: Create milestone for setup issues
-  connection: local
   include_role: 
     name: computate_org_milestone
   vars: 
@@ -278,7 +262,6 @@
   tags: 
     - milestone
 - name: Create milestone for Configure Authentication issues
-  connection: local
   include_role: 
     name: computate_org_milestone
   vars: 
@@ -288,7 +271,6 @@
   tags: 
     - milestone
 - name: Create milestone for OpenShift Deployment issues
-  connection: local
   include_role: 
     name: computate_org_milestone
   vars: 
@@ -298,7 +280,6 @@
   tags: 
     - milestone
 - name: Create milestone for Ansible OpenShift Deployment issues
-  connection: local
   include_role: 
     name: computate_org_milestone
   vars: 
@@ -308,7 +289,6 @@
   tags: 
     - milestone
 - name: Create milestone for Data Development issues
-  connection: local
   include_role: 
     name: computate_org_milestone
   vars: 
@@ -318,7 +298,6 @@
   tags: 
     - milestone
 - name: Create milestone for Local install issues
-  connection: local
   include_role: 
     name: computate_org_milestone
   vars: 
@@ -328,7 +307,6 @@
   tags: 
     - milestone
 - name: Create milestone for Optional Ansible OpenShift Deployment issues
-  connection: local
   include_role: 
     name: computate_org_milestone
   vars: 
@@ -354,7 +332,6 @@
 ####################################
 
 - name: Create issue to setup OpenShift cluster
-  connection: local
   include_role: 
     name: computate_org_issue
   vars: 
@@ -373,7 +350,6 @@
     - issue_label_101
 
 - name: "Create issue to create an OpenShift project"
-  connection: local
   include_role: 
     name: computate_org_issue
   vars: 
@@ -417,7 +393,6 @@
     - issue_label_102
 
 - name: Create issue to install ansible locally
-  connection: local
   include_role: 
     name: computate_org_issue
   vars: 
@@ -491,7 +466,6 @@
     - issue_label_103
 
 - name: "Create issue to clone computate-org repo"
-  connection: local
   include_role: 
     name: computate_org_issue
   vars: 
@@ -558,7 +532,6 @@
     - issue_label_104
 
 - name: "Create issue to create an ansible vault for OpenShift"
-  connection: local
   include_role: 
     name: computate_org_issue
   vars: 
@@ -611,7 +584,6 @@
 ############################
 
 - name: "Create issue to install a Red Hat Single Sign On server to OpenShift"
-  connection: local
   include_role: 
     name: computate_org_issue
   vars: 
@@ -700,7 +672,6 @@
     - issue_label_201
 
 - name: "Create issue to configure the Red Hat Single Sign On server"
-  connection: local
   include_role: 
     name: computate_org_issue
   vars: 
@@ -806,7 +777,6 @@
 ########################
 
 - name: "Create issue to install a PostgreSQL database to OpenShift"
-  connection: local
   include_role: 
     name: computate_org_issue
   vars: 
@@ -840,7 +810,6 @@
     - issue_label_301
 
 - name: "Create issue to install an Apache Zookeeper cluster manager to OpenShift"
-  connection: local
   include_role: 
     name: computate_org_issue
   vars: 
@@ -935,7 +904,6 @@
     - issue_label_302
 
 - name: "Create issue to install an Apache Solr search engine to OpenShift"
-  connection: local
   include_role: 
     name: computate_org_issue
   vars: 
@@ -1015,7 +983,6 @@
 ###################################
 
 - name: "Create issue to create OpenShift ansible hosts file"
-  connection: local
   include_role: 
     name: computate_org_issue
   vars: 
@@ -1074,7 +1041,6 @@
     - issue_label_401
 
 - name: "Create issue to automate the install of the application to OpenShift"
-  connection: local
   include_role: 
     name: computate_org_issue
   vars: 
@@ -1099,7 +1065,6 @@
 ####################
 
 - name: "Create issue to automate the restore of the data to the application in OpenShift"
-  connection: local
   include_role: 
     name: computate_org_issue
   vars: 
@@ -1135,7 +1100,6 @@
 #####################
 
 - name: "Create issue to clone computate repo"
-  connection: local
   include_role: 
     name: computate_org_issue
   vars: 
@@ -1160,7 +1124,6 @@
     - issue_label_501
 
 - name: "Create issue to create an ansible vault for local development"
-  connection: local
   include_role: 
     name: computate_org_issue
   vars: 
@@ -1209,7 +1172,6 @@
     - issue_label_502
 
 - name: "Create issue to install a PostgreSQL database for local development"
-  connection: local
   include_role: 
     name: computate_org_issue
   vars: 
@@ -1230,7 +1192,6 @@
     - issue_label_503
 
 - name: "Create issue to install an Apache Zookeeper cluster manager for local development"
-  connection: local
   include_role: 
     name: computate_org_issue
   vars: 
@@ -1251,7 +1212,6 @@
     - issue_label_504
 
 - name: "Create issue to install an Apache Solr search engine for local development"
-  connection: local
   include_role: 
     name: computate_org_issue
   vars: 
@@ -1272,7 +1232,6 @@
     - issue_label_505
 
 - name: "Create issue to install the application for local development"
-  connection: local
   include_role: 
     name: computate_org_issue
   vars: 
@@ -1340,7 +1299,6 @@
 #    - issue_label_601
 
 - name: "Create issue to automate the install of a Red Hat Single Sign On server to OpenShift"
-  connection: local
   include_role: 
     name: computate_org_issue
   vars: 
@@ -1360,7 +1318,6 @@
     - issue_label_602
 
 - name: "Create issue to automate the install of a PostgreSQL database to OpenShift"
-  connection: local
   include_role: 
     name: computate_org_issue
   vars: 
@@ -1380,7 +1337,6 @@
     - issue_label_603
 
 - name: "Create issue to automate the install of an Apache Zookeeper cluster manager to OpenShift"
-  connection: local
   include_role: 
     name: computate_org_issue
   vars: 
@@ -1400,7 +1356,6 @@
     - issue_label_604
 
 - name: "Create issue to automate the install of an Apache Solr search engine to OpenShift"
-  connection: local
   include_role: 
     name: computate_org_issue
   vars: 
