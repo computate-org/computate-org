@@ -9,7 +9,7 @@
   connection: local
   uri:
     timeout: 90
-    url: "https://api.github.com/repos/{{ GITHUB_ORG }}/{{ GITHUB_REPO }}/issues?labels={{ ISSUE_LABEL | urlencode() }}"
+    url: "https://api.github.com/repos/{{ GITHUB_ORG }}/{{ GITHUB_REPO_NAME }}/issues?labels={{ ISSUE_LABEL | urlencode() }}"
     return_content: true
     headers:
       Authorization: "token {{ GITHUB_TOKEN }}"
@@ -21,7 +21,7 @@
       connection: local
       uri:
         timeout: 90
-        url: "https://api.github.com/repos/{{ GITHUB_ORG }}/{{ GITHUB_REPO }}/issues"
+        url: "https://api.github.com/repos/{{ GITHUB_ORG }}/{{ GITHUB_REPO_NAME }}/issues"
         method: POST
         headers:
           Content-Type: "application/json"
@@ -52,7 +52,7 @@
       connection: local
       uri:
         timeout: 90
-        url: "https://api.github.com/repos/{{ GITHUB_ORG }}/{{ GITHUB_REPO }}/issues"
+        url: "https://api.github.com/repos/{{ GITHUB_ORG }}/{{ GITHUB_REPO_NAME }}/issues"
         method: POST
         headers:
           Content-Type: "application/json"
@@ -83,7 +83,7 @@
       connection: local
       uri:
         timeout: 90
-        url: "https://api.github.com/repos/{{ GITHUB_ORG }}/{{ GITHUB_REPO }}/issues/{{ ISSUE_LABEL_JSON.json[0].number }}"
+        url: "https://api.github.com/repos/{{ GITHUB_ORG }}/{{ GITHUB_REPO_NAME }}/issues/{{ ISSUE_LABEL_JSON.json[0].number }}"
         method: PATCH
         headers:
           Content-Type: "application/json"
@@ -111,7 +111,7 @@
       connection: local
       uri:
         timeout: 90
-        url: "https://api.github.com/repos/{{ GITHUB_ORG }}/{{ GITHUB_REPO }}/issues/{{ ISSUE_LABEL_JSON.json[0].number }}"
+        url: "https://api.github.com/repos/{{ GITHUB_ORG }}/{{ GITHUB_REPO_NAME }}/issues/{{ ISSUE_LABEL_JSON.json[0].number }}"
         method: PATCH
         headers:
           Content-Type: "application/json"

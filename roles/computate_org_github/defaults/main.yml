@@ -1,12 +1,19 @@
 
 GITHUB_ORG: "..."
 GITHUB_TOKEN: "..."
-GITHUB_REPO: computate-org
-REPO_PATH: "/usr/local/src/{{ GITHUB_REPO }}"
+GITHUB_REPO_NAME: computate-org
+GITHUB_REPO_PATH: "/usr/local/src/{{ GITHUB_REPO_NAME }}"
+GITHUB_REPO: "git@github.com:{{ GITHUB_ORG }}/{{ GITHUB_REPO_NAME }}.git"
+ANSIBLE_REPO_NAME: "{{ GITHUB_REPO_NAME }}"
+ANSIBLE_REPO_PATH: "/usr/local/src/{{ ANSIBLE_REPO_NAME }}"
+ANSIBLE_REPO: "git@github.com:{{ GITHUB_ORG }}/{{ ANSIBLE_REPO_NAME }}.git"
 PROJECT_NAME: "School Mock Client Engagement"
 PROJECT_DESCRIPTION: "A mock client engagement project to setup the app. "
 TEAM_ID: "mce1"
 APP_NAME: computate-scolaire
+APP_REPO_NAME: "{{ APP_NAME }}"
+APP_REPO_PATH: "/usr/local/src/{{ APP_REPO_NAME }}"
+APP_REPO: "git@github.com:{{ GITHUB_ORG }}/{{ APP_REPO_NAME }}.git"
 APP_NAME_ANSIBLE: "{{ APP_NAME | regex_replace('-', '_') }}"
 
 REDHAT_OPENSHIFT_HOST: https://console.rh-us-east-1.openshift.com

@@ -21,7 +21,7 @@
   set_fact:
     CARD_CONTENT_ID_JSON: "{{ CARDS.json | json_query(card_query) | first | default(None) }}"
   vars: 
-    card_query: "[?content_url=='https://api.github.com/repos/{{ GITHUB_ORG }}/{{ GITHUB_REPO }}/issues/{{ ISSUE_CREATE_JSON.json.number | default(omit) }}'].{note: note, id: id}"
+    card_query: "[?content_url=='https://api.github.com/repos/{{ GITHUB_ORG }}/{{ GITHUB_REPO_NAME }}/issues/{{ ISSUE_CREATE_JSON.json.number | default(omit) }}'].{note: note, id: id}"
   tags: always
 - name: "Create card by content_id {{ ISSUE_CREATE_JSON.json.id }}"
   connection: local

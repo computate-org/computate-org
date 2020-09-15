@@ -9,7 +9,7 @@
   connection: local
   uri:
     timeout: 90
-    url: "https://api.github.com/repos/{{ GITHUB_ORG }}/{{ GITHUB_REPO }}/milestones"
+    url: "https://api.github.com/repos/{{ GITHUB_ORG }}/{{ GITHUB_REPO_NAME }}/milestones"
     method: POST
     headers:
       Content-Type: "application/json"
@@ -28,7 +28,7 @@
   connection: local
   uri:
     timeout: 90
-    url: "https://api.github.com/repos/{{ GITHUB_ORG }}/{{ GITHUB_REPO }}/milestones/{{ MILESTONE_TITLE_JSON.number }}"
+    url: "https://api.github.com/repos/{{ GITHUB_ORG }}/{{ GITHUB_REPO_NAME }}/milestones/{{ MILESTONE_TITLE_JSON.number }}"
     method: PATCH
     headers:
       Content-Type: "application/json"

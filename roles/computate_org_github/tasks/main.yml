@@ -32,17 +32,17 @@
     msg: "Make sure you have correctly configured a GITHUB_ORG: '...' in your ansible vault. This should be a Github organization that your user and token have access to (https://github.com/organizations/plan). You are using GITHUB_ORG: {{ GITHUB_ORG }}"
   when: GITHUB_ORG_JSON.failed and GITHUB_ORG_JSON.status == 404
   tags: github_org
-- name: "Get Github repo {{ GITHUB_REPO }}"
+- name: "Get Github repo {{ GITHUB_REPO_NAME }}"
   connection: local
   uri: 
-    url: "https://api.github.com/repos/{{ GITHUB_ORG }}/{{ GITHUB_REPO }}"
+    url: "https://api.github.com/repos/{{ GITHUB_ORG }}/{{ GITHUB_REPO_NAME }}"
     return_content: true
     headers: 
       Authorization: "token {{ GITHUB_TOKEN }}"
   ignore_errors: true
-  register: GITHUB_REPO_JSON
+  register: GITHUB_REPO_NAME_JSON
   tags: github_repo
-- name: "Fork Github repo {{ GITHUB_REPO }}"
+- name: "Fork Github repo {{ GITHUB_REPO_NAME }}"
   connection: local
   uri: 
     url: "https://api.github.com/repos/computate-org/computate-org/forks?organization={{ GITHUB_ORG | urlencode() }}"
@@ -50,13 +50,13 @@
     return_content: true
     headers: 
       Authorization: "token {{ GITHUB_TOKEN }}"
-  when: GITHUB_REPO_JSON.failed and GITHUB_REPO_JSON.status == 404
+  when: GITHUB_REPO_NAME_JSON.failed and GITHUB_REPO_NAME_JSON.status == 404
   tags: github_repo
 - name: Check for Github repo
   connection: local
   fail: 
-    msg: "Make sure you have correctly configured a GITHUB_REPO: '...' in your ansible vault. This should be a Github repository in your Github organization that your user and token have access to. You are using GITHUB_REPO: {{ GITHUB_REPO }}"
-  when: GITHUB_REPO_JSON.failed and GITHUB_REPO_JSON.status == 404
+    msg: "Make sure you have correctly configured a GITHUB_REPO_NAME: '...' in your ansible vault. This should be a Github repository in your Github organization that your user and token have access to. You are using GITHUB_REPO_NAME: {{ GITHUB_REPO_NAME }}"
+  when: GITHUB_REPO_NAME_JSON.failed and GITHUB_REPO_NAME_JSON.status == 404
   tags: github_repo
 
 ############
@@ -73,7 +73,6 @@
       Authorization: "token {{ GITHUB_TOKEN }}"
       Accept: "application/vnd.github.inertia-preview+json"
   register: PROJECTS
-  tags: always
 - name: "Get project by name {{ PROJECT_NAME | default(omit) }}"
   connection: local
   set_fact:
@@ -81,7 +80,6 @@
   when: PROJECTS.json | json_query(project_query)
   vars: 
     project_query: "[?name=='{{ PROJECT_NAME | default(omit) }}'].{name: name, description: description, id: id}"
-  tags: always
 
 - name: "Create project {{ PROJECT_NAME }}"
   include_role: 
@@ -123,7 +121,6 @@
       Authorization: "token {{ GITHUB_TOKEN }}"
       Accept: "application/vnd.github.inertia-preview+json"
   register: COLUMNS
-  tags: always
 
 - name: Create column for setup issues
   include_role: 
@@ -245,12 +242,11 @@
   connection: local
   uri:
     timeout: 90
-    url: "https://api.github.com/repos/{{ GITHUB_ORG }}/{{ GITHUB_REPO }}/milestones"
+    url: "https://api.github.com/repos/{{ GITHUB_ORG }}/{{ GITHUB_REPO_NAME }}/milestones"
     return_content: true
     headers:
       Authorization: "token {{ GITHUB_TOKEN }}"
   register: MILESTONES
-  tags: always
 
 - name: Create milestone for setup issues
   include_role: 
@@ -320,7 +316,7 @@
   connection: local
   uri:
     timeout: 90
-    url: "https://api.github.com/repos/{{ GITHUB_ORG }}/{{ GITHUB_REPO }}/milestones"
+    url: "https://api.github.com/repos/{{ GITHUB_ORG }}/{{ GITHUB_REPO_NAME }}/milestones"
     return_content: true
     headers:
       Authorization: "token {{ GITHUB_TOKEN }}"
@@ -366,7 +362,7 @@
       ### Share the OpenShift project with the other users
 
       * You can find your Red Hat Login ID by logging into this site here: https://sso.redhat.com/auth/realms/redhat-external/account/
-      * You can add your Red Hat Login ID to your list of login IDs (REDHAT_OPENSHIFT_LOGIN_IDS) to the project here if you want to regenerate this issue in Github: {{ REPO_PATH }}/roles/computate_org_github/defaults/main.yml
+      * You can add your Red Hat Login ID to your list of login IDs (REDHAT_OPENSHIFT_LOGIN_IDS) to the project here if you want to regenerate this issue in Github: {{ GITHUB_REPO_PATH }}/roles/computate_org_github/defaults/main.yml
       {% if REDHAT_OPENSHIFT_MANAGE_HOST != 'https://employee.openshift.com' %}
       * Now sign in to this site to add users to an OpenShift environment: {{ REDHAT_OPENSHIFT_MANAGE_HOST }}
         * Click on "Manage Subscription" under the cluster you wish to add them to.
@@ -450,7 +446,7 @@
       sudo systemctl start sshd
       sudo systemctl enable sshd
       systemctl status sshd
-      ssh $HOSTNAME
+      ssh localhost
       exit
       ```
 
@@ -465,31 +461,31 @@
     - issue_label
     - issue_label_103
 
-- name: "Create issue to clone computate-org repo"
+- name: "Create issue to clone org repo"
   include_role: 
     name: computate_org_issue
   vars: 
     ISSUE_LABEL: clone_computate_org_repo
-    ISSUE_TITLE: "Clone the {{ GITHUB_REPO }} git repository"
+    ISSUE_TITLE: "Clone the {{ ANSIBLE_REPO_NAME }} git repository"
     MILESTONE_TITLE: Setup Tasks
     COLUMN_NAME: Setup Tasks
     ISSUE_BODY: |
-      Create a directory for the {{ GITHUB_REPO }} repository with the included ansible scripts to setup issues in Github for the organization.
+      Create a directory for the {{ ANSIBLE_REPO_NAME }} repository with the included ansible scripts and ansible vaults in Github for the organization.
       
       ```bash
-      sudo install -d -o $USER -g $USER {{ REPO_PATH }}
+      sudo install -d -o $USER -g $USER {{ ANSIBLE_REPO_PATH }}
       ```
 
       Clone the git repository into the new directory. 
 
       ```bash
-      git clone git@github.com:{{ GITHUB_ORG }}/{{ GITHUB_REPO }}.git {{ REPO_PATH }}
+      git clone {{ ANSIBLE_REPO }} {{ ANSIBLE_REPO_PATH }}
       ```
       
       Create a directory for your development inventory.
       
       ```bash
-      install -d {{ REPO_PATH }}/inventories/$USER-$HOSTNAME
+      install -d {{ ANSIBLE_REPO_PATH }}/inventories/$USER-localhost
       ```
       
       Create a hosts file for your development inventory. Add your hostname to each of the following host groups so that ansible can run each of these playbooks on your host. 
@@ -497,35 +493,38 @@
       ```bash
       echo "
       [computate_org]
-      $HOSTNAME
+      localhost
 
       [computate_postgres]
-      $HOSTNAME
+      localhost
 
       [computate_zookeeper]
-      $HOSTNAME
+      localhost
+
+      [computate_ant]
+      localhost
 
       [computate_solr]
-      $HOSTNAME
+      localhost
 
       [computate_certbot]
-      $HOSTNAME
+      localhost
 
       [{{ APP_NAME_ANSIBLE }}]
-      $HOSTNAME
+      localhost
 
       [{{ APP_NAME_ANSIBLE }}_login]
-      $HOSTNAME
+      localhost
 
       [{{ APP_NAME_ANSIBLE }}_refresh]
-      $HOSTNAME
+      localhost
 
       [{{ APP_NAME_ANSIBLE }}_backup]
-      $HOSTNAME
+      localhost
 
       [{{ APP_NAME_ANSIBLE }}_restore]
-      $HOSTNAME
-      " > {{ REPO_PATH }}/inventories/$USER-$HOSTNAME/hosts
+      localhost
+      " > {{ ANSIBLE_REPO_PATH }}/inventories/$USER-localhost/hosts
       ```
   tags: 
     - issue_label
@@ -545,9 +544,9 @@
       As a team, create and edit an encrypted ansible vault with a password for the host secrets for your shared OpenShift inventory.
       
       ```bash
-      install -d {{ REPO_PATH }}/inventories/openshift/host_vars/localhost/
-      ansible-vault create {{ REPO_PATH }}/inventories/openshift/host_vars/localhost/vault
-      ansible-vault edit {{ REPO_PATH }}/inventories/openshift/host_vars/localhost/vault
+      install -d {{ ANSIBLE_REPO_PATH }}/inventories/openshift/host_vars/localhost/
+      ansible-vault create {{ ANSIBLE_REPO_PATH }}/inventories/openshift/host_vars/localhost/vault
+      ansible-vault edit {{ ANSIBLE_REPO_PATH }}/inventories/openshift/host_vars/localhost/vault
       ```
       
       The contents of the vault will contain the secrets needed to override any default values you want to change in the app defaults defined here.
@@ -995,7 +994,7 @@
       Create a directory for your OpenShift inventory.
       
       ```bash
-      install -d {{ REPO_PATH }}/inventories/openshift
+      install -d {{ ANSIBLE_REPO_PATH }}/inventories/openshift
       ```
       
       Create a hosts file for your OpenShift inventory. Add "localhost" to each of the following host groups so that ansible can run each of these playbooks on your localhost. 
@@ -1034,7 +1033,7 @@
 
       [{{ APP_NAME_ANSIBLE }}_restore]
       localhost
-      " > {{ REPO_PATH }}/inventories/openshift/hosts
+      " > {{ ANSIBLE_REPO_PATH }}/inventories/openshift/hosts
       ```
   tags: 
     - issue_label
@@ -1054,7 +1053,7 @@
       #### Run the playbook to install the application to OpenShift.
       
       ```bash
-      (cd /usr/local/src/computate/ansible && ansible-playbook {{ APP_NAME_ANSIBLE }}_openshift_enUS.yml -i {{ REPO_PATH }}/inventories/openshift/hosts --vault-id @prompt)
+      (cd /usr/local/src/computate/ansible && ansible-playbook {{ APP_NAME_ANSIBLE }}_openshift_enUS.yml -i {{ ANSIBLE_REPO_PATH }}/inventories/openshift/hosts --vault-id @prompt)
       ```
   tags: 
     - issue_label
@@ -1073,23 +1072,13 @@
     MILESTONE_TITLE: Data Development
     COLUMN_NAME: Data Development
     ISSUE_BODY: |
-      Create a directory for the {{ GITHUB_REPO }} repository with the included ansible scripts to setup issues in Github for the organization.
-      
-      ```bash
-      sudo install -d -o $USER -g $USER {{ REPO_PATH }}
-      ```
-
-      Clone the git repository into the new directory. 
-
-      ```bash
-      git clone git@github.com:{{ GITHUB_ORG }}/{{ GITHUB_REPO }}.git {{ REPO_PATH }}
       ```
       As a team, automate the restore of the data to the application in OpenShift. 
 
       #### Run the playbook to install the application to OpenShift.
       
       ```bash
-      (cd /usr/local/src/computate/ansible && ansible-playbook {{ APP_NAME_ANSIBLE }}_restore_enUS.yml -i {{ REPO_PATH }}/inventories/openshift/hosts --vault-id @prompt)
+      (cd /usr/local/src/computate/ansible && ansible-playbook {{ APP_NAME_ANSIBLE }}_restore_enUS.yml -i {{ ANSIBLE_REPO_PATH }}/inventories/openshift/hosts --vault-id @prompt)
       ```
   tags: 
     - issue_label
@@ -1121,6 +1110,7 @@
       ```
   tags: 
     - issue_label
+    - issue_label_500
     - issue_label_501
 
 - name: "Create issue to create an ansible vault for local development"
@@ -1137,9 +1127,9 @@
       Help each member of the team interested in local development to create and edit an encrypted ansible vault with a password for the host secrets for your development inventory.
       
       ```bash
-      install -d {{ REPO_PATH }}/inventories/$USER-$HOSTNAME/host_vars/$HOSTNAME/
-      ansible-vault create {{ REPO_PATH }}/inventories/$USER-$HOSTNAME/host_vars/$HOSTNAME/vault
-      ansible-vault edit {{ REPO_PATH }}/inventories/$USER-$HOSTNAME/host_vars/$HOSTNAME/vault
+      install -d {{ ANSIBLE_REPO_PATH }}/inventories/$USER-localhost/host_vars/localhost/
+      ansible-vault create {{ ANSIBLE_REPO_PATH }}/inventories/$USER-localhost/host_vars/localhost/vault
+      ansible-vault edit {{ ANSIBLE_REPO_PATH }}/inventories/$USER-localhost/host_vars/localhost/vault
       ```
       
       The contents of the vault will contain the secrets needed to override any default values you want to change in the app defaults defined here.
@@ -1169,6 +1159,7 @@
       Look for values to override, especially those like this: "...". 
   tags: 
     - issue_label
+    - issue_label_500
     - issue_label_502
 
 - name: "Create issue to install a PostgreSQL database for local development"
@@ -1185,10 +1176,11 @@
       #### Run the playbook to install a PostgreSQL database on your development computer.
       
       ```bash
-      (cd /usr/local/src/computate/ansible && ansible-playbook computate_postgres.yml -i {{ REPO_PATH }}/inventories/$USER-$HOSTNAME/hosts --vault-id @prompt)
+      (cd /usr/local/src/computate/ansible && ansible-playbook computate_postgres.yml -i {{ ANSIBLE_REPO_PATH }}/inventories/$USER-localhost/hosts --vault-id @prompt)
       ```
   tags: 
     - issue_label
+    - issue_label_500
     - issue_label_503
 
 - name: "Create issue to install an Apache Zookeeper cluster manager for local development"
@@ -1205,10 +1197,11 @@
       #### Run the playbook to install an Apache Zookeeper cluster manager on your development computer.
       
       ```bash
-      (cd /usr/local/src/computate/ansible && ansible-playbook computate_zookeeper.yml -i {{ REPO_PATH }}/inventories/$USER-$HOSTNAME/hosts --vault-id @prompt)
+      (cd /usr/local/src/computate/ansible && ansible-playbook computate_zookeeper.yml -i {{ ANSIBLE_REPO_PATH }}/inventories/$USER-localhost/hosts --vault-id @prompt)
       ```
   tags: 
     - issue_label
+    - issue_label_500
     - issue_label_504
 
 - name: "Create issue to install an Apache Solr search engine for local development"
@@ -1222,13 +1215,20 @@
     ISSUE_BODY: |
       Help each member of the team interested in local development of the project install an Apache Solr search engine. 
 
-      #### Run the playbook to install an Apache Zookeeper cluster manager on your development computer.
+      #### Run the playbook to install ant and ivy dependencies on your development computer.
       
       ```bash
-      (cd /usr/local/src/computate/ansible && ansible-playbook computate_solr.yml -i {{ REPO_PATH }}/inventories/$USER-$HOSTNAME/hosts --vault-id @prompt)
+      (cd /usr/local/src/computate/ansible && ansible-playbook computate_ant.yml -i {{ ANSIBLE_REPO_PATH }}/inventories/$USER-localhost/hosts --vault-id @prompt)
+      ```
+
+      #### Run the playbook to install an Apache Solr search engine on your development computer.
+      
+      ```bash
+      (cd /usr/local/src/computate/ansible && ansible-playbook computate_solr.yml -i {{ ANSIBLE_REPO_PATH }}/inventories/$USER-localhost/hosts --vault-id @prompt)
       ```
   tags: 
     - issue_label
+    - issue_label_500
     - issue_label_505
 
 - name: "Create issue to install the application for local development"
@@ -1243,10 +1243,11 @@
       #### Run the playbook to install the application for development.
       
       ```bash
-      (cd /usr/local/src/computate/ansible && ansible-playbook {{ APP_NAME_ANSIBLE }}.yml -i {{ REPO_PATH }}/inventories/$USER-$HOSTNAME/hosts --vault-id @prompt)
+      (cd /usr/local/src/computate/ansible && ansible-playbook {{ APP_NAME_ANSIBLE }}.yml -i {{ ANSIBLE_REPO_PATH }}/inventories/$USER-localhost/hosts --vault-id @prompt)
       ```
   tags: 
     - issue_label
+    - issue_label_500
     - issue_label_506
 
 ###################################
@@ -1272,7 +1273,7 @@
 #      ### Share the OpenShift project with the other users
 #
 #      * You can find your Red Hat Login ID by logging into this site here: https://sso.redhat.com/auth/realms/redhat-external/account/
-#      * You can add your Red Hat Login ID to your list of login IDs (REDHAT_OPENSHIFT_LOGIN_IDS) to the project here if you want to regenerate this issue in Github: {{ REPO_PATH }}/roles/computate_org_github/defaults/main.yml
+#      * You can add your Red Hat Login ID to your list of login IDs (REDHAT_OPENSHIFT_LOGIN_IDS) to the project here if you want to regenerate this issue in Github: {{ GITHUB_REPO_PATH }}/roles/computate_org_github/defaults/main.yml
 #      {% if REDHAT_OPENSHIFT_MANAGE_HOST != 'https://employee.openshift.com' %}
 #      * Now sign in to this site to add users to an OpenShift environment: {{ REDHAT_OPENSHIFT_MANAGE_HOST }}
 #        * Click on "Manage Subscription" under the cluster you wish to add them to.
