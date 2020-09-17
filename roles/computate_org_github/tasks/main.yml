@@ -379,14 +379,39 @@
       cd /usr/local/src/???
       ```
 
-      ### Creaete an Ansible vault for the instructor secrets
+      Setup the upstream repository to pull updates from the upstream repository. 
+
+      ```bash
+      git remote add upstream git@github.com:computate-org/computate-org.git
+      git fetch upstream
+      git merge upstream/master
+      ```
+
+      ### Create an Ansible hosts file for the instructor
+      
+      First create the directory for the instructor inventory. 
+
+      ```bash
+      install -d {{ GITHUB_REPO_PATH }}/inventories/instructor
+      ```
+      
+      Create a hosts file for your development inventory. Add your hostname to each of the following host groups so that ansible can run each of these playbooks on your host. 
+      
+      ```bash
+      echo "
+      [computate_org]
+      localhost
+      " > {{ GITHUB_REPO_PATH }}/inventories/instructor/hosts
+      ```
+
+      ### Create an Ansible vault for the instructor secrets
       
       As an instructor, create and edit an encrypted ansible vault with the information about the team taking the course, organization, and repositories.
       
       ```bash
-      install -d {{ ANSIBLE_REPO_PATH }}/inventories/instructor/host_vars/localhost/
-      ansible-vault create {{ ANSIBLE_REPO_PATH }}/inventories/instructor/host_vars/localhost/vault
-      ansible-vault edit {{ ANSIBLE_REPO_PATH }}/inventories/instructor/host_vars/localhost/vault
+      install -d {{ GITHUB_REPO_PATH }}/inventories/instructor/host_vars/localhost/
+      ansible-vault create {{ GITHUB_REPO_PATH }}/inventories/instructor/host_vars/localhost/vault
+      ansible-vault edit {{ GITHUB_REPO_PATH }}/inventories/instructor/host_vars/localhost/vault
       ```
       
       The contents of the vault will contain the secrets needed to override any default values you want to change in defining the course.
