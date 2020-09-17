@@ -369,6 +369,14 @@
 
       Click the "Settings" tab on the forked repository and change the repository name to a unique name, then click [ Rename ]. 
 
+      # Add admin users to the repository
+
+      Click the "Settings" tab on the forked repository, select "Manage access", then click [ Invite teams or people ] and add the instructors as admins on the repository. 
+
+      # Enable issues in the repository
+
+      Click the "Settings" tab on the forked repository and check "Issues" so issues can be added to the repository. 
+
       ### Clone the computate-org repository
 
       On the "Code" tab of the forked repository, click the [ Code ] button, select the SSH URL and copy it to the clipboard. Then clone the repository to your computer in a new directory, where "???" is the unique organization or unique repository name. 
@@ -423,6 +431,14 @@
       ```yaml
       {{ lookup('url', 'https://raw.githubusercontent.com/computate-org/computate-org/master/roles/computate_org_github/defaults/main.yml', split_lines=false) }}
       ```
+
+      Once your Ansible hosts and vault are configured, you can run the ansible-playbook to generate the Github project board, columns, milestones, issues and cards. 
+
+      ```bash
+      (cd /usr/local/src/??? && ansible-playbook instructor.yml -i inventories/instructor/hosts --vault-id @prompt)
+      ```
+
+      Now view the results in github in your organization! 
   tags: 
     - issue_label
     - issue_label_101
