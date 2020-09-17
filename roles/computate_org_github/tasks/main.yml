@@ -381,19 +381,19 @@
 
       ### Creaete an Ansible vault for the instructor secrets
       
-      As a team, create and edit an encrypted ansible vault with a password for the host secrets for your shared OpenShift inventory.
+      As an instructor, create and edit an encrypted ansible vault with the information about the team taking the course, organization, and repositories.
       
       ```bash
-      install -d {{ ANSIBLE_REPO_PATH }}/inventories/openshift/host_vars/localhost/
-      ansible-vault create {{ ANSIBLE_REPO_PATH }}/inventories/openshift/host_vars/localhost/vault
-      ansible-vault edit {{ ANSIBLE_REPO_PATH }}/inventories/openshift/host_vars/localhost/vault
+      install -d {{ ANSIBLE_REPO_PATH }}/inventories/instructor/host_vars/localhost/
+      ansible-vault create {{ ANSIBLE_REPO_PATH }}/inventories/instructor/host_vars/localhost/vault
+      ansible-vault edit {{ ANSIBLE_REPO_PATH }}/inventories/instructor/host_vars/localhost/vault
       ```
       
-      The contents of the vault will contain the secrets needed to override any default values you want to change in the app defaults defined here.
+      The contents of the vault will contain the secrets needed to override any default values you want to change in defining the course.
       
       https://github.com/computate-org/computate-org/blob/master/roles/computate_org_github/defaults/main.yml
 
-      Here is an example of the contents of the ansible vault for OpenShift: 
+      Here is an example of the contents of the ansible vault for the course: 
 
       ```yaml
       {{ lookup('url', 'https://raw.githubusercontent.com/computate-org/computate-org/master/roles/computate_org_github/defaults/main.yml', split_lines=false) }}
