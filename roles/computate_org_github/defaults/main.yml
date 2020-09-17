@@ -1,11 +1,13 @@
 
+# The unique team id without spaces. 
+TEAM_ID: "mce1"
 # The name of the Github organization for the course. 
-GITHUB_ORG: "..."
+GITHUB_ORG: "computate-org-{{ TEAM_ID }}"
 # The github token of the instructor's Github account. See Github Settings, Developer Settings, Personal access tokens. 
 # Make sure the token has the following roles (admin:org, repo): https://github.com/settings/tokens
 GITHUB_TOKEN: "..."
 # The name of the forked Github repository for the course containing the ansible scripts and ansible vaults for the project. 
-GITHUB_REPO_NAME: computate-org
+GITHUB_REPO_NAME: "computate-org-{{ TEAM_ID }}"
 # The path to the cloned repository. 
 GITHUB_REPO_PATH: "/usr/local/src/{{ GITHUB_REPO_NAME }}"
 # The SSH URL to the git repository. 
@@ -20,8 +22,6 @@ ANSIBLE_REPO: "git@github.com:{{ GITHUB_ORG }}/{{ ANSIBLE_REPO_NAME }}.git"
 PROJECT_NAME: "School Mock Client Engagement"
 # The description of the Github project. 
 PROJECT_DESCRIPTION: "A mock client engagement project to setup the app. "
-# The unique team id without spaces. 
-TEAM_ID: "mce1"
 # The name of the application to deploy. 
 APP_NAME: computate-scolaire
 # The git repository name of the application to deploy. 
