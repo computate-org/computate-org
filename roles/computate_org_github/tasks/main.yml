@@ -391,8 +391,13 @@
 
       ```bash
       git remote add upstream git@github.com:computate-org/computate-org.git
+
       git fetch upstream
       git merge upstream/master
+
+      # or
+
+      git pull upstream master
       ```
 
       ### Create an Ansible hosts file for the instructor
