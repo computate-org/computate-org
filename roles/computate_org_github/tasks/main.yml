@@ -327,6 +327,63 @@
 # OpenShift Cluster Administration #
 ####################################
 
+- name: Create issue to setup Github organization and repository
+  include_role: 
+    name: computate_org_issue
+  vars: 
+    ISSUE_LABEL: setup_github_org
+    ISSUE_TITLE: Setup Github organization and repository
+    MILESTONE_TITLE: Setup Tasks
+    COLUMN_NAME: Setup Tasks
+    ISSUE_BODY: |
+
+      ### Create a Github organization
+
+      As the instructor of the course, setup a new Github organization with a unique name. You will need to sign into github and share the organization with all the instructors involved. 
+
+      https://github.com/
+
+      Click the [ + ] button in the top right corner, then "New Organization". Click [ Join for free ]. 
+
+      * Give the Organization account name a unique name with dashes, not spaces. 
+      * Provide a contact email of one of the instructors. 
+      * This organization belongs to: My personal account
+
+      Click [ Next ]. 
+
+      Search for usernames to add to the organization here, then click [ Complete Setup ]. 
+
+      Fill in the survey questions, then click [ Submit ]. 
+
+      ### Fork the computate-org repository into the Github organization
+
+      Visit: https://github.com/computate-org/computate-org
+
+      Click the [ Fork ] button in the top right. 
+
+      Select the Github organization you created earlier. 
+
+      ### Rename the computate-org repository to a unique name for the organization
+
+      To manage many courses over time, it will help to rename the repository for each organization to keep track of them over time. 
+
+      Click the "Settings" tab on the forked repository and change the repository name to a unique name, then click [ Rename ]. 
+
+      ### Clone the computate-org repository
+
+      On the "Code" tab of the forked repository, click the [ Code ] button, select the SSH URL and copy it to the clipboard. Then clone the repository to your computer in a new directory, where "???" is the unique organization or unique repository name. 
+
+      ```bash
+      sudo install -d -o $USER -g $USER /usr/local/src/???
+      git clone git@github.com:???/???.git /usr/local/src/???
+      cd /usr/local/src/???
+      ```
+
+      
+  tags: 
+    - issue_label
+    - issue_label_101
+
 - name: Create issue to setup OpenShift cluster
   include_role: 
     name: computate_org_issue
@@ -343,7 +400,7 @@
       You may also obtain an OpenShift cluster by registering for a course that provisions a temporary OpenShift environment. 
   tags: 
     - issue_label
-    - issue_label_101
+    - issue_label_102
 
 - name: "Create issue to create an OpenShift project"
   include_role: 
@@ -386,7 +443,7 @@
       You can visit this site for more information: https://www.openshift.com/blog/add-collaborators-openshift-online-pro-account
   tags: 
     - issue_label
-    - issue_label_102
+    - issue_label_103
 
 - name: Create issue to install ansible locally
   include_role: 
@@ -459,7 +516,7 @@
       https://www.redhat.com/en/services/training/do407-automation-ansible-i
   tags: 
     - issue_label
-    - issue_label_103
+    - issue_label_104
 
 - name: "Create issue to clone org repo"
   include_role: 
@@ -528,7 +585,7 @@
       ```
   tags: 
     - issue_label
-    - issue_label_104
+    - issue_label_105
 
 - name: "Create issue to create an ansible vault for OpenShift"
   include_role: 
@@ -576,7 +633,7 @@
       Look for values to override, especially those like this: "...". 
   tags: 
     - issue_label
-    - issue_label_105
+    - issue_label_106
 
 ############################
 # Configure Authentication #
