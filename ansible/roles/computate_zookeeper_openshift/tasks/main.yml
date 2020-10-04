@@ -6,6 +6,7 @@
     api_key: "{{ZOOKEEPER_TOKEN}}"
     namespace: "{{ZOOKEEPER_NAMESPACE}}"
     definition: "{{ lookup('template', 'computate_zookeeper_image_stream.yml.j2') }}"
+    validate_certs: "{{K8S_VALIDATE_CERT}}"
 - name: Install computate-zookeeper configmap
   k8s: 
     state: present
@@ -14,6 +15,7 @@
     api_key: "{{ZOOKEEPER_TOKEN}}"
     namespace: "{{ZOOKEEPER_NAMESPACE}}"
     definition: "{{ lookup('template', 'computate_zookeeper_configmap.j2') }}"
+    validate_certs: "{{K8S_VALIDATE_CERT}}"
 - name: Install computate-zookeeper persistent volume claim on OpenShift
   k8s: 
     state: present
@@ -22,6 +24,7 @@
     api_key: "{{ZOOKEEPER_TOKEN}}"
     namespace: "{{ZOOKEEPER_NAMESPACE}}"
     definition: "{{ lookup('template', 'computate_zookeeper_persistent_volume_claim.yml.j2') }}"
+    validate_certs: "{{K8S_VALIDATE_CERT}}"
 - name: Install computate-zookeeper deployment config on OpenShift
   k8s: 
     state: present
@@ -30,6 +33,7 @@
     api_key: "{{ZOOKEEPER_TOKEN}}"
     namespace: "{{ZOOKEEPER_NAMESPACE}}"
     definition: "{{ lookup('template', 'computate_zookeeper_deployment_config.yml.j2') }}"
+    validate_certs: "{{K8S_VALIDATE_CERT}}"
 - name: Install computate-zookeeper service on OpenShift
   k8s: 
     state: present
@@ -38,4 +42,5 @@
     api_key: "{{ZOOKEEPER_TOKEN}}"
     namespace: "{{ZOOKEEPER_NAMESPACE}}"
     definition: "{{ lookup('template', 'computate_zookeeper_service.yml.j2') }}"
+    validate_certs: "{{K8S_VALIDATE_CERT}}"
 
