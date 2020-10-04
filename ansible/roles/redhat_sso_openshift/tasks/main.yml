@@ -6,6 +6,7 @@
     api_key: "{{SSO_TOKEN}}"
     namespace: "{{SSO_NAMESPACE}}"
     definition: "{{ lookup('template', 'redhat_sso_secret.yml.j2') }}"
+    validate_certs: "{{K8S_VALIDATE_CERT}}"
 - name: Install sso keystore secret on OpenShift
   k8s: 
     state: present
@@ -14,6 +15,7 @@
     api_key: "{{SSO_TOKEN}}"
     namespace: "{{SSO_NAMESPACE}}"
     definition: "{{ lookup('template', 'redhat_sso_keystore.yml.j2') }}"
+    validate_certs: "{{K8S_VALIDATE_CERT}}"
 - name: Install sso persistent volume claim on OpenShift
   k8s: 
     state: present
@@ -22,6 +24,7 @@
     api_key: "{{SSO_TOKEN}}"
     namespace: "{{SSO_NAMESPACE}}"
     definition: "{{ lookup('template', 'redhat_sso_persistent_volume_claim.yml.j2') }}"
+    validate_certs: "{{K8S_VALIDATE_CERT}}"
 - name: Install sso-postgresql deployment config on OpenShift
   k8s: 
     state: present
@@ -30,6 +33,7 @@
     api_key: "{{SSO_TOKEN}}"
     namespace: "{{SSO_NAMESPACE}}"
     definition: "{{ lookup('template', 'redhat_sso_postgres_deployment_config.yml.j2') }}"
+    validate_certs: "{{K8S_VALIDATE_CERT}}"
 - name: Install sso-postgresql service on OpenShift
   k8s: 
     state: present
@@ -38,6 +42,7 @@
     api_key: "{{SSO_TOKEN}}"
     namespace: "{{SSO_NAMESPACE}}"
     definition: "{{ lookup('template', 'redhat_sso_postgres_service.yml.j2') }}"
+    validate_certs: "{{K8S_VALIDATE_CERT}}"
 - name: Install sso deployment config on OpenShift
   k8s: 
     state: present
@@ -46,6 +51,7 @@
     api_key: "{{SSO_TOKEN}}"
     namespace: "{{SSO_NAMESPACE}}"
     definition: "{{ lookup('template', 'redhat_sso_deployment_config.yml.j2') }}"
+    validate_certs: "{{K8S_VALIDATE_CERT}}"
 - name: Install sso service on OpenShift
   k8s: 
     state: present
@@ -54,6 +60,7 @@
     api_key: "{{SSO_TOKEN}}"
     namespace: "{{SSO_NAMESPACE}}"
     definition: "{{ lookup('template', 'redhat_sso_service.yml.j2') }}"
+    validate_certs: "{{K8S_VALIDATE_CERT}}"
 - name: Install sso route on OpenShift
   k8s: 
     state: present
@@ -62,4 +69,5 @@
     api_key: "{{SSO_TOKEN}}"
     namespace: "{{SSO_NAMESPACE}}"
     definition: "{{ lookup('template', 'redhat_sso_route.yml.j2') }}"
+    validate_certs: "{{K8S_VALIDATE_CERT}}"
 

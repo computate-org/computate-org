@@ -104,6 +104,10 @@ SOUTHERNCOALITION_JAVA_MAIN_CLASS_ENUS: org.southerncoalition.enUS.vertx.AppVert
 SOUTHERNCOALITION_BACKUP_DIR_ENUS: /usr/local/src/southerncoalition-static/data/enUS
 # The restore directory of the site. 
 SOUTHERNCOALITION_RESTORE_DIR_ENUS: /home/ctate/backup/southerncoalition-dev/enUS
+# The were missing in the version I was running 
+SOUTHERNCOALITION_SOLR_COLLECTION: "{{SOUTHERNCOALITION_SOLR_COLLECTION_ENUS}}"
+SOUTHERNCOALITION_SITE_PORT: "{{SOUTHERNCOALITION_SITE_PORT_ENUS}}"
+SOUTHERNCOALITION_SITE_ZONE: "{{SOUTHERNCOALITION_SITE_ZONE_ENUS}}"
 
 #################
 # SMTP defaults #
@@ -185,3 +189,19 @@ ansible_become_pass: "{{USER_PASSWORD}}"
 ansible_ssh_pass: "{{USER_PASSWORD}}"
 # Setup the decryption password for decrypting other secrets in the playbook. 
 VAULT_PASSWORD: "{{USER_PASSWORD}}"
+
+
+#################################
+# Openshift Deployment Defaults #
+# ###############################
+# default storage class on the OCP cluster. 
+PERSITENT_VOLUME_SC: "gp2-encrypted"
+# when deploying without having a valid CA set this to false
+K8S_VALIDATE_CERT: true
+
+###############################
+# Red Hat SSO Images Defaults #
+# #############################
+SSO_IMAGESTREAM: "redhat-sso73-openshift"
+SSO_IMAGESTREAM_TAG: "1.0"
+SSO_POSTGRESQL_IMAGESTREAM_TAG: "9.5"

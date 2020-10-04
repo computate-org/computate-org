@@ -40,7 +40,7 @@ spec:
                   key: DB_DATABASE
                   name: sso-secret
           image: >-
-            docker-registry.default.svc:5000/openshift/postgresql@sha256:0cf19c73fb1ed0784a5092edd42ce662d7328dac529f56b6bfc3d85b24552ed4
+            docker-registry.default.svc:5000/openshift/postgresql
           imagePullPolicy: Always
           livenessProbe:
             failureThreshold: 3
@@ -91,10 +91,8 @@ spec:
           - sso-postgresql
         from:
           kind: ImageStreamTag
-          name: 'postgresql:9.5'
+          name: 'postgresql:{{SSO_POSTGRESQL_IMAGESTREAM_TAG}}'
           namespace: openshift
-        lastTriggeredImage: >-
-          docker-registry.default.svc:5000/openshift/postgresql@sha256:0cf19c73fb1ed0784a5092edd42ce662d7328dac529f56b6bfc3d85b24552ed4
       type: ImageChange
     - type: ConfigChange
 

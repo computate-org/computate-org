@@ -123,7 +123,7 @@ spec:
                   key: SSO_TRUSTSTORE_PASSWORD
                   name: sso-secret
           image: >-
-            docker-registry.default.svc:5000/openshift/redhat-sso73-openshift@sha256:03a700a5b1716248771624d80fdfc93eaf4b2e258857a87823b9c4a6c956e109
+            docker-registry.default.svc:5000/openshifto/{{SSO_IMAGESTREAM}}
           imagePullPolicy: Always
           livenessProbe:
             exec:
@@ -201,7 +201,7 @@ spec:
           - sso
         from:
           kind: ImageStreamTag
-          name: 'redhat-sso73-openshift:1.0'
+          name: '{{SSO_IMAGESTREAM}}:{{SSO_IMAGESTREAM_TAG}}'
           namespace: openshift
       type: ImageChange
     - type: ConfigChange
