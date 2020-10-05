@@ -1,9 +1,9 @@
-config/computate.config
-config/cp.txt
-.classpath
+inventories/computate-*/**
+inventories/southerncoalition-*/**
+inventories/opendatapolicing-*/**
+inventories/*/key
+**/*.retry
+**/*.swp
 .project
 .settings
-/target/
-/bin/
-**/*.swp
-**/*.retry
+

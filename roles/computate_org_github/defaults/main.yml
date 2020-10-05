@@ -1,0 +1,44 @@
+
+# The unique team id without spaces. 
+TEAM_ID: "mce1"
+# The name of the Github organization for the course. 
+GITHUB_ORG: "computate-org-{{ TEAM_ID }}"
+# The github token of the instructor's Github account. See Github Settings, Developer Settings, Personal access tokens. 
+# Make sure the token has the following roles (admin:org, repo): https://github.com/settings/tokens
+GITHUB_TOKEN: "..."
+# The name of the forked Github repository for the course containing the ansible scripts and ansible vaults for the project. 
+GITHUB_REPO_NAME: "computate-org-{{ TEAM_ID }}"
+# The path to the cloned repository. 
+GITHUB_REPO_PATH: "/usr/local/src/{{ GITHUB_REPO_NAME }}"
+# The SSH URL to the git repository. 
+GITHUB_REPO: "git@github.com:{{ GITHUB_ORG }}/{{ GITHUB_REPO_NAME }}.git"
+# The same repository name or a different one if the Ansible vaults are kept in a private repository. 
+ANSIBLE_REPO_NAME: "{{ GITHUB_REPO_NAME }}"
+# The same repository path or a different one if the Ansible vaults are kept in a private repository. 
+ANSIBLE_REPO_PATH: "/usr/local/src/{{ ANSIBLE_REPO_NAME }}"
+# The same repository SSH URL or a different one if the Ansible vaults are kept in a private repository. 
+ANSIBLE_REPO: "git@github.com:{{ GITHUB_ORG }}/{{ ANSIBLE_REPO_NAME }}.git"
+# The display name of the Github project. 
+PROJECT_NAME: "School Mock Client Engagement"
+# The description of the Github project. 
+PROJECT_DESCRIPTION: "A mock client engagement project to setup the app. "
+# The name of the application to deploy. 
+APP_NAME: computate-scolaire
+# The git repository name of the application to deploy. 
+APP_REPO_NAME: "{{ APP_NAME }}"
+# The path to the cloned repository of the application to deploy. 
+APP_REPO_PATH: "/usr/local/src/{{ APP_REPO_NAME }}"
+# The SSH URL to the repository of the application to deploy. 
+APP_REPO: "git@github.com:{{ GITHUB_ORG }}/{{ APP_REPO_NAME }}.git"
+# The Ansible friendly name of the the repository of the application to deploy. 
+APP_NAME_ANSIBLE: "{{ APP_NAME | regex_replace('-', '_') }}"
+
+# The URL to the OpenShift cluster to deploy. 
+REDHAT_OPENSHIFT_HOST: https://console.rh-us-east-1.openshift.com
+# The URL to manage the OpenShift cluster to deploy. 
+REDHAT_OPENSHIFT_MANAGE_HOST: https://employee.openshift.com
+# The OpenShift project name that will be used. 
+REDHAT_OPENSHIFT_NAMESPACE: school
+# The OpenShift login IDs that will be managing the OpenShift cluster. 
+REDHAT_OPENSHIFT_LOGIN_IDS: 
+  - christophertate

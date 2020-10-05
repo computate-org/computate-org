@@ -1,0 +1,7 @@
+---
+- name: Instructor tasks to setup a new organization to manage the app
+  hosts: computate_org
+  gather_facts: false
+  roles: 
+    - computate_org_github
+  

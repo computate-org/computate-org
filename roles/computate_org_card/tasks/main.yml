@@ -1,0 +1,58 @@
+- name: "Get column by name"
+  connection: local
+  set_fact:
+    COLUMN_NAME_JSON: "{{ COLUMNS.json | json_query(column_query) | first }}"
+  vars: 
+    column_query: "[?name=='{{ COLUMN_NAME }}'].{name: name, id: id}"
+  tags: always
+- name: "Get cards"
+  connection: local
+  uri:
+    timeout: 90
+    url: "https://api.github.com/projects/columns/{{ COLUMN_NAME_JSON.id }}/cards"
+    return_content: true
+    headers:
+      Authorization: "token {{ GITHUB_TOKEN }}"
+      Accept: "application/vnd.github.inertia-preview+json"
+  register: CARDS
+  tags: always
+- name: "Get card by content_url"
+  connection: local
+  set_fact:
+    CARD_CONTENT_ID_JSON: "{{ CARDS.json | json_query(card_query) | first | default(None) }}"
+  vars: 
+    card_query: "[?content_url=='https://api.github.com/repos/{{ GITHUB_ORG }}/{{ GITHUB_REPO_NAME }}/issues/{{ ISSUE_CREATE_JSON.json.number | default(omit) }}'].{note: note, id: id}"
+  tags: always
+- name: "Create card by content_id {{ ISSUE_CREATE_JSON.json.id }}"
+  connection: local
+  uri:
+    timeout: 90
+    url: "https://api.github.com/projects/columns/{{ COLUMN_NAME_JSON.id }}/cards"
+    method: POST
+    headers:
+      Content-Type: "application/json"
+      Authorization: "token {{ GITHUB_TOKEN }}"
+      Accept: "application/vnd.github.inertia-preview+json"
+    body_format: json
+    body: "{ \"content_id\": {{ ISSUE_CREATE_JSON.json.id }}, \"content_type\": \"Issue\" }"
+    status_code: 
+      - 200
+      - 201
+  when: CARD_CONTENT_ID_JSON is not defined or CARD_CONTENT_ID_JSON == ""
+  register: CARD_CREATE_JSON
+  tags: always
+#- name: "Update card by content_id {{ ISSUE_CREATE_JSON.json.id }}"
+#  uri:
+#    timeout: 90
+#    url: "https://api.github.com/projects/columns/cards/{{ CARD_CONTENT_ID_JSON.id }}"
+#    method: PATCH
+#    headers:
+#      Content-Type: "application/json"
+#      Authorization: "token {{ GITHUB_TOKEN }}"
+#      Accept: "application/vnd.github.inertia-preview+json"
+#    body_format: json
+#    body: "{ \"content_id\": {{ ISSUE_CREATE_JSON.json.id }}, \"content_type\": \"Issue\" }"
+#  when: CARD_CONTENT_ID_JSON is defined
+#  register: CARD_CREATE_JSON
+#  tags: card_content_id
+

@@ -1,0 +1,43 @@
+- name: "Get milestone by title {{ MILESTONE_TITLE | default(omit) }}"
+  connection: local
+  set_fact:
+    MILESTONE_TITLE_JSON: "{{ MILESTONES.json | json_query(milestone_query) | first | default(None) }}"
+  vars: 
+    milestone_query: "[?title=='{{ MILESTONE_TITLE | default(omit) }}'].{title: title, description: description, number: number}"
+  tags: milestone_title
+- name: "Create milestone by title {{ MILESTONE_TITLE }}"
+  connection: local
+  uri:
+    timeout: 90
+    url: "https://api.github.com/repos/{{ GITHUB_ORG }}/{{ GITHUB_REPO_NAME }}/milestones"
+    method: POST
+    headers:
+      Content-Type: "application/json"
+      Authorization: "token {{ GITHUB_TOKEN }}"
+    body_format: json
+    body: 
+      title: "{{ MILESTONE_TITLE }}"
+      description: "{{ MILESTONE_DESCRIPTION }}"
+    status_code: 
+      - 200
+      - 201
+  when: MILESTONE_TITLE_JSON is not defined or MILESTONE_TITLE_JSON == ""
+  register: MILESTONE_CREATE_JSON
+  tags: milestone_title
+- name: "Update milestone by title {{ MILESTONE_TITLE }}"
+  connection: local
+  uri:
+    timeout: 90
+    url: "https://api.github.com/repos/{{ GITHUB_ORG }}/{{ GITHUB_REPO_NAME }}/milestones/{{ MILESTONE_TITLE_JSON.number }}"
+    method: PATCH
+    headers:
+      Content-Type: "application/json"
+      Authorization: "token {{ GITHUB_TOKEN }}"
+    body_format: json
+    body: 
+      title: "{{ MILESTONE_TITLE }}"
+      description: "{{ MILESTONE_DESCRIPTION }}"
+  when: MILESTONE_TITLE_JSON is defined and MILESTONE_TITLE_JSON != ""
+  register: MILESTONE_CREATE_JSON
+  tags: milestone_title
+

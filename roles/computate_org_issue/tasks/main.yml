@@ -1,0 +1,136 @@
+- name: "Get milestone by title"
+  connection: local
+  set_fact:
+    MILESTONE_TITLE_JSON: "{{ MILESTONES.json | json_query(milestone_query) | first | default(omit) }}"
+  vars: 
+    milestone_query: "[?title=='{{ MILESTONE_TITLE | default(omit) }}'].{title: title, description: description, number: number}"
+  tags: always
+- name: "Get issue by label {{ ISSUE_LABEL }}"
+  connection: local
+  uri:
+    timeout: 90
+    url: "https://api.github.com/repos/{{ GITHUB_ORG }}/{{ GITHUB_REPO_NAME }}/issues?labels={{ ISSUE_LABEL | urlencode() }}"
+    return_content: true
+    headers:
+      Authorization: "token {{ GITHUB_TOKEN }}"
+  register: ISSUE_LABEL_JSON
+  tags: always
+
+- block: 
+    - name: "Create issue by label {{ ISSUE_LABEL }}"
+      connection: local
+      uri:
+        timeout: 90
+        url: "https://api.github.com/repos/{{ GITHUB_ORG }}/{{ GITHUB_REPO_NAME }}/issues"
+        method: POST
+        headers:
+          Content-Type: "application/json"
+          Authorization: "token {{ GITHUB_TOKEN }}"
+        body_format: json
+        body: 
+          labels: 
+            - "{{ ISSUE_LABEL }}"
+          title: "{{ ISSUE_TITLE }}"
+          body: "{{ ISSUE_BODY }}"
+          milestone: "{{ MILESTONE_TITLE_JSON.number | default(omit) }}"
+        status_code: 
+          - 200
+          - 201
+      register: ISSUE_CREATE_JSON
+      tags: always
+    - name: Create card
+      include_role: 
+        name: computate_org_card
+      vars: 
+        CARD_CONTENT_ID: "{{ ISSUE_CREATE_JSON.json.id }}"
+      tags: always
+  connection: local
+  when: COLUMN_NAME is defined and MILESTONE_TITLE_JSON is defined and (ISSUE_LABEL_JSON.json | length == 0)
+  tags: always
+- block: 
+    - name: "Create issue by label {{ ISSUE_LABEL }}"
+      connection: local
+      uri:
+        timeout: 90
+        url: "https://api.github.com/repos/{{ GITHUB_ORG }}/{{ GITHUB_REPO_NAME }}/issues"
+        method: POST
+        headers:
+          Content-Type: "application/json"
+          Authorization: "token {{ GITHUB_TOKEN }}"
+        body_format: json
+        body: 
+          labels: 
+            - "{{ ISSUE_LABEL }}"
+          title: "{{ ISSUE_TITLE }}"
+          body: "{{ ISSUE_BODY }}"
+        status_code: 
+          - 200
+          - 201
+      register: ISSUE_CREATE_JSON
+      tags: always
+    - name: Create card
+      include_role: 
+        name: computate_org_card
+      vars: 
+        CARD_CONTENT_ID: "{{ ISSUE_CREATE_JSON.json.id }}"
+      tags: always
+  connection: local
+  when: COLUMN_NAME is defined and MILESTONE_TITLE_JSON is not defined and (ISSUE_LABEL_JSON.json | length == 0)
+  tags: always
+
+- block: 
+    - name: "Update issue by label {{ ISSUE_LABEL }}"
+      connection: local
+      uri:
+        timeout: 90
+        url: "https://api.github.com/repos/{{ GITHUB_ORG }}/{{ GITHUB_REPO_NAME }}/issues/{{ ISSUE_LABEL_JSON.json[0].number }}"
+        method: PATCH
+        headers:
+          Content-Type: "application/json"
+          Authorization: "token {{ GITHUB_TOKEN }}"
+        body_format: json
+        body: 
+          labels: 
+            - "{{ ISSUE_LABEL }}"
+          title: "{{ ISSUE_TITLE }}"
+          body: "{{ ISSUE_BODY }}"
+          milestone: "{{ MILESTONE_TITLE_JSON.number | default(omit) }}"
+      register: ISSUE_CREATE_JSON
+      tags: always
+    - name: Create card
+      include_role: 
+        name: computate_org_card
+      vars: 
+        CARD_CONTENT_ID: "{{ ISSUE_CREATE_JSON.json.id }}"
+      tags: always
+  connection: local
+  when: COLUMN_NAME is defined and MILESTONE_TITLE_JSON is defined and (ISSUE_LABEL_JSON.json | length > 0)
+  tags: always
+- block: 
+    - name: "Update issue by label {{ ISSUE_LABEL }}"
+      connection: local
+      uri:
+        timeout: 90
+        url: "https://api.github.com/repos/{{ GITHUB_ORG }}/{{ GITHUB_REPO_NAME }}/issues/{{ ISSUE_LABEL_JSON.json[0].number }}"
+        method: PATCH
+        headers:
+          Content-Type: "application/json"
+          Authorization: "token {{ GITHUB_TOKEN }}"
+        body_format: json
+        body: 
+          labels: 
+            - "{{ ISSUE_LABEL }}"
+          title: "{{ ISSUE_TITLE }}"
+          body: "{{ ISSUE_BODY }}"
+      register: ISSUE_CREATE_JSON
+      tags: always
+    - name: Create card
+      include_role: 
+        name: computate_org_card
+      vars: 
+        CARD_CONTENT_ID: "{{ ISSUE_CREATE_JSON.json.id }}"
+      tags: always
+  connection: local
+  when: COLUMN_NAME is defined and MILESTONE_TITLE_JSON is not defined and (ISSUE_LABEL_JSON.json | length > 0)
+  tags: always
+

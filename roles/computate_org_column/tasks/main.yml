@@ -1,0 +1,43 @@
+- name: "Get column by name {{ COLUMN_NAME | default(omit) }}"
+  connection: local
+  set_fact:
+    COLUMN_NAME_JSON: "{{ COLUMNS.json | json_query(column_query) | first | default(None) }}"
+  vars: 
+    column_query: "[?name=='{{ COLUMN_NAME | default(omit) }}'].{name: name, description: description, id: id}"
+  tags: column_name
+- name: "Create column by name {{ COLUMN_NAME }}"
+  connection: local
+  uri:
+    timeout: 90
+    url: "https://api.github.com/projects/{{ PROJECT_NAME_JSON.id }}/columns"
+    method: POST
+    headers:
+      Content-Type: "application/json"
+      Authorization: "token {{ GITHUB_TOKEN }}"
+      Accept: "application/vnd.github.inertia-preview+json"
+    body_format: json
+    body: 
+      name: "{{ COLUMN_NAME }}"
+    status_code: 
+      - 200
+      - 201
+  when: COLUMN_NAME_JSON is not defined or COLUMN_NAME_JSON == ""
+  register: COLUMN_CREATE_JSON
+  tags: column_name
+- name: "Update column by name {{ COLUMN_NAME }}"
+  connection: local
+  uri:
+    timeout: 90
+    url: "https://api.github.com/projects/columns/{{ COLUMN_NAME_JSON.id }}"
+    method: PATCH
+    headers:
+      Content-Type: "application/json"
+      Authorization: "token {{ GITHUB_TOKEN }}"
+      Accept: "application/vnd.github.inertia-preview+json"
+    body_format: json
+    body: 
+      name: "{{ COLUMN_NAME }}"
+  when: COLUMN_NAME_JSON is defined and COLUMN_NAME_JSON != ""
+  register: COLUMN_CREATE_JSON
+  tags: column_name
+
