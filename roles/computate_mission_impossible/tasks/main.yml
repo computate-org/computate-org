@@ -1,0 +1,327 @@
+---
+- name: Check for GITHUB_TOKEN var
+  fail: 
+    msg: "Make sure you have correctly configured a GITHUB_TOKEN: '...' in your ansible vault. You will want to configure a Github token with 'admin:org' and 'repo' scopes (https://github.com/settings/tokens). "
+  when: GITHUB_TOKEN is not defined
+  tags: github_token
+- name: Check for GITHUB_ORG var
+  connection: local
+  fail: 
+    msg: "Make sure you have correctly configured a GITHUB_ORG: '...' in your ansible vault. This should be a Github organization that your user and token have access to (https://github.com/organizations/plan). "
+  when: GITHUB_ORG is not defined
+  tags: github_org
+- name: "Get Github org {{ GITHUB_ORG }}"
+  connection: local
+  uri: 
+    url: "https://api.github.com/orgs/{{ GITHUB_ORG }}"
+    return_content: true
+    headers: 
+      Authorization: "token {{ GITHUB_TOKEN }}"
+  ignore_errors: true
+  register: "{{ 'GITHUB_ORG_JSON' if GITHUB_ORG_JSON is not defined else 'IGNORE_VAR' }}"
+  when: GITHUB_ORG_JSON is not defined
+  tags: github_org
+- name: Check Github token
+  connection: local
+  fail: 
+    msg: "Make sure you have correctly configured a GITHUB_TOKEN: '...' in your ansible vault. You will want to configure a Github token with 'admin:org' and 'repo' scopes (https://github.com/settings/tokens). You are using GITHUB_TOKEN: {{ GITHUB_TOKEN }}"
+  when: GITHUB_ORG_JSON.failed and (GITHUB_ORG_JSON.status is not defined or GITHUB_ORG_JSON.status == 401)
+  tags: github_token
+- name: Check for Github org
+  connection: local
+  fail: 
+    msg: "Make sure you have correctly configured a GITHUB_ORG: '...' in your ansible vault. This should be a Github organization that your user and token have access to (https://github.com/organizations/plan). You are using GITHUB_ORG: {{ GITHUB_ORG }}"
+  when: GITHUB_ORG_JSON.failed and GITHUB_ORG_JSON.status == 404
+  tags: github_org
+
+############
+# Projects #
+############
+
+- name: "Get projects"
+  connection: local
+  uri:
+    timeout: 90
+    url: "https://api.github.com/orgs/{{ GITHUB_ORG }}/projects"
+    return_content: true
+    headers:
+      Authorization: "token {{ GITHUB_TOKEN }}"
+      Accept: "application/vnd.github.inertia-preview+json"
+  register: "{{ 'PROJECTS_JSON' if PROJECTS_JSON is not defined else 'IGNORE_VAR' }}"
+  when: PROJECTS_JSON is not defined
+- name: "Get project by name {{ PROJECT_NAME | default(omit) }}"
+  connection: local
+  set_fact:
+    PROJECT_NAME_JSON: "{{ PROJECTS_JSON.json | json_query(project_query) | first }}"
+  when: PROJECTS_JSON.json | json_query(project_query)
+  vars: 
+    project_query: "[?name=='{{ PROJECT_NAME | default(omit) }}'].{name: name, description: description, id: id}"
+- name: "Create project {{ PROJECT_NAME }}"
+  include_role: 
+    name: computate_org_project
+  tags: 
+    - project
+  when: PROJECT_JSON
+
+- name: "Get projects"
+  connection: local
+  uri:
+    timeout: 90
+    url: "https://api.github.com/orgs/{{ GITHUB_ORG }}/projects"
+    return_content: true
+    headers:
+      Authorization: "token {{ GITHUB_TOKEN }}"
+      Accept: "application/vnd.github.inertia-preview+json"
+  register: PROJECTS_JSON
+  tags: always
+- name: "Get project by name {{ PROJECT_NAME | default(omit) }}"
+  connection: local
+  set_fact:
+    PROJECT_NAME_JSON: "{{ PROJECTS_JSON.json | json_query(project_query) | first }}"
+  when: PROJECTS_JSON.json | json_query(project_query)
+  vars: 
+    project_query: "[?name=='{{ PROJECT_NAME | default(omit) }}'].{name: name, description: description, id: id}"
+  tags: always
+#
+############
+## Columns #
+############
+#
+#- name: "Get columns"
+#  connection: local
+#  uri:
+#    timeout: 90
+#    url: "https://api.github.com/projects/{{ PROJECT_NAME_JSON.id }}/columns"
+#    return_content: true
+#    headers:
+#      Authorization: "token {{ GITHUB_TOKEN }}"
+#      Accept: "application/vnd.github.inertia-preview+json"
+#  register: COLUMNS
+#
+#- name: Create column for setup issues
+#  include_role: 
+#    name: computate_org_column
+#  vars: 
+#    COLUMN_NAME: Setup Tasks
+#  tags: 
+#    - column
+#- name: Create column for Configure Authentication
+#  include_role: 
+#    name: computate_org_column
+#  vars: 
+#    COLUMN_NAME: Configure Authentication
+#  tags: 
+#    - column
+#- name: Create column for OpenShift Deployment issues
+#  include_role: 
+#    name: computate_org_column
+#  vars: 
+#    COLUMN_NAME: OpenShift Deployment
+#  tags: 
+#    - column
+#- name: Create column for Ansible OpenShift Deployment issues
+#  include_role: 
+#    name: computate_org_column
+#  vars: 
+#    COLUMN_NAME: Ansible OpenShift Deployment
+#  tags: 
+#    - column
+#- name: Create column for Data Development issues
+#  include_role: 
+#    name: computate_org_column
+#  vars: 
+#    COLUMN_NAME: Data Development
+#  tags: 
+#    - column
+#- name: Create column for Local install issues
+#  include_role: 
+#    name: computate_org_column
+#  vars: 
+#    COLUMN_NAME: Development Installation
+#  tags: 
+#    - column
+#- name: Create column for Ansible Optional OpenShift Deployment issues
+#  include_role: 
+#    name: computate_org_column
+#  vars: 
+#    COLUMN_NAME: Optional Ansible OpenShift Deployment
+#  tags: 
+#    - column
+#
+#- name: Create column for Backlog
+#  include_role: 
+#    name: computate_org_column
+#  vars: 
+#    COLUMN_NAME: Backlog
+#  tags: 
+#    - column
+#- name: Create column for Committed
+#  include_role: 
+#    name: computate_org_column
+#  vars: 
+#    COLUMN_NAME: Committed
+#  tags: 
+#    - column
+#- name: Create column for In progress
+#  include_role: 
+#    name: computate_org_column
+#  vars: 
+#    COLUMN_NAME: In progress
+#  tags: 
+#    - column
+#- name: Create column for Dev Complete
+#  include_role: 
+#    name: computate_org_column
+#  vars: 
+#    COLUMN_NAME: Dev Complete
+#  tags: 
+#    - column
+#- name: Create column for In QA
+#  include_role: 
+#    name: computate_org_column
+#  vars: 
+#    COLUMN_NAME: In QA
+#  tags: 
+#    - column
+#- name: Create column for QA complete
+#  include_role: 
+#    name: computate_org_column
+#  vars: 
+#    COLUMN_NAME: QA complete
+#  tags: 
+#    - column
+#- name: Create column for PO Accepted
+#  include_role: 
+#    name: computate_org_column
+#  vars: 
+#    COLUMN_NAME: PO Accepted
+#  tags: 
+#    - column
+#
+#- name: "Get columns"
+#  connection: local
+#  uri:
+#    timeout: 90
+#    url: "https://api.github.com/projects/{{ PROJECT_NAME_JSON.id }}/columns"
+#    return_content: true
+#    headers:
+#      Authorization: "token {{ GITHUB_TOKEN }}"
+#      Accept: "application/vnd.github.inertia-preview+json"
+#  register: COLUMNS
+#  tags: always
+#
+###############
+## Milestones #
+###############
+#
+#- name: "Get milestones"
+#  connection: local
+#  uri:
+#    timeout: 90
+#    url: "https://api.github.com/repos/{{ GITHUB_ORG }}/{{ GITHUB_REPO_NAME }}/milestones"
+#    return_content: true
+#    headers:
+#      Authorization: "token {{ GITHUB_TOKEN }}"
+#  register: MILESTONES
+#
+#- name: Create milestone for setup issues
+#  include_role: 
+#    name: computate_org_milestone
+#  vars: 
+#    MILESTONE_TITLE: Setup Tasks
+#    MILESTONE_DESCRIPTION: |
+#      Setup Tasks issues including setting up the OpenShift cluster, installing Ansible locally, defining the ansible vault for the group and other setup tasks. 
+#  tags: 
+#    - milestone
+#- name: Create milestone for Configure Authentication issues
+#  include_role: 
+#    name: computate_org_milestone
+#  vars: 
+#    MILESTONE_TITLE: Configure Authentication
+#    MILESTONE_DESCRIPTION: |
+#      Configuring authentication and authorization in the Red Hat Single Sign-On server. 
+#  tags: 
+#    - milestone
+#- name: Create milestone for OpenShift Deployment issues
+#  include_role: 
+#    name: computate_org_milestone
+#  vars: 
+#    MILESTONE_TITLE: OpenShift Deployment
+#    MILESTONE_DESCRIPTION: |
+#      Deploying applications to OpenShift manually. 
+#  tags: 
+#    - milestone
+#- name: Create milestone for Ansible OpenShift Deployment issues
+#  include_role: 
+#    name: computate_org_milestone
+#  vars: 
+#    MILESTONE_TITLE: Ansible OpenShift Deployment
+#    MILESTONE_DESCRIPTION: |
+#      Automating the deployment of applications to OpenShift using Ansible. 
+#  tags: 
+#    - milestone
+#- name: Create milestone for Data Development issues
+#  include_role: 
+#    name: computate_org_milestone
+#  vars: 
+#    MILESTONE_TITLE: Data Development
+#    MILESTONE_DESCRIPTION: |
+#      Creating, restoring and backing up data in the site. 
+#  tags: 
+#    - milestone
+#- name: Create milestone for Local install issues
+#  include_role: 
+#    name: computate_org_milestone
+#  vars: 
+#    MILESTONE_TITLE: Development Installation
+#    MILESTONE_DESCRIPTION: |
+#      Deploying applications to a local development computer. 
+#  tags: 
+#    - milestone
+#- name: Create milestone for Optional Ansible OpenShift Deployment issues
+#  include_role: 
+#    name: computate_org_milestone
+#  vars: 
+#    MILESTONE_TITLE: Optional Ansible OpenShift Deployment
+#    MILESTONE_DESCRIPTION: |
+#      Optional scripts for Automating the deployment of applications to OpenShift using Ansible. 
+#  tags: 
+#    - milestone
+#
+#- name: "Get milestones"
+#  connection: local
+#  uri:
+#    timeout: 90
+#    url: "https://api.github.com/repos/{{ GITHUB_ORG }}/{{ GITHUB_REPO_NAME }}/milestones"
+#    return_content: true
+#    headers:
+#      Authorization: "token {{ GITHUB_TOKEN }}"
+#  register: MILESTONES
+#  tags: always
+
+- name: Query Apache Solr for all Java classes
+  uri: 
+    url: "http://localhost:8983/solr/computate/select?q=*:*&fq=partEstClasse_indexed_boolean:true&fq=appliNom_indexed_string:opendatapolicing&fq=classeNomCanonique_enUS_indexed_string:com.opendatapolicing.enus.trafficstop.TrafficStop"
+  register: JAVA_CLASSES
+- debug: 
+    var: JAVA_CLASSES
+#- name: "Create issue to install an Apache Zookeeper cluster manager for local development"
+#  include_role: 
+#    name: computate_org_issue
+#  vars: 
+#    ISSUE_LABEL: install_zookeeper_cluster_manager
+#    ISSUE_TITLE: "Install an Apache Zookeeper cluster manager for local development"
+#    MILESTONE_TITLE: Development Installation
+#    COLUMN_NAME: Development Installation
+#    ISSUE_BODY: |
+#      Help each member of the team interested in local development of the project install an Apache Zookeeper cluster manager. 
+#
+#      #### Run the playbook to install an Apache Zookeeper cluster manager on your development computer.
+#      
+#      ```bash
+#      (cd /usr/local/src/computate/ansible && ansible-playbook computate_zookeeper.yml -i {{ ANSIBLE_REPO_PATH }}/inventories/$USER-localhost/hosts --vault-id @prompt)
+#      ```
+#  tags: 
+#    - issue_label
+#    - issue_label_500
+#    - issue_label_504
