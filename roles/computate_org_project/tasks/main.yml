@@ -35,7 +35,7 @@
       name: "{{ PROJECT_NAME }}"
       description: "{{ PROJECT_DESCRIPTION }}"
       private: false
-  when: PROJECT_NAME_JSON is defined
+  when: PROJECT_NAME_JSON is defined and PROJECT_NAME != PROJECT_NAME_JSON.name and PROJECT_DESCRIPTION != PROJECT_NAME_JSON.description
   register: PROJECT_CREATE_JSON
   tags: project_name
 

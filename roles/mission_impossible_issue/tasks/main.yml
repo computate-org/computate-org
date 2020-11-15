@@ -1,0 +1,55 @@
+- name: Query Apache Solr for all Java class parts
+  uri: 
+    url: "http://localhost:8983/solr/computate/select?rows=200&q=*:*&fq=-partEstClasse_indexed_boolean:true&fq=appliNom_indexed_string:opendatapolicing&fq=classeNomCanonique_enUS_indexed_string:{{ JAVA_CLASS.classeNomCanonique_enUS_stored_string }}"
+  register: CLASS_PARTS_JSON
+- name: "Create issue to create a Java class"
+  include_role: 
+    name: computate_org_issue
+  vars: 
+    ISSUE_LABEL: "create_java_class_{{ JAVA_CLASS.classeNomSimple_enUS_stored_string }}"
+    ISSUE_TITLE: "Create Java class {{ JAVA_CLASS.classeNomSimple_enUS_stored_string }}"
+    MILESTONE_TITLE: Software Development
+    COLUMN_NAME: Software Development
+    ISSUE_BODY: |
+      Your mission, if you choose to accept it, is to create a new Java class to. 
+
+      - **The Java package name will be:** {{ JAVA_CLASS.classeNomEnsemble_enUS_stored_string }}
+      - **The Java class name will be:** {{ JAVA_CLASS.classeNomSimple_enUS_stored_string }}
+      {% if JAVA_CLASS.classeNomSimpleSuperGenerique_enUS_stored_string is defined %}
+      - **The Java class will extend:** {{ JAVA_CLASS.classeNomSimpleSuper_enUS_stored_string }}{% raw %}<{% endraw %}{{ JAVA_CLASS.classeNomSimpleSuperGenerique_enUS_stored_string }}{% raw %}>{% endraw %}
+
+      {% elif JAVA_CLASS.classeNomSimpleSuper_enUS_stored_string is defined %}
+      - **The Java class will extend:** {{ JAVA_CLASS.classeNomSimpleSuper_enUS_stored_string }}
+      {% else %}
+      {% endif %}
+
+      {% for CLASS_PART in CLASS_PARTS_JSON.json.response.docs %}
+
+      {% if CLASS_PART.partEstEntite_stored_boolean is defined %}
+      ## Create the {{ CLASS_PART.entiteVar_enUS_stored_string }} entity
+
+      ```java
+      {% if CLASS_PART.entiteCouverture_stored_boolean %}
+      	protected void _{{ CLASS_PART.entiteVar_enUS_stored_string }}(Wrap<{{ CLASS_PART.entiteNomSimpleComplet_enUS_stored_string }}> {{ CLASS_PART.entiteVarParam_enUS_stored_string }}) {% raw %}{{% endraw %}{{ CLASS_PART.entiteCodeSource_enUS_stored_string }}{% raw %}}{% endraw %}
+      {% else %}
+      protected void _{{ CLASS_PART.entiteVar_enUS_stored_string }}({{ CLASS_PART.entiteNomSimpleComplet_enUS_stored_string }} {{ CLASS_PART.entiteVarParam_enUS_stored_string }}) {% raw %}{{% endraw %}{{ CLASS_PART.entiteCodeSource_enUS_stored_string }}{% raw %}}{% endraw %}
+      {% endif %}
+      
+      ```
+      {% elif CLASS_PART.partEstMethode_stored_boolean is defined %}
+      ## Create the {{ CLASS_PART.methodeVar_enUS_stored_string }} method
+
+      ```java
+      	{{ CLASS_PART.methodeVar_enUS_stored_string }}(...) {% raw %}{{% endraw %}{{ CLASS_PART.methodeCodeSource_enUS_stored_string }}{% raw %}}{% endraw %}
+
+      ```
+      {% elif CLASS_PART.partEstChamp_stored_boolean is defined %}
+      ## Create the {{ CLASS_PART.champVar_enUS_stored_string }} field
+
+      ```java
+      	{{ CLASS_PART.champNomSimpleComplet_enUS_stored_string }} {{ CLASS_PART.champVar_enUS_stored_string }} = {{ CLASS_PART.champCodeSource_enUS_stored_string }};
+      ```
+      {% endif %}
+      {% endfor %}
+  tags: 
+    - "class{{ JAVA_CLASS.classeNomSimple_enUS_stored_string }}"
