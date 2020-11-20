@@ -41,6 +41,7 @@
   when: CARD_CONTENT_ID_JSON is not defined or CARD_CONTENT_ID_JSON == ""
   register: CARD_CREATE_JSON
   tags: always
+  ignore_errors: true
 #- name: "Update card by content_id {{ ISSUE_CREATE_JSON.json.id }}"
 #  uri:
 #    timeout: 90
