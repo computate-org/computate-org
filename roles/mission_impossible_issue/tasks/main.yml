@@ -76,6 +76,65 @@
       {% else %}
       {% endif %}
 
+      ```java
+      package {{ JAVA_CLASS.classeNomEnsemble_enUS_stored_string }};
+
+      {% for CLASS_IMPORT in JAVA_CLASS.classeImportations_enUS_stored_strings %}
+      import {{ CLASS_IMPORT }};
+      {% endfor %}
+
+      /**
+      {% if JAVA_CLASS.classeModele_stored_boolean == true %}
+       * Model: true
+      {% endif %}
+      {% if JAVA_CLASS.classeApi_stored_boolean == true %}
+       * Stored: true
+      {% endif %}
+      {% if JAVA_CLASS.classeIndexe_stored_boolean == true %}
+       * Indexed: true
+      {% endif %}
+      {% if JAVA_CLASS.classeSauvegarde_stored_boolean == true %}
+       * Saved: true
+      {% endif %}
+      {% if JAVA_CLASS.classeApiUri_enUS_stored_string is defined %}
+
+       * ApiUri,enUS: {{ JAVA_CLASS.classeApiUri_enUS_stored_string }}
+      {% endif %}
+      {% if JAVA_CLASS.classeApiUri_enUS_stored_string is defined %}
+       * ApiTag,enUS: {{ JAVA_CLASS.classeApiTag_enUS_stored_string }}
+      {% endif %}
+      {% if JAVA_CLASS.classeApiMethodes_enUS_stored_strings is defined and JAVA_CLASS.classeApiMethodes_enUS_stored_strings | length > 0 %}
+
+      {% for CLASS_API_METHOD in JAVA_CLASS.classeApiMethodes_enUS_stored_strings %}
+
+      {% if JAVA_CLASS['classeApiUri' ~ CLASS_API_METHOD ~ '_enUS_stored_string'] != JAVA_CLASS['classeApiUri_enUS_stored_string'] %}
+       * ApiMethod: {{ CLASS_API_METHOD }}.enUS
+       * ApiUri{{ CLASS_API_METHOD }}.enUS: {{ JAVA_CLASS['classeApiUri' ~ CLASS_API_METHOD ~ '_enUS_stored_string'] }}
+      {% else %}
+       * ApiMethod: {{ CLASS_API_METHOD }}
+      {% endif %}
+      {% if JAVA_CLASS['classeRoleUtilisateur' ~ CLASS_API_METHOD ~ '_enUS_stored_boolean'] == true %}
+       * RoleUtilisateur{{ CLASS_API_METHOD }}.enUS: true
+      {% endif %}
+      {% if JAVA_CLASS['classePageNomSimple' ~ CLASS_API_METHOD ~ '_enUS_stored_string'] is defined %}
+       * Page{{ CLASS_API_METHOD }}.enUS: {{ JAVA_CLASS['classePageNomSimple' ~ CLASS_API_METHOD ~ '_enUS_stored_string'] }}
+      {% endif %}
+      {% if JAVA_CLASS['classePageSuperNomSimple' ~ CLASS_API_METHOD ~ '_enUS_stored_string'] is defined %}
+       * PageSuper{{ CLASS_API_METHOD }}.enUS: {{ JAVA_CLASS['classePageNomSimple' ~ CLASS_API_METHOD ~ '_enUS_stored_string'] }}
+      {% endif %}
+      {% endfor %}
+      {% endif %}
+       **/
+      {% if JAVA_CLASS.classeNomSimpleSuperGenerique_enUS_stored_string is defined %}
+      public class {{ JAVA_CLASS.classeNomSimple_enUS_stored_string }} extends {{ JAVA_CLASS.classeNomSimpleSuper_enUS_stored_string }}<{{ JAVA_CLASS.classeNomSimpleSuperGenerique_enUS_stored_string }}> {
+      {% elif JAVA_CLASS.classeNomSimpleSuper_enUS_stored_string is defined and JAVA_CLASS.classeNomSimpleSuper_enUS_stored_string != 'Object' %}
+      public class {{ JAVA_CLASS.classeNomSimple_enUS_stored_string }} extends {{ JAVA_CLASS.classeNomSimpleSuper_enUS_stored_string }} {
+      {% else %}
+      public class {{ JAVA_CLASS.classeNomSimple_enUS_stored_string }} {
+      {% endif %}
+      }
+      ```
+
       {% for CLASS_PART in CLASS_PARTS_JSON.json.response.docs %}
 
       {% if CLASS_PART.partEstEntite_stored_boolean is defined %}
