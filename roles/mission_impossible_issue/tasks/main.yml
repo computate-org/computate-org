@@ -98,13 +98,12 @@
       {% endif %}
       {% if JAVA_CLASS.classeApiUri_enUS_stored_string is defined %}
 
-       * ApiUri,enUS: {{ JAVA_CLASS.classeApiUri_enUS_stored_string }}
+       * ApiUri.enUS: {{ JAVA_CLASS.classeApiUri_enUS_stored_string }}
       {% endif %}
       {% if JAVA_CLASS.classeApiUri_enUS_stored_string is defined %}
-       * ApiTag,enUS: {{ JAVA_CLASS.classeApiTag_enUS_stored_string }}
+       * ApiTag.enUS: {{ JAVA_CLASS.classeApiTag_enUS_stored_string }}
       {% endif %}
       {% if JAVA_CLASS.classeApiMethodes_enUS_stored_strings is defined and JAVA_CLASS.classeApiMethodes_enUS_stored_strings | length > 0 %}
-
       {% for CLASS_API_METHOD in JAVA_CLASS.classeApiMethodes_enUS_stored_strings %}
 
       {% if JAVA_CLASS['classeApiUri' ~ CLASS_API_METHOD ~ '_enUS_stored_string'] != JAVA_CLASS['classeApiUri_enUS_stored_string'] %}
@@ -123,6 +122,39 @@
        * PageSuper{{ CLASS_API_METHOD }}.enUS: {{ JAVA_CLASS['classePageNomSimple' ~ CLASS_API_METHOD ~ '_enUS_stored_string'] }}
       {% endif %}
       {% endfor %}
+      {% endif %}
+      {% if JAVA_CLASS.contexteUnNom_enUS_stored_string is defined %}
+
+       * AName.enUS: {{ JAVA_CLASS.contexteUnNom_enUS_stored_string }}
+       * Color: {{ JAVA_CLASS.contexteCouleur_stored_string }}
+       * IconGroup: {{ JAVA_CLASS.contexteIconeGroupe_stored_string }}
+       * IconName: {{ JAVA_CLASS.contexteIconeNom_stored_string }}
+       * NameVar: {{ JAVA_CLASS.contexteNomVar_enUS_stored_string }}
+      {% endif %}
+      {% if JAVA_CLASS.classeRoles_enUS_stored_strings is defined and JAVA_CLASS.classeRoles_enUS_stored_strings | length > 0 %}
+
+      {% for CLASS_ROLE in JAVA_CLASS.classeRoles_enUS_stored_strings %}
+       * Role.enUS: {{ CLASS_ROLE }}
+      {% endfor %}
+      {% if JAVA_CLASS.classePublicLire_stored_boolean == true %}
+       * PublicRead: true
+      {% endif %}
+      {% if JAVA_CLASS.classeRoleSession_stored_boolean == true %}
+       * RoleSession: true
+      {% endif %}
+      {% if JAVA_CLASS.classeRoleUtilisteur_stored_boolean == true %}
+       * RoleUser: true
+      {% endif %}
+      {% endif %}
+      {% if JAVA_CLASS.classeTrisTrouves_stored_boolean == true %}
+
+      {% for i in range(JAVA_CLASS.classeTrisVar_enUS_stored_strings | length) %}
+       * Sort.{{ JAVA_CLASS['classeTrisOrdre_stored_strings'][i] }}: {{ JAVA_CLASS['classeTrisVar_enUS_stored_strings'][i] }}
+      {% endfor %}
+      {% endif %}
+      {% if JAVA_CLASS.contexteRows_stored_int is defined %}
+
+       * Rows: {{ JAVA_CLASS.contexteRows_stored_int }}
       {% endif %}
        **/
       {% if JAVA_CLASS.classeNomSimpleSuperGenerique_enUS_stored_string is defined %}
@@ -152,7 +184,7 @@
       ## Create the {{ CLASS_PART.methodeVar_enUS_stored_string }} method
 
       ```java
-      	{{ CLASS_PART.methodeVar_enUS_stored_string }}(...) {% raw %}{{% endraw %}{{ CLASS_PART.methodeCodeSource_enUS_stored_string }}{% raw %}}{% endraw %}
+      	{{ CLASS_PART.methodeVar_enUS_stored_string }}({% if CLASS_PART.methodeParamsVar_enUS_stored_strings is defined %}{% for i in range( CLASS_PART.methodeParamsVar_enUS_stored_strings | length ) %}{% if i > 0 %}, {% endif %}{{ CLASS_PART.methodeParamsNomSimpleComplet_enUS_stored_strings[i] }}{% if CLASS_PART.methodeParamsArgsVariables_stored_booleans[i] == true %}...{% else %} {% endif %}{{ CLASS_PART.methodeParamsVar_enUS_stored_strings[i] }}{% endfor %}{% endif %}) {% raw %}{{% endraw %}{{ CLASS_PART.methodeCodeSource_enUS_stored_string }}{% raw %}}{% endraw %}
 
       ```
       {% elif CLASS_PART.partEstChamp_stored_boolean is defined %}
