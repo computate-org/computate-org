@@ -99,48 +99,48 @@
       register: "{{ 'COLUMNS_JSON' if COLUMNS_JSON is not defined else 'IGNORE_VAR' }}"
       when: COLUMNS_JSON is not defined
     
-    - name: Create column for setup issues
-      include_role: 
-        name: computate_org_column
-      vars: 
-        COLUMN_NAME: Setup Tasks
-      tags: 
-        - column
-    - name: Create column for Configure Authentication
-      include_role: 
-        name: computate_org_column
-      vars: 
-        COLUMN_NAME: Configure Authentication
-      tags: 
-        - column
-    - name: Create column for OpenShift Deployment issues
-      include_role: 
-        name: computate_org_column
-      vars: 
-        COLUMN_NAME: OpenShift Deployment
-      tags: 
-        - column
-    - name: Create column for Ansible OpenShift Deployment issues
-      include_role: 
-        name: computate_org_column
-      vars: 
-        COLUMN_NAME: Ansible OpenShift Deployment
-      tags: 
-        - column
-    - name: Create column for Data Development issues
-      include_role: 
-        name: computate_org_column
-      vars: 
-        COLUMN_NAME: Data Development
-      tags: 
-        - column
-    - name: Create column for Local install issues
-      include_role: 
-        name: computate_org_column
-      vars: 
-        COLUMN_NAME: Development Installation
-      tags: 
-        - column
+#    - name: Create column for setup issues
+#      include_role: 
+#        name: computate_org_column
+#      vars: 
+#        COLUMN_NAME: Setup Tasks
+#      tags: 
+#        - column
+#    - name: Create column for Configure Authentication
+#      include_role: 
+#        name: computate_org_column
+#      vars: 
+#        COLUMN_NAME: Configure Authentication
+#      tags: 
+#        - column
+#    - name: Create column for OpenShift Deployment issues
+#      include_role: 
+#        name: computate_org_column
+#      vars: 
+#        COLUMN_NAME: OpenShift Deployment
+#      tags: 
+#        - column
+#    - name: Create column for Ansible OpenShift Deployment issues
+#      include_role: 
+#        name: computate_org_column
+#      vars: 
+#        COLUMN_NAME: Ansible OpenShift Deployment
+#      tags: 
+#        - column
+#    - name: Create column for Data Development issues
+#      include_role: 
+#        name: computate_org_column
+#      vars: 
+#        COLUMN_NAME: Data Development
+#      tags: 
+#        - column
+#    - name: Create column for Local install issues
+#      include_role: 
+#        name: computate_org_column
+#      vars: 
+#        COLUMN_NAME: Development Installation
+#      tags: 
+#        - column
     - name: Create column for software development issues
       include_role: 
         name: computate_org_column
@@ -148,56 +148,55 @@
         COLUMN_NAME: Software Development
       tags: 
         - column
-    
-    - name: Create column for Backlog
-      include_role: 
-        name: computate_org_column
-      vars: 
-        COLUMN_NAME: Backlog
-      tags: 
-        - column
-    - name: Create column for Committed
-      include_role: 
-        name: computate_org_column
-      vars: 
-        COLUMN_NAME: Committed
-      tags: 
-        - column
-    - name: Create column for In progress
-      include_role: 
-        name: computate_org_column
-      vars: 
-        COLUMN_NAME: In progress
-      tags: 
-        - column
-    - name: Create column for Dev Complete
-      include_role: 
-        name: computate_org_column
-      vars: 
-        COLUMN_NAME: Dev Complete
-      tags: 
-        - column
-    - name: Create column for In QA
-      include_role: 
-        name: computate_org_column
-      vars: 
-        COLUMN_NAME: In QA
-      tags: 
-        - column
-    - name: Create column for QA complete
-      include_role: 
-        name: computate_org_column
-      vars: 
-        COLUMN_NAME: QA complete
-      tags: 
-        - column
-    - name: Create column for PO Accepted
-      include_role: 
-        name: computate_org_column
-      vars: 
-        COLUMN_NAME: PO Accepted
-      tags: 
-        - column
+#    - name: Create column for Backlog
+#      include_role: 
+#        name: computate_org_column
+#      vars: 
+#        COLUMN_NAME: Backlog
+#      tags: 
+#        - column
+#    - name: Create column for Committed
+#      include_role: 
+#        name: computate_org_column
+#      vars: 
+#        COLUMN_NAME: Committed
+#      tags: 
+#        - column
+#    - name: Create column for In progress
+#      include_role: 
+#        name: computate_org_column
+#      vars: 
+#        COLUMN_NAME: In progress
+#      tags: 
+#        - column
+#    - name: Create column for Dev Complete
+#      include_role: 
+#        name: computate_org_column
+#      vars: 
+#        COLUMN_NAME: Dev Complete
+#      tags: 
+#        - column
+#    - name: Create column for In QA
+#      include_role: 
+#        name: computate_org_column
+#      vars: 
+#        COLUMN_NAME: In QA
+#      tags: 
+#        - column
+#    - name: Create column for QA complete
+#      include_role: 
+#        name: computate_org_column
+#      vars: 
+#        COLUMN_NAME: QA complete
+#      tags: 
+#        - column
+#    - name: Create column for PO Accepted
+#      include_role: 
+#        name: computate_org_column
+#      vars: 
+#        COLUMN_NAME: PO Accepted
+#      tags: 
+#        - column
     - name: "Get columns"
       connection: local
       uri:
@@ -228,60 +227,60 @@
       register: "{{ 'MILESTONES_JSON' if MILESTONES_JSON is not defined else 'IGNORE_VAR' }}"
       when: MILESTONES_JSON is not defined
     
-    - name: Create milestone for setup issues
-      include_role: 
-        name: computate_org_milestone
-      vars: 
-        MILESTONE_TITLE: Setup Tasks
-        MILESTONE_DESCRIPTION: |
-          Setup Tasks issues including setting up the OpenShift cluster, installing Ansible locally, defining the ansible vault for the group and other setup tasks. 
-      tags: 
-        - milestone
-    - name: Create milestone for Configure Authentication issues
-      include_role: 
-        name: computate_org_milestone
-      vars: 
-        MILESTONE_TITLE: Configure Authentication
-        MILESTONE_DESCRIPTION: |
-          Configuring authentication and authorization in the Red Hat Single Sign-On server. 
-      tags: 
-        - milestone
-    - name: Create milestone for OpenShift Deployment issues
-      include_role: 
-        name: computate_org_milestone
-      vars: 
-        MILESTONE_TITLE: OpenShift Deployment
-        MILESTONE_DESCRIPTION: |
-          Deploying applications to OpenShift manually. 
-      tags: 
-        - milestone
-    - name: Create milestone for Ansible OpenShift Deployment issues
-      include_role: 
-        name: computate_org_milestone
-      vars: 
-        MILESTONE_TITLE: Ansible OpenShift Deployment
-        MILESTONE_DESCRIPTION: |
-          Automating the deployment of applications to OpenShift using Ansible. 
-      tags: 
-        - milestone
-    - name: Create milestone for Data Development issues
-      include_role: 
-        name: computate_org_milestone
-      vars: 
-        MILESTONE_TITLE: Data Development
-        MILESTONE_DESCRIPTION: |
-          Creating, restoring and backing up data in the site. 
-      tags: 
-        - milestone
-    - name: Create milestone for Local install issues
-      include_role: 
-        name: computate_org_milestone
-      vars: 
-        MILESTONE_TITLE: Development Installation
-        MILESTONE_DESCRIPTION: |
-          Deploying applications to a local development computer. 
-      tags: 
-        - milestone
+#    - name: Create milestone for setup issues
+#      include_role: 
+#        name: computate_org_milestone
+#      vars: 
+#        MILESTONE_TITLE: Setup Tasks
+#        MILESTONE_DESCRIPTION: |
+#          Setup Tasks issues including setting up the OpenShift cluster, installing Ansible locally, defining the ansible vault for the group and other setup tasks. 
+#      tags: 
+#        - milestone
+#    - name: Create milestone for Configure Authentication issues
+#      include_role: 
+#        name: computate_org_milestone
+#      vars: 
+#        MILESTONE_TITLE: Configure Authentication
+#        MILESTONE_DESCRIPTION: |
+#          Configuring authentication and authorization in the Red Hat Single Sign-On server. 
+#      tags: 
+#        - milestone
+#    - name: Create milestone for OpenShift Deployment issues
+#      include_role: 
+#        name: computate_org_milestone
+#      vars: 
+#        MILESTONE_TITLE: OpenShift Deployment
+#        MILESTONE_DESCRIPTION: |
+#          Deploying applications to OpenShift manually. 
+#      tags: 
+#        - milestone
+#    - name: Create milestone for Ansible OpenShift Deployment issues
+#      include_role: 
+#        name: computate_org_milestone
+#      vars: 
+#        MILESTONE_TITLE: Ansible OpenShift Deployment
+#        MILESTONE_DESCRIPTION: |
+#          Automating the deployment of applications to OpenShift using Ansible. 
+#      tags: 
+#        - milestone
+#    - name: Create milestone for Data Development issues
+#      include_role: 
+#        name: computate_org_milestone
+#      vars: 
+#        MILESTONE_TITLE: Data Development
+#        MILESTONE_DESCRIPTION: |
+#          Creating, restoring and backing up data in the site. 
+#      tags: 
+#        - milestone
+#    - name: Create milestone for Local install issues
+#      include_role: 
+#        name: computate_org_milestone
+#      vars: 
+#        MILESTONE_TITLE: Development Installation
+#        MILESTONE_DESCRIPTION: |
+#          Deploying applications to a local development computer. 
+#      tags: 
+#        - milestone
     
     - name: "Get milestones"
       connection: local
@@ -1146,7 +1145,8 @@
 - name: Query Apache Solr for all Java classes
   uri: 
 #    url: "http://localhost:8983/solr/computate/select?rows=200&q=*:*&fq=partEstClasse_indexed_boolean:true&fq=appliNom_indexed_string:opendatapolicing&fq=classeNomCanonique_enUS_indexed_string:com.opendatapolicing.enus.trafficstop.TrafficStop"
-    url: "http://localhost:8983/solr/computate/select?rows=200&q=*:*&fq=partEstClasse_indexed_boolean:true&fq=appliNom_indexed_string:opendatapolicing&fq=classeNomCanonique_enUS_indexed_string:com.opendatapolicing.enus.wrap.Wrap"
+#    url: "http://localhost:8983/solr/computate/select?rows=200&q=*:*&fq=partEstClasse_indexed_boolean:true&fq=appliNom_indexed_string:opendatapolicing&fq=classeNomCanonique_enUS_indexed_string:com.opendatapolicing.enus.wrap.Wrap"
+    url: "http://localhost:8983/solr/computate/select?rows=200&q=*:*&fq=partEstClasse_indexed_boolean:true&fq=appliNom_indexed_string:opendatapolicing&fq=classeNomCanonique_enUS_indexed_string:com.opendatapolicing.enus.main.pom.PomXml"
 #    url: "http://localhost:8983/solr/computate/select?rows=200&q=*:*&fq=partEstClasse_indexed_boolean:true&fq=appliNom_indexed_string:opendatapolicing&fq=classeTraduire_indexed_boolean:true"
   register: JAVA_CLASSES
 - name: "Create issue for the Java class"
