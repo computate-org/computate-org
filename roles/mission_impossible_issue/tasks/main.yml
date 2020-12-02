@@ -37,32 +37,42 @@
 
       {% endif %}
 
-      Your mission, should you choose to accept it, is to create a new Java class {{ JAVA_CLASS.hackathonMission_stored_string | default(JAVA_CLASS.classeNomSimpleSuper_enUS_stored_string) }}. 
-
-      ## Red Hat has given the green light to all associates like you to join the Open Data Policing team as an agent. 
+      Your mission, should you choose to accept it, is {{ JAVA_CLASS.hackathonMission_stored_string | default("to create a new Java class " ~ JAVA_CLASS.classeNomSimpleSuper_enUS_stored_string) }}. 
 
       The [Southern Coalition for Social Justice](https://southerncoalition.org/) needs you to solve one of the world's most challenging problems: 
 
       ## To aggregate, visualize, and publish the public records related to all known traffic stops to make stop, search, and use-of-force data publicly available to ensure transparency. 
 
+      ## Red Hat has given the green light to all associates like you to join the Open Data Policing team as an agent. 
+
       This platform allows users—including those in police management—to easily compare enforcement patterns among individual officers and agencies, 
       evaluate the frequency and efficiency of searches, and monitor for racially disparate enforcement practices.
 
-      ## The day of the operation: Martin Luther King Day, January 18th, 2021
+      ## The day of the operation is Martin Luther King Day, January 18th, 2021
 
       {% if ISSUE_LABEL_JSON.json[0].assignee.login is defined %}
-      Agent {{ ISSUE_LABEL_JSON.json[0].assignee.login }}, you will have one day to complete the mission. 
+      Agent {{ ISSUE_LABEL_JSON.json[0].assignee.login }}, you will have 24 hours to complete your mission. 
       {% else %}
-      You will have one day to complete the mission. 
+      You will have 24 hours to complete your mission. 
       {% endif %}
 
-      - That day is Martin Luther King Day, January 18th, 2021. 
-      - You will have 24 hours to complete your mission. 
-      - Should you, or any of your force be taken or compromised that day, you must report back as many changes as you have made, and any knowledge of your actions, by pull request or comments on the issue on the board. 
+      ## In the words of Martin Luther King Jr.: 
+      - 
+      - Now is the time to make real the promises of democracy. 
+      - Now is the time to lift our nation from the quicksands of racial injustice to the solid rock of brotherhood. 
+      - It would be fatal for the nation to overlook the urgency of the moment. 
 
       You will be joining a team of the 
       # boldest
       of all Red Hatters for this mission, who will be at your service. 
+
+      - Let freedom ring from the mighty mountains of New York.
+      - Let freedom ring from the heightening Alleghenies of Pennsylvania. 
+      - Let freedom ring from the snow-capped Rockies of Colorado.
+      - Let freedom ring from the curvaceous slopes of California.
+      - From every mountainside, let freedom ring.
+
+      - Should you, or any of your force be taken or compromised that day, you must report back as many changes as you have made, and any knowledge of your actions, by pull request or comments on the issue on the board. 
 
       ## The details of your mission: 
 
