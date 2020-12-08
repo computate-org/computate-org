@@ -1,4 +1,4 @@
-- name: "Get milestone by title"
+- name: "Get milestone by title: {{ MILESTONE_TITLE }}"
   connection: local
   set_fact:
     MILESTONE_TITLE_JSON: "{{ MILESTONES_JSON.json | json_query(milestone_query) | first | default(omit) }}"

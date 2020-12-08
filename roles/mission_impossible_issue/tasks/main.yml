@@ -45,9 +45,6 @@
 
       ## Red Hat has given the green light to all associates like you to join the Open Data Policing team as an agent. 
 
-      This platform allows users—including those in police management—to easily compare enforcement patterns among individual officers and agencies, 
-      evaluate the frequency and efficiency of searches, and monitor for racially disparate enforcement practices.
-
       ## The day of the operation is Martin Luther King Day, January 18th, 2021
 
       {% if ISSUE_LABEL_JSON.json[0].assignee.login is defined %}
@@ -56,15 +53,19 @@
       You will have 24 hours to complete your mission. 
       {% endif %}
 
+      This platform allows users—including those in police management—to easily compare enforcement patterns among individual officers and agencies, 
+      evaluate the frequency and efficiency of searches, and monitor for racially disparate enforcement practices.
+
       ## In the words of Martin Luther King Jr.: 
-      - 
+
       - Now is the time to make real the promises of democracy. 
       - Now is the time to lift our nation from the quicksands of racial injustice to the solid rock of brotherhood. 
       - It would be fatal for the nation to overlook the urgency of the moment. 
 
-      You will be joining a team of the 
-      # boldest
-      of all Red Hatters for this mission, who will be at your service. 
+      # You will be joining a team of the boldest
+
+      of all Red Hatters for this mission, who will be at your service
+      developing the code and automating the deployment to OpenShift. 
 
       - Let freedom ring from the mighty mountains of New York.
       - Let freedom ring from the heightening Alleghenies of Pennsylvania. 

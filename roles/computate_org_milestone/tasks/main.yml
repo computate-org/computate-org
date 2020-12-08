@@ -1,7 +1,7 @@
 - name: "Get milestone by title {{ MILESTONE_TITLE | default(omit) }}"
   connection: local
   set_fact:
-    MILESTONE_TITLE_JSON: "{{ MILESTONES.json | json_query(milestone_query) | first | default(None) }}"
+    MILESTONE_TITLE_JSON: "{{ MILESTONES_JSON.json | json_query(milestone_query) | first | default(None) }}"
   vars: 
     milestone_query: "[?title=='{{ MILESTONE_TITLE | default(omit) }}'].{title: title, description: description, number: number}"
   tags: milestone_title
