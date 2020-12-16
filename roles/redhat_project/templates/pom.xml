@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project 
+        xmlns="http://maven.apache.org/POM/4.0.0"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd"
+        >
+    <modelVersion>4.0.0</modelVersion>
+{% if  PROJECT_POM.parent is defined %}
+    <parent>
+{% if  PROJECT_POM.parent.groupId is defined %}
+        <groupId>{{  PROJECT_POM.parent.groupId }}</groupId>
+{% endif %}
+{% if  PROJECT_POM.parent.artifactId is defined %}
+        <artifactId>{{  PROJECT_POM.parent.artifactId }}</artifactId>
+{% endif %}
+{% if  PROJECT_POM.parent.version is defined %}
+        <version>{{  PROJECT_POM.parent.version }}</version>
+{% endif %}
+    </parent>
+{% endif %}
+    <groupId>{{  PROJECT_POM.groupId }}</groupId>
+    <artifactId>{{  PROJECT_POM.artifactId }}</artifactId>
+{% if  PROJECT_POM.version is defined %}
+    <version>{{  PROJECT_POM.version }}</version>
+{% endif %}
+{% if  PROJECT_POM.packaging is defined %}
+    <packaging>{{ PROJECT_POM.packaging }}</packaging>
+{% endif %}
+{% if  PROJECT_POM.name is defined %}
+    <name>{{  PROJECT_POM.name }}</name>
+{% endif %}
+{% if  PROJECT_POM.description is defined %}
+    <description>{{  PROJECT_POM.description }}</description>
+{% endif %}
+{% if PROJECT_POM.properties is defined and PROJECT_POM.properties | length() > 0 %}
+
+    <properties>
+{% for PROPERTY in PROJECT_POM.properties %}
+        <{{ PROPERTY.name }}>{{ PROPERTY.value }}</{{ PROPERTY.name }}>
+{% endfor %}
+    </properties>
+{% endif %}
+{% if PROJECT_POM.modules is defined and PROJECT_POM.modules | length() > 0 %}
+
+    <modules>
+{% for MODULE in PROJECT_POM.modules %}
+        <module>{{ MODULE }}</module>
+{% endfor %}
+    </modules>
+{% endif %}
+{% if PROJECT_POM.dependencies is defined and PROJECT_POM.dependencies | length() > 0 %}
+
+    <dependencies>
+{% for DEPENDENCY in PROJECT_POM.dependencies %}
+
+        <dependency>
+{% if DEPENDENCY.groupId is defined %}
+            <groupId>{{ DEPENDENCY.groupId }}</groupId>
+{% endif %}
+{% if DEPENDENCY.artifactId is defined %}
+            <artifactId>{{ DEPENDENCY.artifactId }}</artifactId>
+{% endif %}
+{% if DEPENDENCY.scope is defined %}
+            <scope>{{ DEPENDENCY.scope }}</scope>
+{% endif %}
+{% if DEPENDENCY.build is defined %}
+            <build>
+{% if DEPENDENCY.build.plugins is defined and DEPENDENCY.build.plugins | length() > 0 %}
+                <plugins>
+{% for PLUGIN in DEPENDENCY.build.plugins %}
+                    <plugin>
+{% if PLUGIN.groupId is defined %}
+                        <groupId>{{ PLUGIN.groupId }}</groupId>
+{% endif %}
+{% if PLUGIN.artifactId is defined %}
+                        <artifactId>{{ PLUGIN.artifactId }}</artifactId>
+{% endif %}
+                    </plugin>
+{% endfor %}
+                </plugins>
+{% endif %}
+            </build>
+{% endif %}
+        </dependency>
+{% endfor %}
+    </dependencies>
+{% endif %}
+{% if  PROJECT_POM.profiles is defined and  PROJECT_POM.profiles | length() > 0 %}
+
+    <profiles>
+{% for PROFILE in  PROJECT_POM.profiles %}
+
+        <profile>
+{% if PROFILE.id is defined %}
+            <id>{{ PROFILE.id }}</id>
+{% endif %}
+{% if PROFILE.activation is defined %}
+            <activation>
+{% if PROFILE.activation.property is defined and PROFILE.activation.property | length() > 0 %}
+{% for PROPERTY in PROFILE.activation.property %}
+                <property>
+{% if PROPERTY.name is defined %}
+                    <name>{{ PROPERTY.name }}</name>
+{% endif %}
+                </property>
+{% endfor %}
+{% endif %}
+            </activation>
+{% if PROFILE.properties is defined and PROFILE.properties | length() > 0 %}
+            <properties>
+{% for PROPERTY in PROFILE.properties %}
+                <{{ PROPERTY.name }}>{{ PROPERTY.value }}</name>
+{% endfor %}
+            </properties>
+{% endif %}
+{% endif %}
+        </profile>
+{% endfor %}
+    </profiles>
+{% endif %}
+</project>
