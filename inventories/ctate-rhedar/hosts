@@ -1,0 +1,259 @@
+
+all: 
+  vars: 
+    PROJECT_SRC: /usr/local/src/rhedar
+    PROJECT_PREFIX: rhedar-
+    PROJECT_POM_GROUP_ID: com.redhat.rhedar
+    PROJECT_POM_ARTIFACT_ID_ROOT: "{{ PROJECT_PREFIX }}root"
+    PROJECT_POM_ARTIFACT_ID_PARENT: "{{ PROJECT_PREFIX }}parent"
+    PROJECT_POM_VERSION: "${revision}"
+    PROJECT_POM_VERSION_PREFIX: "1.0.0.0"
+    PROJECT_POM_VERSION_SUFFIX_LOCAL: ".local"
+    PROJECTS: 
+      - PROJECT_SRC: "{{ PROJECT_SRC }}"
+        PROJECT_POM: 
+          template: "pom.xml"
+          groupId: "{{ PROJECT_POM_GROUP_ID }}"
+          artifactId: "{{ PROJECT_PREFIX }}root"
+          name: "RHEDAR base project"
+          description: "Red Hat Event Driven Automated Remediation base project"
+          version: "{{ PROJECT_POM_VERSION }}"
+          packaging: pom
+          modules: 
+            - "{{ PROJECT_PREFIX }}parent"
+            - "{{ PROJECT_PREFIX }}rp"
+          properties: 
+            - name: baseRevision
+              value: "{{ PROJECT_POM_VERSION_PREFIX }}"
+            - name: revision
+              value: "${baseRevision}{{ PROJECT_POM_VERSION_SUFFIX_LOCAL }}"
+            - name: maven.min.version
+              value: 3.3.9
+            - name: project.build.sourceEncoding
+              value: UTF-8
+            - name: project.reporting.outputEncoding
+              value: UTF-8
+            - name: maven.compiler.source
+              value: 1.8
+            - name: maven.compiler.target
+              value: 1.8
+            - name: jdk.min.version
+              value: ${maven.compiler.source}
+            - name: platform-bom.version
+              value: 7.8.1.redhat-00002
+            - name: fuse.version
+              value: 7.6.0.fuse-760027-redhat-00001
+            - name: kie.version
+              value: 7.39.0.Final-redhat-00007
+            - name: junit.version
+              value: 4.12
+            - name: kafka.version
+              value: 1.0.0
+            - name: resteasy.version
+              value: 3.5.1.Final-redhat-1
+            - name: spring-data-releasetrain.version
+              value: Fowler-SR2
+            - name: spring-boot.version
+              value: 2.1.6.RELEASE
+            - name: spring-boot-bom.version
+              value: 2.1.6.Final
+            - name: cucumber.version
+              value: 1.2.5
+            - name: hamcrest-library.version
+              value: 1.3-redhat-1
+            - name: maven-compiler-plugin.version
+              value: 3.8.0
+            - name: maven-surefire-plugin.version
+              value: 2.19.1
+            - name: maven-war-plugin.version
+              value: 2.3
+            - name: jpmml.version
+              value: 1.4.9
+            - name: hawtio-springboot.version
+              value: 2.0.0.fuse-000201-redhat-3
+          profiles: 
+            - id: jenkins
+              activation: 
+                property: 
+                  - name: env.BUILD_NUMBER
+              properties: 
+                - name: revision
+                  value: ${baseRevision}.${env.BUILD_NUMBER}
+      - PROJECT_SRC: "{{ PROJECT_SRC }}/{{ PROJECT_POM_ARTIFACT_ID_PARENT }}"
+        PROJECT_POM: 
+          template: "pom.xml"
+          parent: 
+            groupId: "{{ PROJECT_POM_GROUP_ID }}"
+            artifactId: "{{ PROJECT_POM_ARTIFACT_ID_ROOT }}"
+            version: "{{ PROJECT_POM_VERSION }}"
+          artifactId: "{{ PROJECT_POM_ARTIFACT_ID_PARENT }}"
+          name: "RHEDAR parent project"
+          description: "Red Hat Event Driven Automated Remediation parent project"
+          dependencyManagement: 
+            - groupId: org.jboss.redhat-fuse
+              artifactId: fuse-springboot-bom
+              version: ${fuse.version}
+              scope: import
+              type: pom
+            - groupId: com.redhat.ba
+              artifactId: ba-platform-bom
+              version: ${platform-bom.version}
+              scope: import
+              type: pom
+            - groupId: org.springframework.data
+              artifactId: spring-data-releasetrain
+              version: ${spring-data-releasetrain.version}
+              scope: import
+              type: pom
+            - groupId: org.springframework.boot
+              artifactId: spring-boot-dependencies
+              version: ${spring-boot.version}
+              scope: import
+              type: pom
+          dependencies: 
+            - groupId: org.apache.camel
+              artifactId: camel-core
+              commentGroup: Fuse/Camel
+            - groupId: org.apache.camel
+              artifactId: camel-kafka
+            - groupId: org.apache.camel
+              artifactId: camel-stream
+            - groupId: org.springframework.boot
+              artifactId: spring-boot-starter-actuator
+              commentGroup: Spring
+              exclusions: 
+                - groupId: org.springframework.boot
+                  artifactId: spring-boot-starter-logging
+            - groupId: org.springframework.boot
+              artifactId: spring-boot-starter-web
+              exclusions: 
+                - groupId: org.springframework.boot
+                  artifactId: spring-boot-starter-tomcat
+                - groupId: org.springframework.boot
+                  artifactId: spring-boot-starter-logging
+            - groupId: org.springframework.boot
+              artifactId: spring-boot-starter-undertow
+              exclusions: 
+                - groupId: org.springframework.boot
+                  artifactId: spring-boot-starter-logging
+            - groupId: org.apache.camel
+              artifactId: camel-spring-boot-starter
+              commentGroup: Camel
+              exclusions: 
+                - groupId: org.springframework.boot
+                  artifactId: spring-boot-starter-logging
+            - groupId: junit
+              artifactId: junit
+              scope: test
+              commentGroup: Testing
+            - groupId: org.jboss.arquillian.junit
+              artifactId: arquillian-junit-container
+              scope: test
+            - groupId: org.arquillian.cube
+              artifactId: arquillian-cube-openshift
+              scope: test
+#            - groupId: info.cukes
+#              artifactId: cucumber-junit
+#              version: ${cucumber.version}
+#              scope: test
+#            - groupId: org.hamcrest
+#              artifactId: hamcrest-library
+#              scope: test
+#            - groupId: io.hawt
+#              artifactId: hawtio-springboot
+#              version: ${hawtio-springboot.version}
+#            - groupId: io.hawt
+#              artifactId: hawtio-core
+#            - groupId: org.jpmml
+#              artifactId: pmml-evaluator
+#              version: ${jpmml.version}
+#            - groupId: org.jpmml
+#              artifactId: pmml-evaluator-extension
+#              version: ${jpmml.version}
+#            - groupId: com.google.code.gson
+#              artifactId: gson
+#            - groupId: org.jboss.resteasy
+#              artifactId: resteasy-client
+#              version: ${resteasy.version}
+#            - groupId: org.jboss.errai
+#              artifactId: errai-jaxrs-client
+#              commentGroup: Other
+          build: 
+            pluginManagement:
+              plugins: 
+                - groupId: "org.jboss.redhat-fuse"
+                  artifactId: "spring-boot-maven-plugin"
+                  version: ${fuse.version}
+                  executions: 
+                    - goals: 
+                        - repackage
+            plugins:
+              - artifactId: maven-compiler-plugin
+                version: ${maven-compiler-plugin.version}
+                configuration: 
+                  target: ${maven.compiler.target}
+                  source: ${maven.compile.source}
+                  encoding: UTF-8
+                  debug: true
+                  debugLevel: lines,vars,source
+              - groupId: org.apache.maven.plugins
+                artifactId: maven-surefire-plugin
+                version: ${maven-surefire-plugin.version}
+                configuration: 
+                  argLine: "-DenableImageStreamDetection=true"
+                  excludes: 
+                    - "**/*KT.java"
+      - PROJECT_SRC: "{{ PROJECT_SRC }}/{{ PROJECT_PREFIX }}rp"
+        PROJECT_POM: 
+          template: "pom.xml"
+          parent: 
+            groupId: "{{ PROJECT_POM_GROUP_ID }}"
+            artifactId: "{{ PROJECT_POM_ARTIFACT_ID_ROOT }}"
+            version: "{{ PROJECT_POM_VERSION }}"
+          artifactId: "{{ PROJECT_PREFIX }}rp"
+          name: "RHEDAR responsible party router project"
+          description: "Red Hat Event Driven Automated Remediation responsible party router project"
+          dependencyManagement: 
+            - groupId: org.springframework.data
+              artifactId: spring-data-releasetrain
+              version: ${spring-data-releasetrain.version}
+              scope: import
+              type: pom
+            - groupId: org.springframework.boot
+              artifactId: spring-boot-dependencies
+              version: ${spring-boot.version}
+              scope: import
+              type: pom
+          dependencies: 
+            - groupId: "org.springframework.boot"
+              artifactId: "spring-boot-starter"
+              commentGroup: "Spring"
+            - groupId: "org.springframework.boot"
+              artifactId: "spring-boot-starter-web"
+            - groupId: "org.springframework.boot"
+              artifactId: "spring-boot-starter-data-jpa"
+            - groupId: "org.springframework.data"
+              artifactId: "spring-data-commons"
+            - groupId: "org.postgresql"
+              artifactId: "postgresql"
+              commentGroup: "PostgreSQL"
+            - groupId: "org.springframework.boot"
+              artifactId: "spring-boot-starter-test"
+              scope: test
+              exclusions: 
+                - groupId: "org.junit.vintage"
+                  artifactId: "junit-vintage-engine"
+              commentGroup: "Testing"
+            - groupId: "com.h2database"
+              artifactId: "h2"
+              scope: test
+            - groupId: "junit"
+              artifactId: "junit"
+              scope: test
+          build: 
+            plugins: 
+              - groupId: "org.springframework.boot"
+                artifactId: "spring-boot-maven-plugin"
+redhat_project: 
+  hosts: 
+    localhost.localdomain: 
