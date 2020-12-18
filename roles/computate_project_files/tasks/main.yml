@@ -1,0 +1,6 @@
+- include_role: 
+    name: "computate_project_file_{{ PROJECT_LANG }}"
+  loop: "{{ PROJECT.PROJECT_FILES }}"
+  loop_control: 
+    loop_var: FILE
+  when: PROJECT.PROJECT_FILES is defined

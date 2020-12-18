@@ -1,0 +1,8 @@
+- name: "Create the project file directory {{ FILE.path | dirname }}"
+  file:
+    state: directory
+    path: "{{ FILE.path | dirname }}"
+- name: "Create the project file {{ FILE.template }}"
+  template:
+    src: "{{ FILE.template }}"
+    dest: "{{ FILE.path }}"

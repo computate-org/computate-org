@@ -1,6 +1,7 @@
 
 all: 
   vars: 
+    PROJECT_LANG: enUS
     PROJECT_SRC: /usr/local/src/rhedar
     PROJECT_PREFIX: rhedar-
     PROJECT_POM_GROUP_ID: com.redhat.rhedar
@@ -9,7 +10,14 @@ all:
     PROJECT_POM_VERSION: "${revision}"
     PROJECT_POM_VERSION_PREFIX: "1.0.0.0"
     PROJECT_POM_VERSION_SUFFIX_LOCAL: ".local"
+    PROJECT_JAVA_PACKAGE: "{{ PROJECT_POM_GROUP_ID }}"
+    PROJECT_RP_SRC: "{{ PROJECT_SRC }}/{{ PROJECT_PREFIX }}rp"
     PROJECTS: 
+
+      ###############
+      # rhedar-root #
+      ###############
+
       - PROJECT_SRC: "{{ PROJECT_SRC }}"
         PROJECT_POM: 
           template: "pom.xml"
@@ -71,6 +79,19 @@ all:
               value: 1.4.9
             - name: hawtio-springboot.version
               value: 2.0.0.fuse-000201-redhat-3
+
+            #######################
+            # Vert.X dependencies #
+            #######################
+
+            - name: vertx-maven-plugin.version
+              value: 1.0.9
+            - name: build-helper-maven-plugin.version
+              value: 3.0.0
+            - name: exec-maven-plugin.version
+              value: 1.5.0
+            - name: vertx.version
+              value: 3.8.5
           profiles: 
             - id: jenkins
               activation: 
@@ -79,6 +100,11 @@ all:
               properties: 
                 - name: revision
                   value: ${baseRevision}.${env.BUILD_NUMBER}
+
+      #################
+      # rhedar-parent #
+      #################
+
       - PROJECT_SRC: "{{ PROJECT_SRC }}/{{ PROJECT_POM_ARTIFACT_ID_PARENT }}"
         PROJECT_POM: 
           template: "pom.xml"
@@ -203,7 +229,12 @@ all:
                   argLine: "-DenableImageStreamDetection=true"
                   excludes: 
                     - "**/*KT.java"
-      - PROJECT_SRC: "{{ PROJECT_SRC }}/{{ PROJECT_PREFIX }}rp"
+
+      #############
+      # rhedar-rp #
+      #############
+
+      - PROJECT_SRC: "{{ PROJECT_RP_SRC }}"
         PROJECT_POM: 
           template: "pom.xml"
           parent: 
@@ -222,6 +253,11 @@ all:
             - groupId: org.springframework.boot
               artifactId: spring-boot-dependencies
               version: ${spring-boot.version}
+              scope: import
+              type: pom
+            - groupId: io.vertx
+              artifactId: vertx-dependencies
+              version: ${vertx.version}
               scope: import
               type: pom
           dependencies: 
@@ -250,10 +286,139 @@ all:
             - groupId: "junit"
               artifactId: "junit"
               scope: test
+
+              #######################
+              # Vert.X dependencies #
+              #######################
+
+            - groupId: commons-beanutils
+              artifactId: commons-beanutils
+              version: 1.9.4
+            - groupId: org.apache.commons
+              artifactId: commons-configuration2
+              version: 2.7
+            - groupId: commons-dbutils
+              artifactId: commons-dbutils
+              version: 1.7
+            - groupId: org.apache.commons
+              artifactId: commons-exec
+              version: 1.3
+            - groupId: org.apache.commons
+              artifactId: commons-text
+              version: 1.8
+            - groupId: org.postgresql
+              artifactId: postgresql
+              version: 42.2.2.jre7
+            - groupId: org.apache.solr
+              artifactId: solr-solrj
+              version: 8.4.1
+            - groupId: org.xhtmlrenderer
+              artifactId: flying-saucer-core
+              version: 9.1.19
+            - groupId: org.xhtmlrenderer
+              artifactId: flying-saucer-swt
+              version: 9.1.19
+            - groupId: org.xhtmlrenderer
+              artifactId: flying-saucer-pdf-itext5
+              version: 9.1.19
+            - groupId: com.github.librepdf
+              artifactId: openpdf
+              version: 1.3.11
+            - groupId: com.itextpdf
+              artifactId: itext-asian
+              version: 5.2.0
+
+            - groupId: io.vertx
+              artifactId: vertx-core
+            - groupId: io.vertx
+              artifactId: vertx-web
+            - groupId: io.vertx
+              artifactId: vertx-pg-client
+            - groupId: io.vertx
+              artifactId: vertx-auth-oauth2
+            - groupId: io.vertx
+              artifactId: vertx-reactive-streams
+            - groupId: io.vertx
+              artifactId: vertx-sql-common
+            - groupId: io.vertx
+              artifactId: vertx-web-api-contract
+            - groupId: io.vertx
+              artifactId: vertx-codegen
+            - groupId: io.vertx
+              artifactId: vertx-service-proxy
+            - groupId: io.vertx
+              artifactId: vertx-web-api-service
+            - groupId: io.vertx
+              artifactId: vertx-mail-client
+            - groupId: io.vertx
+              artifactId: vertx-health-check
+
+            - groupId: io.opentracing.contrib
+              artifactId: opentracing-vertx-web
+              version: 0.1.0
+            - groupId: io.opentracing.contrib
+              artifactId: opentracing-solr-client
+              version: 0.1.0
+            - groupId: org.jfree
+              artifactId: jfreechart
+              version: 1.5.0
+            - groupId: junit
+              artifactId: junit
+              version: 4.13.1
+              scope: test
           build: 
             plugins: 
               - groupId: "org.springframework.boot"
                 artifactId: "spring-boot-maven-plugin"
+        PROJECT_FILES: 
+          - path: "{{ PROJECT_RP_SRC }}/src/main/java/{{ PROJECT_JAVA_PACKAGE | replace('.', '/') }}/wrap/Wrap.java"
+            template: Wrap.java
+          - path: "{{ PROJECT_RP_SRC }}/src/main/java/{{ PROJECT_JAVA_PACKAGE | replace('.', '/') }}/request/SiteRequestEnUS.java"
+            template: SiteRequestEnUS.java
+          - path: "{{ PROJECT_RP_SRC }}/src/main/java/{{ PROJECT_JAVA_PACKAGE | replace('.', '/') }}/config/SiteConfig.java"
+            template: SiteConfig.java
+          - path: "{{ PROJECT_RP_SRC }}/src/main/java/{{ PROJECT_JAVA_PACKAGE | replace('.', '/') }}/context/SiteContextEnUS.java"
+            template: SiteContextEnUS.java
+          - path: "{{ PROJECT_RP_SRC }}/src/main/java/{{ PROJECT_JAVA_PACKAGE | replace('.', '/') }}/request/api/ApiRequest.java"
+            template: ApiRequest.java
+          - path: "{{ PROJECT_RP_SRC }}/src/main/java/{{ PROJECT_JAVA_PACKAGE | replace('.', '/') }}/search/SearchList.java"
+            template: SearchList.java
+          - path: "{{ PROJECT_RP_SRC }}/src/main/java/{{ PROJECT_JAVA_PACKAGE | replace('.', '/') }}/search/SearchResult.java"
+            template: SearchResult.java
+          - path: "{{ PROJECT_RP_SRC }}/src/main/java/{{ PROJECT_JAVA_PACKAGE | replace('.', '/') }}/writer/AllWriter.java"
+            template: AllWriter.java
+          - path: "{{ PROJECT_RP_SRC }}/src/main/java/{{ PROJECT_JAVA_PACKAGE | replace('.', '/') }}/writer/AllWriters.java"
+            template: AllWriters.java
+          - path: "{{ PROJECT_RP_SRC }}/src/main/java/{{ PROJECT_JAVA_PACKAGE | replace('.', '/') }}/writer/ApiWriter.java"
+            template: ApiWriter.java
+          - path: "{{ PROJECT_RP_SRC }}/src/main/java/{{ PROJECT_JAVA_PACKAGE | replace('.', '/') }}/design/PageDesign.java"
+            template: PageDesign.java
+          - path: "{{ PROJECT_RP_SRC }}/src/main/java/{{ PROJECT_JAVA_PACKAGE | replace('.', '/') }}/html/part/HtmlPart.java"
+            template: HtmlPart.java
+          - path: "{{ PROJECT_RP_SRC }}/src/main/java/{{ PROJECT_JAVA_PACKAGE | replace('.', '/') }}/page/PageLayout.java"
+            template: PageLayout.java
+          - path: "{{ PROJECT_RP_SRC }}/src/main/java/{{ PROJECT_JAVA_PACKAGE | replace('.', '/') }}/vertx/AppOpenApi3.java"
+            template: AppOpenApi3.java
+#          - path: "{{ PROJECT_RP_SRC }}/src/main/java/{{ PROJECT_JAVA_PACKAGE | replace('.', '/') }}/vertx/AppRestore.java"
+#            template: AppRestore.java
+          - path: "{{ PROJECT_RP_SRC }}/src/main/java/{{ PROJECT_JAVA_PACKAGE | replace('.', '/') }}/vertx/AppSwagger2.java"
+            template: AppSwagger2.java
+#          - path: "{{ PROJECT_RP_SRC }}/src/main/java/{{ PROJECT_JAVA_PACKAGE | replace('.', '/') }}/vertx/AppVertx.java"
+#            template: AppVertx.java
+          - path: "{{ PROJECT_RP_SRC }}/src/main/java/{{ PROJECT_JAVA_PACKAGE | replace('.', '/') }}/user/SiteUser.java"
+            template: SiteUser.java
+          - path: "{{ PROJECT_RP_SRC }}/src/main/java/{{ PROJECT_JAVA_PACKAGE | replace('.', '/') }}/cluster/Cluster.java"
+            template: Cluster.java
+          - path: "{{ PROJECT_RP_SRC }}/src/main/java/{{ PROJECT_JAVA_PACKAGE | replace('.', '/') }}/escape/EscapeTool.java"
+            template: EscapeTool.java
+          - path: "{{ PROJECT_RP_SRC }}/src/main/java/{{ PROJECT_JAVA_PACKAGE | replace('.', '/') }}/xml/UtilXml.java"
+            template: UtilXml.java
+          - path: "{{ PROJECT_RP_SRC }}/src/main/java/{{ PROJECT_JAVA_PACKAGE | replace('.', '/') }}/java/LocalDateSerializer.java"
+            template: LocalDateSerializer.java
+          - path: "{{ PROJECT_RP_SRC }}/src/main/java/{{ PROJECT_JAVA_PACKAGE | replace('.', '/') }}/java/LocalTimeSerializer.java"
+            template: LocalTimeSerializer.java
+          - path: "{{ PROJECT_RP_SRC }}/src/main/java/{{ PROJECT_JAVA_PACKAGE | replace('.', '/') }}/java/ZonedDateTimeSerializer.java"
+            template: ZonedDateTimeSerializer.java
 redhat_project: 
   hosts: 
     localhost.localdomain: 

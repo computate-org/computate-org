@@ -13,3 +13,9 @@
   vars: 
     PROJECT_POM: "{{ item.PROJECT_POM }}"
   loop: "{{ PROJECTS }}"
+- name: Create the project files
+  include_role: 
+    name: computate_project_files
+  loop: "{{ PROJECTS }}"
+  loop_control: 
+    loop_var: PROJECT
