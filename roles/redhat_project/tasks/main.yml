@@ -1,0 +1,21 @@
+- name: Create the {{ PROJECT_NAME }} source directory {{ PROJECT_SRC }}
+  file:
+    name: "{{ item.PROJECT_SRC }}"
+    state: directory
+    owner: "{{ USER_NAME }}"
+    group: "{{ USER_NAME }}"
+  become: yes
+  loop: "{{ PROJECTS }}"
+- name: Create the pom.xml
+  template:
+    src: "{{ item.PROJECT_POM.template }}"
+    dest: "{{ item.PROJECT_SRC }}/pom.xml"
+  vars: 
+    PROJECT_POM: "{{ item.PROJECT_POM }}"
+  loop: "{{ PROJECTS }}"
+- name: Create the project files
+  include_role: 
+    name: computate_project_files
+  loop: "{{ PROJECTS }}"
+  loop_control: 
+    loop_var: PROJECT

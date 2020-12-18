@@ -1,0 +1,8 @@
+---
+- name: Setup redhat project code. 
+  hosts: "{{ target }}"
+  vars_files: 
+    - "vaults/{{ VAULT_ID }}/vault"
+  roles:
+    - redhat_project
+

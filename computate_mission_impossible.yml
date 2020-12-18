@@ -1,0 +1,7 @@
+---
+- name: Setup a mission impossible github project. 
+  gather_facts: no
+  hosts: "{{ target }}"
+  roles:
+    - computate_mission_impossible
+

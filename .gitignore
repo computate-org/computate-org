@@ -2,6 +2,7 @@ inventories/computate-*/**
 inventories/southerncoalition-*/**
 inventories/opendatapolicing-*/**
 inventories/*/key
+vaults/*/key
 **/*.retry
 **/*.swp
 .project

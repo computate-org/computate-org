@@ -1,0 +1,252 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project 
+        xmlns="http://maven.apache.org/POM/4.0.0"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd"
+        >
+    <modelVersion>4.0.0</modelVersion>
+{% if  PROJECT_POM.parent is defined %}
+    <parent>
+{% if  PROJECT_POM.parent.groupId is defined %}
+        <groupId>{{  PROJECT_POM.parent.groupId }}</groupId>
+{% endif %}
+{% if  PROJECT_POM.parent.artifactId is defined %}
+        <artifactId>{{  PROJECT_POM.parent.artifactId }}</artifactId>
+{% endif %}
+{% if  PROJECT_POM.parent.version is defined %}
+        <version>{{  PROJECT_POM.parent.version }}</version>
+{% endif %}
+    </parent>
+{% endif %}
+{% if  PROJECT_POM.groupId is defined %}
+    <groupId>{{  PROJECT_POM.groupId }}</groupId>
+{% endif %}
+    <artifactId>{{  PROJECT_POM.artifactId }}</artifactId>
+{% if  PROJECT_POM.version is defined %}
+    <version>{{  PROJECT_POM.version }}</version>
+{% endif %}
+{% if  PROJECT_POM.packaging is defined %}
+    <packaging>{{ PROJECT_POM.packaging }}</packaging>
+{% endif %}
+{% if  PROJECT_POM.name is defined %}
+    <name>{{  PROJECT_POM.name }}</name>
+{% endif %}
+{% if  PROJECT_POM.description is defined %}
+    <description>{{  PROJECT_POM.description }}</description>
+{% endif %}
+{% if PROJECT_POM.properties is defined and PROJECT_POM.properties | length() > 0 %}
+
+    <properties>
+{% for PROPERTY in PROJECT_POM.properties %}
+        <{{ PROPERTY.name }}>{{ PROPERTY.value }}</{{ PROPERTY.name }}>
+{% endfor %}
+    </properties>
+{% endif %}
+{% if PROJECT_POM.modules is defined and PROJECT_POM.modules | length() > 0 %}
+
+    <modules>
+{% for MODULE in PROJECT_POM.modules %}
+        <module>{{ MODULE }}</module>
+{% endfor %}
+    </modules>
+{% endif %}
+{% if PROJECT_POM.dependencyManagement is defined and PROJECT_POM.dependencyManagement | length() > 0 %}
+
+    <dependencyManagement>
+        <dependencies>
+{% for DEPENDENCY in PROJECT_POM.dependencyManagement %}
+
+{% if DEPENDENCY.commentGroup is defined %}
+            <!-- {{ DEPENDENCY.commentGroup | regex_replace('.', '#') }} -->
+            <!-- {{ DEPENDENCY.commentGroup }} -->
+            <!-- {{ DEPENDENCY.commentGroup | regex_replace('.', '#') }} -->
+
+{% endif %}
+{% if DEPENDENCY.comment is defined %}
+            <!-- {{ DEPENDENCY.comment }} -->
+{% endif %}
+            <dependency>
+{% if DEPENDENCY.groupId is defined %}
+                <groupId>{{ DEPENDENCY.groupId }}</groupId>
+{% endif %}
+{% if DEPENDENCY.artifactId is defined %}
+                <artifactId>{{ DEPENDENCY.artifactId }}</artifactId>
+{% endif %}
+{% if DEPENDENCY.version is defined %}
+                <version>{{ DEPENDENCY.version }}</version>
+{% endif %}
+{% if DEPENDENCY.type is defined %}
+                <type>{{ DEPENDENCY.type }}</type>
+{% endif %}
+{% if DEPENDENCY.scope is defined %}
+                <scope>{{ DEPENDENCY.scope }}</scope>
+{% endif %}
+            </dependency>
+{% endfor %}
+        </dependencies>
+    </dependencyManagement>
+{% endif %}
+{% if PROJECT_POM.dependencies is defined and PROJECT_POM.dependencies | length() > 0 %}
+
+    <dependencies>
+{% for DEPENDENCY in PROJECT_POM.dependencies %}
+
+{% if DEPENDENCY.commentGroup is defined %}
+        <!-- {{ DEPENDENCY.commentGroup | regex_replace('.', '#') }} -->
+        <!-- {{ DEPENDENCY.commentGroup }} -->
+        <!-- {{ DEPENDENCY.commentGroup | regex_replace('.', '#') }} -->
+
+{% endif %}
+{% if DEPENDENCY.comment is defined %}
+        <!-- {{ DEPENDENCY.comment }} -->
+{% endif %}
+        <dependency>
+{% if DEPENDENCY.groupId is defined %}
+            <groupId>{{ DEPENDENCY.groupId }}</groupId>
+{% endif %}
+{% if DEPENDENCY.artifactId is defined %}
+            <artifactId>{{ DEPENDENCY.artifactId }}</artifactId>
+{% endif %}
+{% if DEPENDENCY.scope is defined %}
+            <scope>{{ DEPENDENCY.scope }}</scope>
+{% endif %}
+{% if DEPENDENCY.exclusions is defined and DEPENDENCY.exclusions | length() > 0 %}
+            <exclusions>
+{% for EXCLUSION in DEPENDENCY.exclusions %}
+                <exclusion>
+{% if EXCLUSION.groupId is defined %}
+                    <groupId>{{ EXCLUSION.groupId }}</groupId>
+{% endif %}
+{% if EXCLUSION.artifactId is defined %}
+                    <artifactId>{{ EXCLUSION.artifactId }}</artifactId>
+{% endif %}
+                </exclusion>
+{% endfor %}
+            </exclusions>
+{% endif %}
+        </dependency>
+{% endfor %}
+    </dependencies>
+{% endif %}
+{% if  PROJECT_POM.profiles is defined and  PROJECT_POM.profiles | length() > 0 %}
+
+    <profiles>
+{% for PROFILE in  PROJECT_POM.profiles %}
+
+        <profile>
+{% if PROFILE.id is defined %}
+            <id>{{ PROFILE.id }}</id>
+{% endif %}
+{% if PROFILE.activation is defined %}
+            <activation>
+{% if PROFILE.activation.property is defined and PROFILE.activation.property | length() > 0 %}
+{% for PROPERTY in PROFILE.activation.property %}
+                <property>
+{% if PROPERTY.name is defined %}
+                    <name>{{ PROPERTY.name }}</name>
+{% endif %}
+                </property>
+{% endfor %}
+{% endif %}
+            </activation>
+{% if PROFILE.properties is defined and PROFILE.properties | length() > 0 %}
+            <properties>
+{% for PROPERTY in PROFILE.properties %}
+                <{{ PROPERTY.name }}>{{ PROPERTY.value }}</{{ PROPERTY.name }}>
+{% endfor %}
+            </properties>
+{% endif %}
+{% endif %}
+        </profile>
+{% endfor %}
+    </profiles>
+{% endif %}
+{% if PROJECT_POM.build is defined %}
+
+    <build>
+{% if PROJECT_POM.build.pluginManagement.plugins is defined and PROJECT_POM.build.pluginManagement.plugins | length() > 0 %}
+        <pluginManagement>
+            <plugins>
+{% for PLUGIN in PROJECT_POM.build.pluginManagement.plugins %}
+                <plugin>
+{% if PLUGIN.groupId is defined %}
+                    <groupId>{{ PLUGIN.groupId }}</groupId>
+{% endif %}
+{% if PLUGIN.artifactId is defined %}
+                    <artifactId>{{ PLUGIN.artifactId }}</artifactId>
+{% endif %}
+{% if PLUGIN.version is defined %}
+                    <version>{{ PLUGIN.version }}</version>
+{% endif %}
+{% if PLUGIN.executions is defined and PLUGIN.executions | length() > 0 %}
+                    <executions>
+{% for EXECUTION in PLUGIN.executions %}
+                        <execution>
+{% if EXECUTION.goals is defined and EXECUTION.goals | length() > 0 %}
+                            <goals>
+{% for GOAL in EXECUTION.goals %}
+                                <goal>{{ GOAL }}</goal>
+{% endfor %}
+                            </goals>
+{% endif %}
+                        </execution>
+{% endfor %}
+                    </executions>
+{% endif %}
+                </plugin>
+{% endfor %}
+            </plugins>
+        </pluginManagement>
+{% endif %}
+{% if PROJECT_POM.build.plugins is defined and PROJECT_POM.build.plugins | length() > 0 %}
+        <plugins>
+{% for PLUGIN in PROJECT_POM.build.plugins %}
+            <plugin>
+{% if PLUGIN.groupId is defined %}
+                <groupId>{{ PLUGIN.groupId }}</groupId>
+{% endif %}
+{% if PLUGIN.artifactId is defined %}
+                <artifactId>{{ PLUGIN.artifactId }}</artifactId>
+{% endif %}
+{% if PLUGIN.version is defined %}
+                <version>{{ PLUGIN.version }}</version>
+{% endif %}
+{% if PLUGIN.inherited is defined %}
+                <inherited>{{ PLUGIN.inherited }}</inherited>
+{% endif %}
+{% if PLUGIN.configuration is defined %}
+                <configuration>
+{% if PLUGIN.configuration.target is defined %}
+                    <target>{{ PLUGIN.configuration.target }}</target>
+{% endif %}
+{% if PLUGIN.configuration.source is defined %}
+                    <source>{{ PLUGIN.configuration.source }}</source>
+{% endif %}
+{% if PLUGIN.configuration.encoding is defined %}
+                    <encoding>{{ PLUGIN.configuration.encoding }}</encoding>
+{% endif %}
+{% if PLUGIN.configuration.argLine is defined %}
+                    <argLine>{{ PLUGIN.configuration.argLine }}</argLine>
+{% endif %}
+{% if PLUGIN.configuration.excludes is defined and PLUGIN.configuration.excludes | length() > 0 %}
+                    <excludes>
+{% for EXCLUDE in PLUGIN.configuration.excludes %}
+                        <exclude>{{ EXCLUDE }}</exclude>
+{% endfor %}
+                    </excludes>
+{% endif %}
+{% if PLUGIN.configuration.debug is defined %}
+                    <debug>{{ PLUGIN.configuration.debug }}</debug>
+{% endif %}
+{% if PLUGIN.configuration.debuglevel is defined %}
+                    <debuglevel>{{ PLUGIN.configuration.debuglevel }}</debuglevel>
+{% endif %}
+                </configuration>
+{% endif %}
+            </plugin>
+{% endfor %}
+        </plugins>
+{% endif %}
+    </build>
+{% endif %}
+</project>

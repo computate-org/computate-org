@@ -1,0 +1,356 @@
+- name: Setup issue vars
+  set_fact: 
+    ISSUE_LABEL: "create_java_class_{{ JAVA_CLASS.classeNomSimple_enUS_stored_string }}"
+    ISSUE_TITLE: "Create the {{ JAVA_CLASS.classeNomAffichage_enUS_stored_string | default(JAVA_CLASS.classeNomSimple_enUS_stored_string ~ ' Java class') }}"
+    MILESTONE_TITLE: Software Development
+    COLUMN_NAME: Software Development
+- name: "Get milestone by title"
+  connection: local
+  set_fact:
+    MILESTONE_TITLE_JSON: "{{ MILESTONES_JSON.json | json_query(milestone_query) | first | default(omit) }}"
+  vars: 
+    milestone_query: "[?title=='{{ MILESTONE_TITLE | default(omit) }}'].{title: title, description: description, number: number}"
+  tags: always
+- name: "Get issue by label {{ ISSUE_LABEL }}"
+  connection: local
+  uri:
+    timeout: 90
+    url: "https://api.github.com/repos/{{ GITHUB_ORG }}/{{ GITHUB_REPO_NAME }}/issues?labels={{ ISSUE_LABEL | urlencode() }}"
+    return_content: true
+    headers:
+      Authorization: "token {{ GITHUB_TOKEN }}"
+  register: ISSUE_LABEL_JSON
+  tags: always
+- name: Query Apache Solr for all Java class parts
+  uri: 
+    url: "http://localhost:8983/solr/computate/select?rows=200&q=*:*&fq=-partEstClasse_indexed_boolean:true&fq=appliNom_indexed_string:opendatapolicing&fq=classeNomCanonique_enUS_indexed_string:{{ JAVA_CLASS.classeNomCanonique_enUS_stored_string }}"
+  register: CLASS_PARTS_JSON
+- name: Setup issue body
+  set_fact: 
+    ISSUE_BODY: |
+      # Mission {{ JAVA_CLASS.classeNomAffichage_enUS_stored_string | default(JAVA_CLASS.classeNomSimple_enUS_stored_string ~ ' Java class') }}
+
+      ![Mission:Impossible Open Data Policing](https://computate.neocities.org/gif/mission-impossible-opendatapolicing.gif "Mission:Impossible Open Data Policing")
+
+      {% if ISSUE_LABEL_JSON.json[0].assignee.login is defined %}
+      ## Agent {{ ISSUE_LABEL_JSON.json[0].assignee.login }}: 
+
+      {% endif %}
+
+      Your mission, should you choose to accept it, is {{ JAVA_CLASS.hackathonMission_stored_string | default("to create a new Java class " ~ JAVA_CLASS.classeNomSimpleSuper_enUS_stored_string) }}. 
+
+      The [Southern Coalition for Social Justice](https://southerncoalition.org/) needs you to solve one of the world's most challenging problems: 
+
+      ## To aggregate, visualize, and publish the public records related to all known traffic stops to make stop, search, and use-of-force data publicly available to ensure transparency. 
+
+      ## Red Hat has given the green light to all associates like you to join the Open Data Policing team as an agent. 
+
+      ## The day of the operation is Martin Luther King Day, January 18th, 2021
+
+      {% if ISSUE_LABEL_JSON.json[0].assignee.login is defined %}
+      Agent {{ ISSUE_LABEL_JSON.json[0].assignee.login }}, you will have 24 hours to complete your mission. 
+      {% else %}
+      You will have 24 hours to complete your mission. 
+      {% endif %}
+
+      This platform allows users—including those in police management—to easily compare enforcement patterns among individual officers and agencies, 
+      evaluate the frequency and efficiency of searches, and monitor for racially disparate enforcement practices.
+
+      ## In the words of Martin Luther King Jr.: 
+
+      - Now is the time to make real the promises of democracy. 
+      - Now is the time to lift our nation from the quicksands of racial injustice to the solid rock of brotherhood. 
+      - It would be fatal for the nation to overlook the urgency of the moment. 
+
+      # You will be joining a team of the boldest
+
+      of all Red Hatters for this mission, who will be at your service
+      developing the code and automating the deployment to OpenShift. 
+
+      - Let freedom ring from the mighty mountains of New York.
+      - Let freedom ring from the heightening Alleghenies of Pennsylvania. 
+      - Let freedom ring from the snow-capped Rockies of Colorado.
+      - Let freedom ring from the curvaceous slopes of California.
+      - From every mountainside, let freedom ring.
+
+      - Should you, or any of your force be taken or compromised that day, you must report back as many changes as you have made, and any knowledge of your actions, by pull request or comments on the issue on the board. 
+
+      ## The details of your mission: 
+
+      {% if JAVA_CLASS.classeTypeContenu_stored_string is not defined %}
+
+      - **The Java package name will be:** {{ JAVA_CLASS.classeNomEnsemble_enUS_stored_string }}
+      - **The Java class name will be:** {{ JAVA_CLASS.classeNomSimple_enUS_stored_string }}
+      {% if JAVA_CLASS.classeNomSimpleSuperGenerique_enUS_stored_string is defined %}
+      - **The Java class will extend:** {{ JAVA_CLASS.classeNomSimpleSuper_enUS_stored_string }}\<{{ JAVA_CLASS.classeNomSimpleSuperGenerique_enUS_stored_string }}\>
+
+      {% elif JAVA_CLASS.classeNomSimpleSuper_enUS_stored_string is defined %}
+      - **The Java class will extend:** {{ JAVA_CLASS.classeNomSimpleSuper_enUS_stored_string }}
+      {% else %}
+      {% endif %}
+
+      ```java
+      package {{ JAVA_CLASS.classeNomEnsemble_enUS_stored_string }};
+
+      {% if JAVA_CLASS.classeImportations_enUS_stored_strings is defined %}
+      {% for CLASS_IMPORT in JAVA_CLASS.classeImportations_enUS_stored_strings %}
+      import {{ CLASS_IMPORT }};
+      {% endfor %}
+      {% endif %}
+
+      /**
+      {% if JAVA_CLASS.classeModele_stored_boolean == true %}
+       * Model: true
+      {% endif %}
+      {% if JAVA_CLASS.classeApi_stored_boolean == true %}
+       * Stored: true
+      {% endif %}
+      {% if JAVA_CLASS.classeIndexe_stored_boolean == true %}
+       * Indexed: true
+      {% endif %}
+      {% if JAVA_CLASS.classeSauvegarde_stored_boolean == true %}
+       * Saved: true
+      {% endif %}
+      {% if JAVA_CLASS.classeApiUri_enUS_stored_string is defined %}
+
+       * ApiUri.enUS: {{ JAVA_CLASS.classeApiUri_enUS_stored_string }}
+      {% endif %}
+      {% if JAVA_CLASS.classeApiUri_enUS_stored_string is defined %}
+       * ApiTag.enUS: {{ JAVA_CLASS.classeApiTag_enUS_stored_string }}
+      {% endif %}
+      {% if JAVA_CLASS.classeApiMethodes_enUS_stored_strings is defined and JAVA_CLASS.classeApiMethodes_enUS_stored_strings | length > 0 %}
+      {% for CLASS_API_METHOD in JAVA_CLASS.classeApiMethodes_enUS_stored_strings %}
+
+      {% if JAVA_CLASS['classeApiUri' ~ CLASS_API_METHOD ~ '_enUS_stored_string'] != JAVA_CLASS['classeApiUri_enUS_stored_string'] %}
+       * ApiMethod: {{ CLASS_API_METHOD }}.enUS
+       * ApiUri{{ CLASS_API_METHOD }}.enUS: {{ JAVA_CLASS['classeApiUri' ~ CLASS_API_METHOD ~ '_enUS_stored_string'] }}
+      {% else %}
+       * ApiMethod: {{ CLASS_API_METHOD }}
+      {% endif %}
+      {% if JAVA_CLASS['classeRoleUtilisateur' ~ CLASS_API_METHOD ~ '_enUS_stored_boolean'] == true %}
+       * RoleUtilisateur{{ CLASS_API_METHOD }}.enUS: true
+      {% endif %}
+      {% if JAVA_CLASS['classePageNomSimple' ~ CLASS_API_METHOD ~ '_enUS_stored_string'] is defined %}
+       * Page{{ CLASS_API_METHOD }}.enUS: {{ JAVA_CLASS['classePageNomSimple' ~ CLASS_API_METHOD ~ '_enUS_stored_string'] }}
+      {% endif %}
+      {% if JAVA_CLASS['classePageSuperNomSimple' ~ CLASS_API_METHOD ~ '_enUS_stored_string'] is defined %}
+       * PageSuper{{ CLASS_API_METHOD }}.enUS: {{ JAVA_CLASS['classePageNomSimple' ~ CLASS_API_METHOD ~ '_enUS_stored_string'] }}
+      {% endif %}
+      {% endfor %}
+      {% endif %}
+      {% if JAVA_CLASS.contexteUnNom_enUS_stored_string is defined %}
+
+       * AName.enUS: {{ JAVA_CLASS.contexteUnNom_enUS_stored_string }}
+       * Color: {{ JAVA_CLASS.contexteCouleur_stored_string }}
+       * IconGroup: {{ JAVA_CLASS.contexteIconeGroupe_stored_string }}
+       * IconName: {{ JAVA_CLASS.contexteIconeNom_stored_string }}
+       * NameVar: {{ JAVA_CLASS.contexteNomVar_enUS_stored_string }}
+      {% endif %}
+      {% if JAVA_CLASS.classeRoles_enUS_stored_strings is defined and JAVA_CLASS.classeRoles_enUS_stored_strings | length > 0 %}
+
+      {% for CLASS_ROLE in JAVA_CLASS.classeRoles_enUS_stored_strings %}
+       * Role.enUS: {{ CLASS_ROLE }}
+      {% endfor %}
+      {% if JAVA_CLASS.classePublicLire_stored_boolean == true %}
+       * PublicRead: true
+      {% endif %}
+      {% if JAVA_CLASS.classeRoleSession_stored_boolean == true %}
+       * RoleSession: true
+      {% endif %}
+      {% if JAVA_CLASS.classeRoleUtilisteur_stored_boolean == true %}
+       * RoleUser: true
+      {% endif %}
+      {% endif %}
+      {% if JAVA_CLASS.classeTrisTrouves_stored_boolean == true %}
+
+      {% for i in range(JAVA_CLASS.classeTrisVar_enUS_stored_strings | length) %}
+       * Sort.{{ JAVA_CLASS['classeTrisOrdre_stored_strings'][i] }}: {{ JAVA_CLASS['classeTrisVar_enUS_stored_strings'][i] }}
+      {% endfor %}
+      {% endif %}
+      {% if JAVA_CLASS.contexteRows_stored_int is defined %}
+
+       * Rows: {{ JAVA_CLASS.contexteRows_stored_int }}
+      {% endif %}
+       **/
+      
+      public{% if JAVA_CLASS.classeEstAbstrait_stored_boolean == true %} abstract{% endif %} class {{ JAVA_CLASS.classeNomSimple_enUS_stored_string }}{% if JAVA_CLASS.classeNomSimpleSuper_enUS_stored_string is defined and JAVA_CLASS.classeNomSimpleSuper_enUS_stored_string != 'Object' %} extends {{ JAVA_CLASS.classeNomSimpleSuper_enUS_stored_string }}{% if JAVA_CLASS.classeNomSimpleSuperGenerique_enUS_stored_string is defined %}<{{ JAVA_CLASS.classeNomSimpleSuperGenerique_enUS_stored_string }}>{% endif %}{% endif %} {
+      }
+      ```
+
+      {% endif %}
+
+      {% for CLASS_PART in CLASS_PARTS_JSON.json.response.docs %}
+
+      {% if CLASS_PART.partEstEntite_stored_boolean is defined %}
+      ## Create the {{ CLASS_PART.entiteVar_enUS_stored_string }} entity
+      {% if CLASS_PART.entiteCommentaire_enUS_stored_string is defined %}
+
+      {{ CLASS_PART.entiteCommentaire_enUS_stored_string }}
+      {% endif %}
+
+      ```java
+      {% if CLASS_PART.entiteCouverture_stored_boolean %}
+      	protected void _{{ CLASS_PART.entiteVar_enUS_stored_string }}(Wrap<{{ CLASS_PART.entiteNomSimpleComplet_enUS_stored_string }}> {{ CLASS_PART.entiteVarParam_enUS_stored_string }}) {% raw %}{{% endraw %}{{ CLASS_PART.entiteCodeSource_enUS_stored_string }}{% raw %}}{% endraw %}
+      {% else %}
+      protected void _{{ CLASS_PART.entiteVar_enUS_stored_string }}({{ CLASS_PART.entiteNomSimpleComplet_enUS_stored_string }} {{ CLASS_PART.entiteVarParam_enUS_stored_string }}) {% raw %}{{% endraw %}{{ CLASS_PART.entiteCodeSource_enUS_stored_string }}{% raw %}}{% endraw %}
+      {% endif %}
+      
+      ```
+      {% elif CLASS_PART.partEstMethode_stored_boolean is defined %}
+      ## Create the {{ CLASS_PART.methodeNomAffichage_enUS_stored_string | default(CLASS_PART.methodeVar_enUS_stored_string ~ ' method') }}
+      {% if CLASS_PART.methodeCommentaire_enUS_stored_string is defined %}
+
+      {{ CLASS_PART.methodeCommentaire_enUS_stored_string }}
+      {% endif %}
+
+      {% if JAVA_CLASS.classeTypeContenu_stored_string is not defined %}
+      ```java
+      	{{ CLASS_PART.methodeVar_enUS_stored_string }}({% if CLASS_PART.methodeParamsVar_enUS_stored_strings is defined %}{% for i in range( CLASS_PART.methodeParamsVar_enUS_stored_strings | length ) %}{% if i > 0 %}, {% endif %}{{ CLASS_PART.methodeParamsNomSimpleComplet_enUS_stored_strings[i] }}{% if CLASS_PART.methodeParamsArgsVariables_stored_booleans[i] == true %}...{% else %} {% endif %}{{ CLASS_PART.methodeParamsVar_enUS_stored_strings[i] }}{% endfor %}{% endif %}) {% raw %}{{% endraw %}{{ CLASS_PART.methodeCodeSource_enUS_stored_string }}{% raw %}}{% endraw %}
+
+      ```
+      {% else %}
+      ```{{ JAVA_CLASS.classeTypeContenu_stored_string | regex_replace('.*/', '') }}
+      {{ CLASS_PART.methodeCodeSource_enUS_stored_string }}
+      ```
+      {% endif %}
+      {% elif CLASS_PART.partEstChamp_stored_boolean is defined %}
+      ## Create the {{ CLASS_PART.champVar_enUS_stored_string }} field
+      {% if CLASS_PART.champCommentaire_enUS_stored_string is defined %}
+
+      {{ CLASS_PART.champCommentaire_enUS_stored_string }}
+      {% endif %}
+
+      ```java
+      {% if CLASS_PART.champCodeSource_enUS_stored_string is defined %}
+      	{{ CLASS_PART.champNomSimpleComplet_enUS_stored_string }} {{ CLASS_PART.champVar_enUS_stored_string }} = {{ CLASS_PART.champCodeSource_enUS_stored_string }};
+      {% else %}
+      	{{ CLASS_PART.champNomSimpleComplet_enUS_stored_string }} {{ CLASS_PART.champVar_enUS_stored_string }};
+      {% endif %}
+      ```
+      {% endif %}
+      {% endfor %}
+
+      ![This message will not self-destruct. ](https://computate.neocities.org/png/mission-impossible-message.png "This message will not self-destruct. ")
+
+      # This message will not self destruct, because this project is open source. 
+
+  tags: 
+    - "class{{ JAVA_CLASS.classeNomSimple_enUS_stored_string }}"
+
+- block: 
+    - name: "Create issue by label {{ ISSUE_LABEL }}"
+      connection: local
+      uri:
+        timeout: 90
+        url: "https://api.github.com/repos/{{ GITHUB_ORG }}/{{ GITHUB_REPO_NAME }}/issues"
+        method: POST
+        headers:
+          Content-Type: "application/json"
+          Authorization: "token {{ GITHUB_TOKEN }}"
+        body_format: json
+        body: 
+          labels: 
+            - "{{ ISSUE_LABEL }}"
+          title: "{{ ISSUE_TITLE }}"
+          body: "{{ ISSUE_BODY }}"
+          milestone: "{{ MILESTONE_TITLE_JSON.number | default(omit) }}"
+        status_code: 
+          - 200
+          - 201
+      register: ISSUE_CREATE_JSON
+      tags: always
+    - name: Create card
+      include_role: 
+        name: computate_org_card
+      vars: 
+        CARD_CONTENT_ID: "{{ ISSUE_CREATE_JSON.json.id }}"
+      tags: always
+  connection: local
+  when: COLUMN_NAME is defined and MILESTONE_TITLE_JSON is defined and (ISSUE_LABEL_JSON.json | length == 0)
+  tags: always
+- block: 
+    - name: "Create issue by label {{ ISSUE_LABEL }}"
+      connection: local
+      uri:
+        timeout: 90
+        url: "https://api.github.com/repos/{{ GITHUB_ORG }}/{{ GITHUB_REPO_NAME }}/issues"
+        method: POST
+        headers:
+          Content-Type: "application/json"
+          Authorization: "token {{ GITHUB_TOKEN }}"
+        body_format: json
+        body: 
+          labels: 
+            - "{{ ISSUE_LABEL }}"
+          title: "{{ ISSUE_TITLE }}"
+          body: "{{ ISSUE_BODY }}"
+        status_code: 
+          - 200
+          - 201
+      register: ISSUE_CREATE_JSON
+      tags: always
+    - name: Create card
+      include_role: 
+        name: computate_org_card
+      vars: 
+        CARD_CONTENT_ID: "{{ ISSUE_CREATE_JSON.json.id }}"
+      tags: always
+  connection: local
+  when: COLUMN_NAME is defined and MILESTONE_TITLE_JSON is not defined and (ISSUE_LABEL_JSON.json | length == 0)
+  tags: always
+
+- block: 
+    - name: "Update issue by label {{ ISSUE_LABEL }}"
+      connection: local
+      uri:
+        timeout: 90
+        url: "https://api.github.com/repos/{{ GITHUB_ORG }}/{{ GITHUB_REPO_NAME }}/issues/{{ ISSUE_LABEL_JSON.json[0].number }}"
+        method: PATCH
+        headers:
+          Content-Type: "application/json"
+          Authorization: "token {{ GITHUB_TOKEN }}"
+        body_format: json
+        body: 
+          labels: 
+            - "{{ ISSUE_LABEL }}"
+          title: "{{ ISSUE_TITLE }}"
+          body: "{{ ISSUE_BODY }}"
+          milestone: "{{ MILESTONE_TITLE_JSON.number | default(omit) }}"
+      register: ISSUE_CREATE_JSON
+      tags: always
+    - name: Create card
+      include_role: 
+        name: computate_org_card
+      vars: 
+        CARD_CONTENT_ID: "{{ ISSUE_CREATE_JSON.json.id }}"
+      tags: always
+  connection: local
+  when: COLUMN_NAME is defined and MILESTONE_TITLE_JSON is defined and (ISSUE_LABEL_JSON.json | length > 0)
+  tags: always
+- block: 
+    - name: "Update issue by label {{ ISSUE_LABEL }}"
+      connection: local
+      uri:
+        timeout: 90
+        url: "https://api.github.com/repos/{{ GITHUB_ORG }}/{{ GITHUB_REPO_NAME }}/issues/{{ ISSUE_LABEL_JSON.json[0].number }}"
+        method: PATCH
+        headers:
+          Content-Type: "application/json"
+          Authorization: "token {{ GITHUB_TOKEN }}"
+        body_format: json
+        body: 
+          labels: 
+            - "{{ ISSUE_LABEL }}"
+          title: "{{ ISSUE_TITLE }}"
+          body: "{{ ISSUE_BODY }}"
+      register: ISSUE_CREATE_JSON
+      tags: always
+    - name: Create card
+      include_role: 
+        name: computate_org_card
+      vars: 
+        CARD_CONTENT_ID: "{{ ISSUE_CREATE_JSON.json.id }}"
+      tags: always
+  connection: local
+  when: COLUMN_NAME is defined and MILESTONE_TITLE_JSON is not defined and (ISSUE_LABEL_JSON.json | length > 0)
+  tags: always

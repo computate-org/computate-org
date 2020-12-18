@@ -168,7 +168,7 @@
   include_role: 
     name: computate_org_column
   vars: 
-    COLUMN_NAME: Optional Ansible OpenShift Deployment
+    COLUMN_NAME: Ansible OpenShift Deployment
   tags: 
     - column
 
@@ -302,11 +302,11 @@
       Deploying applications to a local development computer. 
   tags: 
     - milestone
-- name: Create milestone for Optional Ansible OpenShift Deployment issues
+- name: Create milestone for Ansible OpenShift Deployment issues
   include_role: 
     name: computate_org_milestone
   vars: 
-    MILESTONE_TITLE: Optional Ansible OpenShift Deployment
+    MILESTONE_TITLE: Ansible OpenShift Deployment
     MILESTONE_DESCRIPTION: |
       Optional scripts for Automating the deployment of applications to OpenShift using Ansible. 
   tags: 
@@ -554,8 +554,9 @@
       Your dependencies might be different on an older operating system.
       
       ```bash
-      sudo yum install -y ansible python python-pip
-      sudo pip install psycopg2
+      sudo yum install -y python3 python3-pip
+      sudo pip3 install --upgrade pip
+      sudo pip3 install psycopg2-binary openshift jmespath --use-feature=2020-resolver
       ```
 
       ## Setup ssh on your computer for ansible to connect
@@ -1381,8 +1382,8 @@
 #  vars: 
 #    ISSUE_LABEL: delete_and_recreate_openshift_project
 #    ISSUE_TITLE: "Delete and recreate an OpenShift project"
-#    MILESTONE_TITLE: Optional Ansible OpenShift Deployment
-#    COLUMN_NAME: Optional Ansible OpenShift Deployment
+#    MILESTONE_TITLE: Ansible OpenShift Deployment
+#    COLUMN_NAME: Ansible OpenShift Deployment
 #    ISSUE_BODY: |
 #      As a team, create an OpenShift project and share the project with the team. 
 #
@@ -1426,8 +1427,8 @@
   vars: 
     ISSUE_LABEL: automate_openshift_red_hat_sso
     ISSUE_TITLE: "Automate the install of a Red Hat Single Sign On server to OpenShift"
-    MILESTONE_TITLE: Optional Ansible OpenShift Deployment
-    COLUMN_NAME: Optional Ansible OpenShift Deployment
+    MILESTONE_TITLE: Ansible OpenShift Deployment
+    COLUMN_NAME: Ansible OpenShift Deployment
     ISSUE_BODY: |
       As a team, automate the install of a PostgreSQL database to OpenShift. 
       #### Run the playbook to install a PostgreSQL database in OpenShift.
@@ -1445,8 +1446,8 @@
   vars: 
     ISSUE_LABEL: automate_openshift_postgres_database
     ISSUE_TITLE: "Automate the install of a PostgreSQL database to OpenShift"
-    MILESTONE_TITLE: Optional Ansible OpenShift Deployment
-    COLUMN_NAME: Optional Ansible OpenShift Deployment
+    MILESTONE_TITLE: Ansible OpenShift Deployment
+    COLUMN_NAME: Ansible OpenShift Deployment
     ISSUE_BODY: |
       As a team, automate the install of a PostgreSQL database to OpenShift. 
       #### Run the playbook to install a PostgreSQL database in OpenShift.
@@ -1464,8 +1465,8 @@
   vars: 
     ISSUE_LABEL: automate_openshift_zookeeper_cluster_manager
     ISSUE_TITLE: "Automate the install of an Apache Zookeeper cluster manager to OpenShift"
-    MILESTONE_TITLE: Optional Ansible OpenShift Deployment
-    COLUMN_NAME: Optional Ansible OpenShift Deployment
+    MILESTONE_TITLE: Ansible OpenShift Deployment
+    COLUMN_NAME: Ansible OpenShift Deployment
     ISSUE_BODY: |
       As a team, automate the install of an Apache Zookeeper cluster manager to OpenShift. 
       #### Run the playbook to install an Apache Zookeeper cluster manager to OpenShift.
@@ -1483,8 +1484,8 @@
   vars: 
     ISSUE_LABEL: automate_openshift_solr_search_engine
     ISSUE_TITLE: "Automate the install of an Apache Solr search engine to OpenShift"
-    MILESTONE_TITLE: Optional Ansible OpenShift Deployment
-    COLUMN_NAME: Optional Ansible OpenShift Deployment
+    MILESTONE_TITLE: Ansible OpenShift Deployment
+    COLUMN_NAME: Ansible OpenShift Deployment
     ISSUE_BODY: |
       As a team, automate the install of an Apache Solr search engine to OpenShift. 
 

@@ -1,7 +1,7 @@
 - name: "Get column by name"
   connection: local
   set_fact:
-    COLUMN_NAME_JSON: "{{ COLUMNS.json | json_query(column_query) | first }}"
+    COLUMN_NAME_JSON: "{{ COLUMNS_JSON.json | json_query(column_query) | first }}"
   vars: 
     column_query: "[?name=='{{ COLUMN_NAME }}'].{name: name, id: id}"
   tags: always
@@ -41,6 +41,7 @@
   when: CARD_CONTENT_ID_JSON is not defined or CARD_CONTENT_ID_JSON == ""
   register: CARD_CREATE_JSON
   tags: always
+  ignore_errors: true
 #- name: "Update card by content_id {{ ISSUE_CREATE_JSON.json.id }}"
 #  uri:
 #    timeout: 90
