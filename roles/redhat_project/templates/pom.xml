@@ -107,6 +107,9 @@
 {% if DEPENDENCY.artifactId is defined %}
             <artifactId>{{ DEPENDENCY.artifactId }}</artifactId>
 {% endif %}
+{% if DEPENDENCY.version is defined %}
+            <version>{{ DEPENDENCY.version }}</version>
+{% endif %}
 {% if DEPENDENCY.scope is defined %}
             <scope>{{ DEPENDENCY.scope }}</scope>
 {% endif %}
@@ -149,6 +152,7 @@
 {% endfor %}
 {% endif %}
             </activation>
+{% endif %}
 {% if PROFILE.properties is defined and PROFILE.properties | length() > 0 %}
             <properties>
 {% for PROPERTY in PROFILE.properties %}
@@ -156,6 +160,127 @@
 {% endfor %}
             </properties>
 {% endif %}
+{% if PROFILE.build is defined %}
+            <build>
+{% if PROFILE.build.plugins is defined and PROFILE.build.plugins | length() > 0 %}
+                <plugins>
+{% for PLUGIN in PROFILE.build.plugins %}
+                    <plugin>
+{% if PLUGIN.groupId is defined %}
+                        <groupId>{{ PLUGIN.groupId }}</groupId>
+{% endif %}
+{% if PLUGIN.artifactId is defined %}
+                        <artifactId>{{ PLUGIN.artifactId }}</artifactId>
+{% endif %}
+{% if PLUGIN.version is defined %}
+                        <version>{{ PLUGIN.version }}</version>
+{% endif %}
+{% if PLUGIN.inherited is defined %}
+                        <inherited>{{ PLUGIN.inherited }}</inherited>
+{% endif %}
+{% if PLUGIN.configuration is defined %}
+                        <configuration>
+{% if PLUGIN.configuration.target is defined %}
+                            <target>{{ PLUGIN.configuration.target }}</target>
+{% endif %}
+{% if PLUGIN.configuration.source is defined %}
+                            <source>{{ PLUGIN.configuration.source }}</source>
+{% endif %}
+{% if PLUGIN.configuration.encoding is defined %}
+                            <encoding>{{ PLUGIN.configuration.encoding }}</encoding>
+{% endif %}
+{% if PLUGIN.configuration.argLine is defined %}
+                            <argLine>{{ PLUGIN.configuration.argLine }}</argLine>
+{% endif %}
+{% if PLUGIN.configuration.excludes is defined and PLUGIN.configuration.excludes | length() > 0 %}
+                            <excludes>
+{% for EXCLUDE in PLUGIN.configuration.excludes %}
+                                <exclude>{{ EXCLUDE }}</exclude>
+{% endfor %}
+                            </excludes>
+{% endif %}
+{% if PLUGIN.configuration.annotationProcessors is defined and PLUGIN.configuration.annotationProcessors | length() > 0 %}
+                            <annotationProcessors>
+{% for ANNOTATION_PROCESSOR in PLUGIN.configuration.annotationProcessors %}
+                                <annotationProcessor>{{ ANNOTATION_PROCESSOR }}</annotationProcessor>
+{% endfor %}
+                            </annotationProcessors>
+{% endif %}
+{% if PLUGIN.configuration.debug is defined %}
+                            <debug>{{ PLUGIN.configuration.debug }}</debug>
+{% endif %}
+{% if PLUGIN.configuration.debuglevel is defined %}
+                            <debuglevel>{{ PLUGIN.configuration.debuglevel }}</debuglevel>
+{% endif %}
+                        </configuration>
+{% endif %}
+{% if PLUGIN.executions is defined and PLUGIN.executions | length() > 0 %}
+                        <executions>
+{% for EXECUTION in PLUGIN.executions %}
+                            <execution>
+{% if EXECUTION.phase is defined %}
+                                <phase>{{ EXECUTION.phase }}</phase>
+{% endif %}
+{% if EXECUTION.goals is defined and EXECUTION.goals | length() > 0 %}
+                                <goals>
+{% for GOAL in EXECUTION.goals %}
+                                    <goal>{{ GOAL }}</goal>
+{% endfor %}
+                                </goals>
+{% endif %}
+{% if EXECUTION.configuration is defined %}
+                                <configuration>
+{% if EXECUTION.configuration.sources is defined and EXECUTION.configuration.sources | length() > 0 %}
+                                    <sources>
+{% for SOURCE in EXECUTION.configuration.sources %}
+                                        <source>{{ SOURCE }}</source>
+{% endfor %}
+                                    </sources>
+{% endif %}
+{% if EXECUTION.configuration.files is defined and EXECUTION.configuration.files | length() > 0 %}
+                                    <files>
+{% for FILE in EXECUTION.configuration.files %}
+                                        <file>{{ FILE }}</file>
+{% endfor %}
+                                    </files>
+{% endif %}
+{% if EXECUTION.configuration.filters is defined and EXECUTION.configuration.filters | length() > 0 %}
+                                    <filters>
+{% for FILTER in EXECUTION.configuration.filters %}
+                                        <filter>
+{% if FILTER.artifact is defined %}
+                                            <artifact>{{ FILTER.artifact }}</artifact>
+{% endif %}
+{% if FILTER.excludes is defined and FILTER.excludes | length() > 0 %}
+                                            <excludes>
+{% for EXCLUDE in FILTER.excludes %}
+                                                <exclude>{{ EXCLUDE }}</exclude>
+{% endfor %}
+                                            </excludes>
+{% endif %}
+                                        </filter>
+{% endfor %}
+                                    </filters>
+{% endif %}
+{% if EXECUTION.configuration.transformers is defined and EXECUTION.configuration.transformers | length() > 0 %}
+                                    <transformers>
+{% for TRANSFORMER in EXECUTION.configuration.transformers %}
+                                        <transformer{% if TRANSFORMER.implementation is defined %} implementation="{{ TRANSFORMER.implementation }}"{% endif %}>
+                                        </transformer>
+{% endfor %}
+                                    </transformers>
+{% endif %}
+                                </configuration>
+{% endif %}
+                            </execution>
+{% endfor %}
+                        </executions>
+{% endif %}
+                    </plugin>
+{% endfor %}
+                </plugins>
+{% endif %}
+            </build>
 {% endif %}
         </profile>
 {% endfor %}
@@ -164,6 +289,17 @@
 {% if PROJECT_POM.build is defined %}
 
     <build>
+{% if PROJECT_POM.build.resources is defined and PROJECT_POM.build.resources | length() > 0 %}
+        <resources>
+{% for RESOURCE in PROJECT_POM.build.resources %}
+            <resource>
+{% if RESOURCE.directory is defined %}
+                <directory>{{ RESOURCE.directory }}</directory>
+{% endif %}
+            </resource>
+{% endfor %}
+        </resources>
+{% endif %}
 {% if PROJECT_POM.build.pluginManagement.plugins is defined and PROJECT_POM.build.pluginManagement.plugins | length() > 0 %}
         <pluginManagement>
             <plugins>
@@ -235,6 +371,13 @@
 {% endfor %}
                     </excludes>
 {% endif %}
+{% if PLUGIN.configuration.annotationProcessors is defined and PLUGIN.configuration.annotationProcessors | length() > 0 %}
+                    <annotationProcessors>
+{% for ANNOTATION_PROCESSOR in PLUGIN.configuration.annotationProcessors %}
+                        <annotationProcessor>{{ ANNOTATION_PROCESSOR }}</annotationProcessor>
+{% endfor %}
+                    </annotationProcessors>
+{% endif %}
 {% if PLUGIN.configuration.debug is defined %}
                     <debug>{{ PLUGIN.configuration.debug }}</debug>
 {% endif %}
@@ -242,6 +385,68 @@
                     <debuglevel>{{ PLUGIN.configuration.debuglevel }}</debuglevel>
 {% endif %}
                 </configuration>
+{% endif %}
+{% if PLUGIN.executions is defined and PLUGIN.executions | length() > 0 %}
+                <executions>
+{% for EXECUTION in PLUGIN.executions %}
+                    <execution>
+{% if EXECUTION.phase is defined %}
+                        <phase>{{ EXECUTION.phase }}</phase>
+{% endif %}
+{% if EXECUTION.goals is defined and EXECUTION.goals | length() > 0 %}
+                        <goals>
+{% for GOAL in EXECUTION.goals %}
+                            <goal>{{ GOAL }}</goal>
+{% endfor %}
+                        </goals>
+{% endif %}
+{% if EXECUTION.configuration is defined %}
+                        <configuration>
+{% if EXECUTION.configuration.sources is defined and EXECUTION.configuration.sources | length() > 0 %}
+                            <sources>
+{% for SOURCE in EXECUTION.configuration.sources %}
+                                <source>{{ SOURCE }}</source>
+{% endfor %}
+                            </sources>
+{% endif %}
+{% if EXECUTION.configuration.files is defined and EXECUTION.configuration.files | length() > 0 %}
+                            <files>
+{% for FILE in EXECUTION.configuration.files %}
+                                <file>{{ FILE }}</file>
+{% endfor %}
+                            </files>
+{% endif %}
+{% if EXECUTION.configuration.filters is defined and EXECUTION.configuration.filters | length() > 0 %}
+                            <filters>
+{% for FILTER in EXECUTION.configuration.filters %}
+                                <filter>
+{% if FILTER.artifact is defined %}
+                                    <artifact>{{ FILTER.artifact }}</artifact>
+{% endif %}
+{% if FILTER.excludes is defined and FILTER.excludes | length() > 0 %}
+                                    <excludes>
+{% for EXCLUDE in FILTER.excludes %}
+                                        <exclude>{{ EXCLUDE }}</exclude>
+{% endfor %}
+                                    </excludes>
+{% endif %}
+                                </filter>
+{% endfor %}
+                            </filters>
+{% endif %}
+{% if EXECUTION.configuration.transformers is defined and EXECUTION.configuration.transformers | length() > 0 %}
+                            <transformers>
+{% for TRANSFORMER in EXECUTION.configuration.transformers %}
+                                <transformer{% if TRANSFORMER.implementation is defined %} implementation="{{ TRANSFORMER.implementation }}"{% endif %}>
+                                </transformer>
+{% endfor %}
+                            </transformers>
+{% endif %}
+                        </configuration>
+{% endif %}
+                    </execution>
+{% endfor %}
+                </executions>
 {% endif %}
             </plugin>
 {% endfor %}
