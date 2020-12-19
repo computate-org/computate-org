@@ -1,3 +1,13 @@
+- name: Create the project bin directory
+  file:
+    state: directory
+    path: "{{ PROJECT.PROJECT_SRC }}/bin"
+- name: Create the touch.sh script
+  template:
+    src: "touch.sh"
+    dest: "{{ PROJECT.PROJECT_SRC }}/bin/touch.sh"
+    mode: 0775
+  when: PROJECT.PROJECT_FILES is defined
 - include_role: 
     name: "computate_project_file_{{ PROJECT_LANG }}"
   loop: "{{ PROJECT.PROJECT_FILES }}"

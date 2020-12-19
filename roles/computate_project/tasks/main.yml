@@ -1,5 +1,3 @@
-- set_fact: 
-    PROJECT_SRC: "{{ playbook_dir | dirname }}"
 - stat: 
     path: /usr/bin/git
   register: GIT_EXISTS
@@ -21,41 +19,41 @@
 # Project dir #
 ###############
 
-- name: Check for the {{PROJECT_NAME}} .git directory
+- name: Check for the {{ PROJECT_NAME }} .git directory
   stat:
-    path: "{{PROJECT_SRC}}/.git"
+    path: "{{ PROJECT_SRC }}/.git"
   register: PROJECT_GIT_DIR
-- name: Create the {{PROJECT_NAME}} source directory {{PROJECT_SRC}}
+- name: Create the {{ PROJECT_NAME }} source directory {{ PROJECT_SRC }}
   file:
-    name: "{{PROJECT_SRC}}"
+    name: "{{ PROJECT_SRC }}"
     state: directory
-    owner: "{{USER_NAME}}"
-    group: "{{USER_NAME}}"
+    owner: "{{ USER_NAME }}"
+    group: "{{ USER_NAME }}"
   become: yes
   when: PROJECT_GIT_DIR.stat.exists == False
-- name: Clone the {{PROJECT_NAME}} source code
+- name: Clone the {{ PROJECT_NAME }} source code
   git:
-    repo: "{{PROJECT_REPO}}"
-    dest: "{{PROJECT_SRC}}"
+    repo: "{{ PROJECT_REPO }}"
+    dest: "{{ PROJECT_SRC }}"
   when: PROJECT_GIT_DIR.stat.exists == False
 
 ##############
 # Static dir #
 ##############
 
-- name: Check for the {{PROJECT_STATIC_NAME}} .git directory
+- name: Check for the {{ PROJECT_STATIC_NAME }} .git directory
   stat:
-    path: "{{PROJECT_SRC}}-static/.git"
+    path: "{{ PROJECT_SRC }}-static/.git"
   register: PROJECT_STATIC_GIT_DIR
-- name: Create the {{PROJECT_STATIC_NAME}} source directory {{PROJECT_SRC}}-static
+- name: Create the {{ PROJECT_STATIC_NAME }} source directory {{ PROJECT_SRC }}-static
   file:
-    name: "{{PROJECT_SRC}}-static"
+    name: "{{ PROJECT_SRC }}-static"
     state: directory
-    owner: "{{USER_NAME}}"
-    group: "{{USER_NAME}}"
+    owner: "{{ USER_NAME }}"
+    group: "{{ USER_NAME }}"
   become: yes
   when: PROJECT_STATIC_GIT_DIR.stat.exists == False
-- name: Clone the {{PROJECT_STATIC_NAME}} source code
+- name: Clone the {{ PROJECT_STATIC_NAME }} source code
   git:
     repo: "{{ PROJECT_STATIC_REPO }}"
     dest: "{{ PROJECT_SRC }}-static"
@@ -65,19 +63,19 @@
 # Ansible dir #
 ###############
 
-- name: Check for the {{PROJECT_ANSIBLE_NAME}} .git directory
+- name: Check for the {{ PROJECT_ANSIBLE_NAME }} .git directory
   stat:
-    path: "{{PROJECT_SRC}}-ansible/.git"
+    path: "{{ PROJECT_SRC }}-ansible/.git"
   register: PROJECT_ANSIBLE_GIT_DIR
-- name: Create the {{PROJECT_ANSIBLE_NAME}} source directory {{PROJECT_SRC}}-ansible
+- name: Create the {{ PROJECT_ANSIBLE_NAME }} source directory {{ PROJECT_SRC }}-ansible
   file:
-    name: "{{PROJECT_SRC}}-ansible"
+    name: "{{ PROJECT_SRC }}-ansible"
     state: directory
-    owner: "{{USER_NAME}}"
-    group: "{{USER_NAME}}"
+    owner: "{{ USER_NAME }}"
+    group: "{{ USER_NAME }}"
   become: yes
   when: PROJECT_ANSIBLE_GIT_DIR.stat.exists == False
-- name: Clone the {{PROJECT_ANSIBLE_NAME}} source code
+- name: Clone the {{ PROJECT_ANSIBLE_NAME }} source code
   git:
     repo: "{{ PROJECT_ANSIBLE_REPO }}"
     dest: "{{ PROJECT_SRC }}-ansible"
@@ -87,34 +85,36 @@
 # Service #
 ###########
 
-- name: Create the {{PROJECT_NAME}} systemd service {{PROJECT_SYSTEMD}}. 
+- name: Create the {{ PROJECT_NAME }} systemd services. 
   template:
     src: opendatapolicing_service.j2
-    dest: "{{PROJECT_SYSTEMD}}"
+    dest: "/usr/lib/systemd/system/{{ item.PROJECT_NAME }}.service"
   become: yes
-- name: Create the {{PROJECT_NAME}} config dir. 
+  loop: PROJECT_SERVICES
+- name: Create the {{ item.PROJECT_NAME }} config dirs. 
   file:
-    name: "{{PROJECT_SRC}}/config"
+    name: "{{ PROJECT_SRC }}/config"
     state: directory
-    owner: "{{USER_NAME}}"
-    group: "{{USER_NAME}}"
-- name: Create the {{PROJECT_NAME}} enUS config. 
+    owner: "{{ USER_NAME }}"
+    group: "{{ USER_NAME }}"
+  loop: PROJECT_SERVICES
+- name: Create the {{ item.PROJECT_NAME }} enUS configs. 
   template:
     src: opendatapolicing_config_enUS.config.j2
-    dest: "{{PROJECT_SRC}}/config/opendatapolicing.config"
-    owner: "{{USER_NAME}}"
-    group: "{{USER_NAME}}"
-  become: yes
+    dest: "{{ item.PROJECT_SRC }}/config/opendatapolicing.config"
+  loop: PROJECT_SERVICES
 - name: Reload the services. 
   systemd:
     daemon_reload: yes
   become: yes
-- name: Start and enable the {{PROJECT_NAME}} service. 
+  loop: PROJECT_SERVICES
+- name: Start and enable the {{ item.PROJECT_NAME }} services. 
   service:
-    name: "{{PROJECT_SERVICE}}"
+    name: "watch-{{ item.PROJECT_NAME }}"
     enabled: yes
     state: restarted
   become: yes
+  loop: PROJECT_SERVICES
 
 ##############
 # PostgreSQL #
@@ -122,25 +122,25 @@
 
 - name: Create enUS database user
   postgresql_user:
-    name: "{{PROJECT_DB_USER_ENUS}}"
-    password: "{{PROJECT_DB_PASSWORD_ENUS}}"
+    name: "{{ PROJECT_DB_USER_ENUS }}"
+    password: "{{ PROJECT_DB_PASSWORD_ENUS }}"
     login_unix_socket: /tmp
-    login_user: "{{POSTGRES_BECOME_USER}}"
+    login_user: "{{ POSTGRES_BECOME_USER }}"
     db: postgres
   become: true
-  become_user: "{{POSTGRES_BECOME_USER}}"
+  become_user: "{{ POSTGRES_BECOME_USER }}"
 - name: Create enUS database
   postgresql_db:
-    name: "{{PROJECT_DB_NAME_ENUS}}"
-    owner: "{{PROJECT_DB_USER_ENUS}}"
+    name: "{{ PROJECT_DB_NAME_ENUS }}"
+    owner: "{{ PROJECT_DB_USER_ENUS }}"
     login_unix_socket: /tmp
-    login_user: "{{POSTGRES_BECOME_USER}}"
+    login_user: "{{ POSTGRES_BECOME_USER }}"
     db: postgres
   become: true
-  become_user: "{{POSTGRES_BECOME_USER}}"
+  become_user: "{{ POSTGRES_BECOME_USER }}"
 - name: Restart the postgresql service. 
   service:
-    name: "{{POSTGRES_SERVICE}}"
+    name: "{{ POSTGRES_SERVICE }}"
     state: restarted
   become: yes
 
@@ -149,39 +149,39 @@
 ###############
 
 - name: Check for existing solr collection enUS
-  shell: "{{SOLR_OPT}}/server/scripts/cloud-scripts/zkcli.sh -zkhost localhost:{{ZOOKEEPER_PORT}} -cmd ls /collections/{{PROJECT_SOLR_COLLECTION_ENUS}}"
+  shell: "{{ SOLR_OPT }}/server/scripts/cloud-scripts/zkcli.sh -zkhost localhost:{{ ZOOKEEPER_PORT }} -cmd ls /collections/{{ PROJECT_SOLR_COLLECTION_ENUS }}"
   ignore_errors: yes
   register: SOLR_COLLECTION_EXISTS_ENUS
   changed_when: false
 - name: Create collection in solr enUS
-  shell: "{{SOLR_OPT}}/bin/solr create_collection -n computate -c {{PROJECT_SOLR_COLLECTION_ENUS}}"
+  shell: "{{ SOLR_OPT }}/bin/solr create_collection -n computate -c {{ PROJECT_SOLR_COLLECTION_ENUS }}"
   when: SOLR_COLLECTION_EXISTS_ENUS.rc != 0
 
 ###########
 # SSL/TLS #
 ###########
 
-- name: Create the keystore directory {{SSL_KEYSTORE_PATH}}
+- name: Create the keystore directory {{ SSL_KEYSTORE_PATH }}
   file:
-    name: "{{SSL_KEYSTORE_PATH}}"
+    name: "{{ SSL_KEYSTORE_PATH }}"
     state: directory
-    owner: "{{USER_NAME}}"
-    group: "{{USER_NAME}}"
+    owner: "{{ USER_NAME }}"
+    group: "{{ USER_NAME }}"
   become: yes
   when: PROJECT_SITE_BASE_URL_ENUS is regex("^https://")
-- name: Create the {{PROJECT_NAME}} keystore properties {{SSL_KEYSTORE_PATH}}/{{SSL_PROPERTIES_FILENAME}}
+- name: Create the {{ PROJECT_NAME }} keystore properties {{ SSL_KEYSTORE_PATH }}/{{ SSL_PROPERTIES_FILENAME }}
   template:
     src: opendatapolicing_keystore.properties.j2
-    dest: "{{SSL_KEYSTORE_PATH}}/{{PROJECT_SSL_PROPERTIES_FILENAME}}"
+    dest: "{{ SSL_KEYSTORE_PATH }}/{{ PROJECT_SSL_PROPERTIES_FILENAME }}"
   when: PROJECT_SITE_BASE_URL_ENUS is regex("^https://")
-- name: Create the {{PROJECT_NAME}} keystore jks {{SSL_JKS_PATH}}
-  shell: echo {{SSL_JKS_BASE64}} | base64 -d > {{SSL_JKS_PATH}}
+- name: Create the {{ PROJECT_NAME }} keystore jks {{ SSL_JKS_PATH }}
+  shell: echo {{ SSL_JKS_BASE64 }} | base64 -d > {{ SSL_JKS_PATH }}
   when: PROJECT_SITE_BASE_URL_ENUS is regex("^https://")
 - name: Build the source code in /usr/local/src/computate
   shell: "mvn clean install"
   args: 
     chdir: "/usr/local/src/computate"
-- name: Build the source code in {{PROJECT_SRC}}
+- name: Build the source code in {{ PROJECT_SRC }}
   shell: "mvn clean install"
   args: 
-    chdir: "{{PROJECT_SRC}}"
+    chdir: "{{ PROJECT_SRC }}"

@@ -79,6 +79,12 @@ all:
               value: 1.4.9
             - name: hawtio-springboot.version
               value: 2.0.0.fuse-000201-redhat-3
+            - name: maven-shade-plugin.version
+              value: 2.3
+            - name: maven-jarsigner-plugin.version
+              value: 1.4
+            - name: properties-maven-plugin.version
+              value: 1.0.0
 
             #######################
             # Vert.X dependencies #
@@ -367,9 +373,80 @@ all:
               version: 4.13.1
               scope: test
           build: 
+            resources:
+              - directory: src/main/resources
             plugins: 
               - groupId: "org.springframework.boot"
                 artifactId: "spring-boot-maven-plugin"
+              - groupId: org.codehaus.mojo
+                artifactId: properties-maven-plugin
+                version: ${properties-maven-plugin.version}
+                executions:
+                  - phase: initialize
+                    goals:
+                      - read-project-properties
+                    configuration:
+                      files:
+                        - /opt/keystore/{{ PROJECT_NAME }}-keystore.properties
+              - artifactId: maven-compiler-plugin
+                version: ${maven-compiler-plugin.version}
+                configuration:
+                  source: 1.8
+                  target: 1.8
+                  annotationProcessors:
+                    - io.vertx.codegen.CodeGenProcessor
+              - groupId: org.codehaus.mojo
+                artifactId: build-helper-maven-plugin
+                version: ${build-helper-maven-plugin.version}
+                executions: 
+                  - phase: generate-sources
+                    goals: 
+                      - add-source
+                    configuration: 
+                      sources: 
+                        - src/gen/java
+                        - target/generated-sources/annotations
+          profiles: 
+            - id: openshift
+              build:
+                plugins:
+                  - groupId: org.apache.maven.plugins
+                    artifactId: maven-shade-plugin
+                    version: ${maven-shade-plugin.version}
+                    executions:
+                      - phase: package
+                        goals:
+                          - shade
+                        configuration:
+                          filters:
+                            - artifact: "*:*"
+                              excludes:
+                                - META-INF/*.SF
+                                - META-INF/*.DSA
+                                - META-INF/*.RSA
+                          transformers:
+                            - implementation: org.apache.maven.plugins.shade.resource.ManifestResourceTransformer
+                  - groupId: org.apache.maven.plugins
+                    artifactId: maven-jarsigner-plugin
+                    version: ${maven-jarsigner-plugin.version}
+                    executions:
+                      - id: sign
+                        goals:
+                          - sign
+                      - id: verify
+                        goals:
+                          - verify
+                    configuration:
+                      keystore: ${keystore-path}
+                      alias: ${keystore-alias}
+                      storepass: ${keystore-storepass}
+                      keypass: ${keystore-keypass}
+              activation: 
+                property: 
+                  - name: env.BUILD_NUMBER
+              properties: 
+                - name: revision
+                  value: ${baseRevision}.${env.BUILD_NUMBER}
         PROJECT_FILES: 
           - path: "{{ PROJECT_RP_SRC }}/src/main/java/{{ PROJECT_JAVA_PACKAGE | replace('.', '/') }}/wrap/Wrap.java"
             template: Wrap.java
