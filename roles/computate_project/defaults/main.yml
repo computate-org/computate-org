@@ -103,7 +103,7 @@ PROJECT_DB_HOST_NAME_ENUS: "localhost"
 # The PostgreSQL database user name of the site. 
 PROJECT_DB_USER_ENUS: computate
 # The PostgreSQL database password of the site. 
-PROJECT_DB_PASSWORD_ENUS: "..."
+PROJECT_DB_PASSWORD_ENUS: "{{ lookup('password', '/dev/null length=10 chars=ascii_letters,digits') }}"
 # The PostgreSQL database name of the site. 
 PROJECT_DB_NAME_ENUS: opendatapolicing
 # The Java main class of the site. 

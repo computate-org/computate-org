@@ -378,16 +378,16 @@ all:
             plugins: 
               - groupId: "org.springframework.boot"
                 artifactId: "spring-boot-maven-plugin"
-              - groupId: org.codehaus.mojo
-                artifactId: properties-maven-plugin
-                version: ${properties-maven-plugin.version}
-                executions:
-                  - phase: initialize
-                    goals:
-                      - read-project-properties
-                    configuration:
-                      files:
-                        - /opt/keystore/{{ PROJECT_NAME }}-keystore.properties
+#              - groupId: org.codehaus.mojo
+#                artifactId: properties-maven-plugin
+#                version: ${properties-maven-plugin.version}
+#                executions:
+#                  - phase: initialize
+#                    goals:
+#                      - read-project-properties
+#                    configuration:
+#                      files:
+#                        - /opt/keystore/{{ PROJECT_NAME }}-keystore.properties
               - artifactId: maven-compiler-plugin
                 version: ${maven-compiler-plugin.version}
                 configuration:
@@ -409,38 +409,38 @@ all:
           profiles: 
             - id: openshift
               build:
-                plugins:
-                  - groupId: org.apache.maven.plugins
-                    artifactId: maven-shade-plugin
-                    version: ${maven-shade-plugin.version}
-                    executions:
-                      - phase: package
-                        goals:
-                          - shade
-                        configuration:
-                          filters:
-                            - artifact: "*:*"
-                              excludes:
-                                - META-INF/*.SF
-                                - META-INF/*.DSA
-                                - META-INF/*.RSA
-                          transformers:
-                            - implementation: org.apache.maven.plugins.shade.resource.ManifestResourceTransformer
-                  - groupId: org.apache.maven.plugins
-                    artifactId: maven-jarsigner-plugin
-                    version: ${maven-jarsigner-plugin.version}
-                    executions:
-                      - id: sign
-                        goals:
-                          - sign
-                      - id: verify
-                        goals:
-                          - verify
-                    configuration:
-                      keystore: ${keystore-path}
-                      alias: ${keystore-alias}
-                      storepass: ${keystore-storepass}
-                      keypass: ${keystore-keypass}
+#                plugins:
+#                  - groupId: org.apache.maven.plugins
+#                    artifactId: maven-shade-plugin
+#                    version: ${maven-shade-plugin.version}
+#                    executions:
+#                      - phase: package
+#                        goals:
+#                          - shade
+#                        configuration:
+#                          filters:
+#                            - artifact: "*:*"
+#                              excludes:
+#                                - META-INF/*.SF
+#                                - META-INF/*.DSA
+#                                - META-INF/*.RSA
+#                          transformers:
+#                            - implementation: org.apache.maven.plugins.shade.resource.ManifestResourceTransformer
+#                  - groupId: org.apache.maven.plugins
+#                    artifactId: maven-jarsigner-plugin
+#                    version: ${maven-jarsigner-plugin.version}
+#                    executions:
+#                      - id: sign
+#                        goals:
+#                          - sign
+#                      - id: verify
+#                        goals:
+#                          - verify
+#                    configuration:
+#                      keystore: ${keystore-path}
+#                      alias: ${keystore-alias}
+#                      storepass: ${keystore-storepass}
+#                      keypass: ${keystore-keypass}
               activation: 
                 property: 
                   - name: env.BUILD_NUMBER
@@ -472,8 +472,8 @@ all:
             template: PageDesign.java
           - path: "{{ PROJECT_RP_SRC }}/src/main/java/{{ PROJECT_JAVA_PACKAGE | replace('.', '/') }}/html/part/HtmlPart.java"
             template: HtmlPart.java
-          - path: "{{ PROJECT_RP_SRC }}/src/main/java/{{ PROJECT_JAVA_PACKAGE | replace('.', '/') }}/page/PageLayout.java"
-            template: PageLayout.java
+#          - path: "{{ PROJECT_RP_SRC }}/src/main/java/{{ PROJECT_JAVA_PACKAGE | replace('.', '/') }}/page/PageLayout.java"
+#            template: PageLayout.java
           - path: "{{ PROJECT_RP_SRC }}/src/main/java/{{ PROJECT_JAVA_PACKAGE | replace('.', '/') }}/vertx/AppOpenApi3.java"
             template: AppOpenApi3.java
 #          - path: "{{ PROJECT_RP_SRC }}/src/main/java/{{ PROJECT_JAVA_PACKAGE | replace('.', '/') }}/vertx/AppRestore.java"
