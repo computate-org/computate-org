@@ -2,7 +2,12 @@
   file:
     state: directory
     path: "{{ FILE.path | dirname }}"
+- name: "Check for the project file {{ FILE.template }}"
+  stat: 
+    path: "{{ FILE.path }}"
+  register: FILE_EXISTS
 - name: "Create the project file {{ FILE.template }}"
   template:
     src: "{{ FILE.template }}"
     dest: "{{ FILE.path }}"
+  when: (FILE.once is not defined or FILE.once == false) or FILE_EXISTS.stat.exists == false

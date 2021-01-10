@@ -13,13 +13,9 @@ import {{ PROJECT_JAVA_PACKAGE }}.wrap.Wrap;
  * Api: true
  * Indexed: true
  * 
- * ApiTag.frFR: Utilisateur
- * ApiUri.frFR: /api/utilisateur
- * 
  * ApiTag.enUS: User
  * ApiUri.enUS: /api/user
  * 
- * ApiMethod.frFR: Recherche
  * ApiMethod.enUS: Search
  * ApiMethod: PATCH
  * ApiMethod: POST
@@ -30,20 +26,16 @@ import {{ PROJECT_JAVA_PACKAGE }}.wrap.Wrap;
  * ApiUriSearchPage.enUS: /user
  * 
  * Keyword: classSimpleNameSiteUser
- * Role.frFR: SiteAdmin
  * Role.enUS: SiteAdmin
  * Filter: utilisateurId
  * Saves: true
  * 
- * AName.frFR: un utilisateur du site
  * AName.enUS: a site user
- * PluralName.frFR: utilisateurs du site
- * Coulor: gray
+ * Color: gray
  * IconGroup: regular
  * IconName: user-cog
  * 
  * RoleUser: true
- * Role.frFR: SiteAdmin
  * Role.enUS: SiteAdmin
  */            
 public class SiteUser extends SiteUserGen<Cluster> {   
@@ -179,9 +171,5 @@ public class SiteUser extends SiteUserGen<Cluster> {
 
 	@Override protected void  _objectTitle(Wrap<String> c) {
 		c.o(userFullName + " " + userEmail + " " + userName);
-	}
-
-	public void  htmlBody() {
-		super.htmlBody();
 	}
 }
