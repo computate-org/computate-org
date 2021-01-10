@@ -1152,7 +1152,8 @@
 #    url: "http://localhost:8983/solr/computate/select?rows=200&q=*:*&fq=partEstClasse_indexed_boolean:true&fq=appliNom_indexed_string:opendatapolicing&fq=classeNomCanonique_enUS_indexed_string:com.opendatapolicing.enus.wrap.Wrap"
 #    url: "http://localhost:8983/solr/computate/select?rows=200&q=*:*&fq=partEstClasse_indexed_boolean:true&fq=appliNom_indexed_string:opendatapolicing&fq=classeNomCanonique_enUS_indexed_string:com.opendatapolicing.enus.main.pom.PomXml"
 #    url: "http://localhost:8983/solr/computate/select?rows=200&q=*:*&fq=partEstClasse_indexed_boolean:true&fq=appliNom_indexed_string:opendatapolicing&fq=classeNomCanonique_enUS_indexed_string:com.opendatapolicing.enus.main.pom.TouchSh"
-    url: "http://localhost:8983/solr/computate/select?rows=200&q=*:*&fq=partEstClasse_indexed_boolean:true&fq=appliNom_indexed_string:opendatapolicing&fq=classeTraduire_indexed_boolean:true"
+    url: "http://localhost:8983/solr/computate/select?rows=200&q=*:*&fq=partEstClasse_indexed_boolean:true&fq=appliNom_indexed_string:opendatapolicing&fq=classeNomEnsemble_enUS_indexed_string:com.opendatapolicing.enus.ansible"
+#    url: "http://localhost:8983/solr/computate/select?rows=200&q=*:*&fq=partEstClasse_indexed_boolean:true&fq=appliNom_indexed_string:opendatapolicing&fq=classeTraduire_indexed_boolean:true"
   register: JAVA_CLASSES
 - name: "Create issue for the Java class"
   include_role: 
