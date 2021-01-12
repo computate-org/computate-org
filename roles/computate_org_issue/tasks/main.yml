@@ -31,7 +31,7 @@
           labels: 
             - "{{ ISSUE_LABEL }}"
           title: "{{ ISSUE_TITLE }}"
-          body: "{{ ISSUE_BODY }}"
+          body: "{{ ISSUE_BODY | replace('\\{\\{', '{{') | replace('\\}\\}', '}}') }}"
           milestone: "{{ MILESTONE_TITLE_JSON.number | default(omit) }}"
         status_code: 
           - 200
@@ -62,7 +62,7 @@
           labels: 
             - "{{ ISSUE_LABEL }}"
           title: "{{ ISSUE_TITLE }}"
-          body: "{{ ISSUE_BODY }}"
+          body: "{{ ISSUE_BODY | replace('\\{\\{', '{{') | replace('\\}\\}', '}}') }}"
         status_code: 
           - 200
           - 201
@@ -93,7 +93,7 @@
           labels: 
             - "{{ ISSUE_LABEL }}"
           title: "{{ ISSUE_TITLE }}"
-          body: "{{ ISSUE_BODY }}"
+          body: "{{ ISSUE_BODY | replace('\\{\\{', '{{') | replace('\\}\\}', '}}') }}"
           milestone: "{{ MILESTONE_TITLE_JSON.number | default(omit) }}"
       register: ISSUE_CREATE_JSON
       tags: always
@@ -121,7 +121,7 @@
           labels: 
             - "{{ ISSUE_LABEL }}"
           title: "{{ ISSUE_TITLE }}"
-          body: "{{ ISSUE_BODY }}"
+          body: "{{ ISSUE_BODY | regex_replace('\\\\{\\\\{', '{{', multiline=True) | regex_replace('\\\\}\\\\}', '}}', multiline=True) }}"
       register: ISSUE_CREATE_JSON
       tags: always
     - name: Create card
