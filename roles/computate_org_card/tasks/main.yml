@@ -1,7 +1,7 @@
-- name: "Get column by name"
+- name: "Get column by name: {{ COLUMN_NAME }}"
   connection: local
   set_fact:
-    COLUMN_NAME_JSON: "{{ COLUMNS_JSON.json | json_query(column_query) | first }}"
+    COLUMN_NAME_JSON: "{{ COLUMNS_JSON.json | json_query(column_query) | default([]) | first }}"
   vars: 
     column_query: "[?name=='{{ COLUMN_NAME }}'].{name: name, id: id}"
   tags: always

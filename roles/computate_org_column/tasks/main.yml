@@ -1,7 +1,7 @@
 - name: "Get column by name {{ COLUMN_NAME | default(omit) }}"
   connection: local
   set_fact:
-    COLUMN_NAME_JSON: "{{ COLUMNS_JSON.json | json_query(column_query) | first | default(None) }}"
+    COLUMN_NAME_JSON: "{{ COLUMNS_JSON.json | json_query(column_query) | default([]) | first | default(None) }}"
   vars: 
     column_query: "[?name=='{{ COLUMN_NAME | default(omit) }}'].{name: name, description: description, id: id}"
   tags: column_name

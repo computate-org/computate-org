@@ -187,6 +187,14 @@
         COLUMN_NAME: Automate SSO Deployment
       tags: 
         - column
+    - name: Create column for Create Static Content
+      include_role: 
+        name: computate_org_column
+      vars: 
+        COLUMN_NAME: Create Static Content
+      tags: 
+        - column
+
     - name: "Get columns"
       connection: local
       uri:
@@ -302,6 +310,15 @@
         MILESTONE_TITLE: Automate SSO Deployment
         MILESTONE_DESCRIPTION: |
           Automate SSO Deployment
+      tags: 
+        - milestone
+    - name: Create milestone for Create Static Content issues
+      include_role: 
+        name: computate_org_milestone
+      vars: 
+        MILESTONE_TITLE: Create Static Content
+        MILESTONE_DESCRIPTION: |
+          Create Static Content
       tags: 
         - milestone
     
@@ -520,14 +537,16 @@
 #    url: "http://localhost:8983/solr/computate/select?rows=200&q=*:*&fq=partEstClasse_indexed_boolean:true&fq=appliNom_indexed_string:opendatapolicing&fq=classeNomCanonique_enUS_indexed_string:com.opendatapolicing.enus.wrap.Wrap"
 #    url: "http://localhost:8983/solr/computate/select?rows=200&q=*:*&fq=partEstClasse_indexed_boolean:true&fq=appliNom_indexed_string:opendatapolicing&fq=classeNomCanonique_enUS_indexed_string:com.opendatapolicing.enus.main.pom.PomXml"
 #    url: "http://localhost:8983/solr/computate/select?rows=200&q=*:*&fq=partEstClasse_indexed_boolean:true&fq=appliNom_indexed_string:opendatapolicing&fq=classeNomCanonique_enUS_indexed_string:com.opendatapolicing.enus.main.pom.TouchSh"
-    url: "http://localhost:8983/solr/computate/select?rows=200&q=*:*&fq=partEstClasse_indexed_boolean:true&fq=appliNom_indexed_string:opendatapolicing&fq=classeNomEnsemble_enUS_indexed_string:com.opendatapolicing.enus.ansible"
 #    url: "http://localhost:8983/solr/computate/select?rows=200&q=*:*&fq=partEstClasse_indexed_boolean:true&fq=appliNom_indexed_string:opendatapolicing&fq=classeNomSimple_enUS_indexed_string:Roles_generate_static_classes_tasks_generate_static_class"
-#    url: "http://localhost:8983/solr/computate/select?rows=200&q=*:*&fq=partEstClasse_indexed_boolean:true&fq=appliNom_indexed_string:opendatapolicing&fq=classeTraduire_indexed_boolean:true"
+#    url: "http://localhost:8983/solr/computate/select?rows=200&q=*:*&fq=partEstClasse_indexed_boolean:true&fq=appliNom_indexed_string:opendatapolicing&fq=classeNomEnsemble_enUS_indexed_string:com.opendatapolicing.enus.ansible&fq=classeNomSimple_enUS_indexed_string:Roles_project_openshift_templates_project_route"
+#    url: "http://localhost:8983/solr/computate/select?rows=200&q=*:*&fq=partEstClasse_indexed_boolean:true&fq=appliNom_indexed_string:opendatapolicing&fq=classeNomEnsemble_enUS_indexed_string:com.opendatapolicing.enus.ansible"
+    url: "http://localhost:8983/solr/computate/select?rows=300&q=*:*&fq=partEstClasse_indexed_boolean:true&fq=appliNom_indexed_string:opendatapolicing&fq=classeTraduire_indexed_boolean:true"
   register: JAVA_CLASSES
-- name: "Create issue for the Java class"
+- name: "Create issues for the {{ JAVA_CLASSES.json.response.docs | length }} Java classes"
   include_role: 
     name: mission_impossible_issue
   vars: 
     JAVA_CLASS: "{{ item }}"
-  when: item.classeNomSimple_enUS_stored_string not in ['Roles_generate_static_classes_tasks_generate_static_class', 'Generate_static_classes']
+    CLASS_DISPLAY_NAME: "{{ item | json_query('classeNomAffichage_enUS_stored_string') | replace('{{', '\\{\\{') | replace('}}', '\\}\\}') | default(omit) }}"
+  when: item.classeNomSimple_enUS_stored_string not in ['Roles_generate_static_classes_tasks_generate_static_class', 'Roles_generate_static_classes_tasks_main', 'Generate_static_classes']
   loop: "{{ JAVA_CLASSES.json.response.docs }}"

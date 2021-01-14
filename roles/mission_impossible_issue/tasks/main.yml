@@ -1,13 +1,13 @@
 - name: Setup issue vars
   set_fact: 
-    ISSUE_LABEL: "create_java_class_{{ JAVA_CLASS.classeNomSimple_enUS_stored_string }}"
-    ISSUE_TITLE: "{{ JAVA_CLASS.hackathonTitle_stored_string | default(JAVA_CLASS.classeNomAffichage_enUS_stored_string) | default('Create the ' ~ JAVA_CLASS.classeNomSimple_enUS_stored_string ~ ' Java class') }}"
+    ISSUE_LABEL: "{{ JAVA_CLASS.hackathonLabel_stored_string | default('create_java_class_' ~ JAVA_CLASS.classeNomSimple_enUS_stored_string) }}"
+    ISSUE_TITLE: "{{ JAVA_CLASS.hackathonTitle_stored_string | default(CLASS_DISPLAY_NAME) | default('Create the ' ~ JAVA_CLASS.classeNomSimple_enUS_stored_string ~ ' Java class') }}"
     MILESTONE_TITLE: "{{ JAVA_CLASS.hackathonMilestone_stored_string | default('Software Development') }}"
     COLUMN_NAME: "{{ JAVA_CLASS.hackathonColumn_stored_string | default('Software Development') }}"
-- name: "Get milestone by title"
+- name: "Get milestone by title: {{ MILESTONE_TITLE }}"
   connection: local
   set_fact:
-    MILESTONE_TITLE_JSON: "{{ MILESTONES_JSON.json | json_query(milestone_query) | first | default(omit) }}"
+    MILESTONE_TITLE_JSON: "{{ MILESTONES_JSON.json | json_query(milestone_query) | default([]) | first | default(omit) }}"
   vars: 
     milestone_query: "[?title=='{{ MILESTONE_TITLE | default(omit) }}'].{title: title, description: description, number: number}"
   tags: always
@@ -28,7 +28,7 @@
 - name: Setup issue body
   set_fact: 
     ISSUE_BODY: |
-      # Mission {{ JAVA_CLASS.classeNomAffichage_enUS_stored_string | default(JAVA_CLASS.classeNomSimple_enUS_stored_string ~ ' Java class') }}
+      # Mission {{ CLASS_DISPLAY_NAME | default(JAVA_CLASS.classeNomSimple_enUS_stored_string ~ ' Java class') }}
 
       ![Mission:Impossible Open Data Policing](https://computate.neocities.org/gif/mission-impossible-opendatapolicing.gif "Mission:Impossible Open Data Policing")
 
@@ -185,7 +185,7 @@
       ## Create the {{ CLASS_PART.entiteVar_enUS_stored_string }} entity
       {% if CLASS_PART.entiteCommentaire_enUS_stored_string is defined %}
 
-      {{ CLASS_PART.entiteCommentaire_enUS_stored_string }}
+      {{ CLASS_PART.entiteCommentaire_enUS_stored_string | regex_replace('{([{%])', '\\{\\\1') | regex_replace('([\\\%])}', '\\\1\\}') }}
       {% endif %}
 
       ```java
@@ -197,10 +197,10 @@
       
       ```
       {% elif CLASS_PART.partEstMethode_stored_boolean is defined %}
-      ## Create the {{ CLASS_PART.methodeNomAffichage_enUS_stored_string | default(CLASS_PART.methodeVar_enUS_stored_string ~ ' method') }}
+      ## {{ CLASS_PART | json_query('methodeNomAffichage_enUS_stored_string') | regex_replace('{([{%])', '\\{\\\1') | regex_replace('([\\\%])}', '\\\1\\}') | default('Create the ' ~ CLASS_PART.methodeVar_enUS_stored_string ~ ' method') }}
       {% if CLASS_PART.methodeCommentaire_enUS_stored_string is defined %}
 
-      {{ CLASS_PART.methodeCommentaire_enUS_stored_string }}
+      {{ CLASS_PART.methodeCommentaire_enUS_stored_string | regex_replace('{([{%])', '\\{\\\1') | regex_replace('([\\\%])}', '\\\1\\}') }}
       {% endif %}
 
       {% if JAVA_CLASS.classeTypeContenu_stored_string is not defined %}
@@ -210,14 +210,14 @@
       ```
       {% else %}
       ```{{ JAVA_CLASS.classeTypeContenu_stored_string | regex_replace('.*/', '') }}
-      {{ CLASS_PART.methodeCodeSource_enUS_stored_string | replace('{{', '\{\{') | replace('}}', '\}\}') }}
+      {{ CLASS_PART.methodeCodeSource_enUS_stored_string | regex_replace('{([{%])', '\\{\\\1') | regex_replace('([\\\%])}', '\\\1\\}') }}
       ```
       {% endif %}
       {% elif CLASS_PART.partEstChamp_stored_boolean is defined %}
       ## Create the {{ CLASS_PART.champVar_enUS_stored_string }} field
       {% if CLASS_PART.champCommentaire_enUS_stored_string is defined %}
 
-      {{ CLASS_PART.champCommentaire_enUS_stored_string }}
+      {{ CLASS_PART.champCommentaire_enUS_stored_string | regex_replace('{([{%])', '\\{\\\1') | regex_replace('([\\\%])}', '\\\1\\}') }}
       {% endif %}
 
       ```java
@@ -237,6 +237,10 @@
   tags: 
     - "class{{ JAVA_CLASS.classeNomSimple_enUS_stored_string }}"
 
+- debug:
+    var: ISSUE_TITLE
+- debug:
+    var: ISSUE_BODY
 - block: 
     - name: "Create issue by label {{ ISSUE_LABEL }}"
       connection: local
@@ -252,7 +256,7 @@
           labels: 
             - "{{ ISSUE_LABEL }}"
           title: "{{ ISSUE_TITLE }}"
-          body: "{{ ISSUE_BODY | replace('\\{\\{', '{{') | replace('\\}\\}', '}}') }}"
+          body: "{{ ISSUE_BODY | regex_replace('\\\\\\{\\\\([\\{%])', '{\\1') | regex_replace('\\\\([\\}%])\\\\\\}', '\\1}') }}"
           milestone: "{{ MILESTONE_TITLE_JSON.number | default(omit) }}"
         status_code: 
           - 200
@@ -266,6 +270,7 @@
         CARD_CONTENT_ID: "{{ ISSUE_CREATE_JSON.json.id }}"
       tags: always
   connection: local
+  #ignore_errors: true
   when: COLUMN_NAME is defined and MILESTONE_TITLE_JSON is defined and (ISSUE_LABEL_JSON.json | length == 0)
   tags: always
 - block: 
@@ -283,7 +288,7 @@
           labels: 
             - "{{ ISSUE_LABEL }}"
           title: "{{ ISSUE_TITLE }}"
-          body: "{{ ISSUE_BODY | replace('\\{\\{', '{{') | replace('\\}\\}', '}}') }}"
+          body: "{{ ISSUE_BODY | regex_replace('\\\\\\{\\\\([\\{%])', '{\\1') | regex_replace('\\\\([\\}%])\\\\\\}', '\\1}') }}"
         status_code: 
           - 200
           - 201
@@ -296,6 +301,7 @@
         CARD_CONTENT_ID: "{{ ISSUE_CREATE_JSON.json.id }}"
       tags: always
   connection: local
+  #ignore_errors: true
   when: COLUMN_NAME is defined and MILESTONE_TITLE_JSON is not defined and (ISSUE_LABEL_JSON.json | length == 0)
   tags: always
 
@@ -314,7 +320,7 @@
           labels: 
             - "{{ ISSUE_LABEL }}"
           title: "{{ ISSUE_TITLE }}"
-          body: "{{ ISSUE_BODY | replace('\\{\\{', '{{') | replace('\\}\\}', '}}') }}"
+          body: "{{ ISSUE_BODY | regex_replace('\\\\\\{\\\\([\\{%])', '{\\1') | regex_replace('\\\\([\\}%])\\\\\\}', '\\1}') }}"
           milestone: "{{ MILESTONE_TITLE_JSON.number | default(omit) }}"
       register: ISSUE_CREATE_JSON
       tags: always
@@ -325,6 +331,7 @@
         CARD_CONTENT_ID: "{{ ISSUE_CREATE_JSON.json.id }}"
       tags: always
   connection: local
+  #ignore_errors: true
   when: COLUMN_NAME is defined and MILESTONE_TITLE_JSON is defined and (ISSUE_LABEL_JSON.json | length > 0)
   tags: always
 - block: 
@@ -342,7 +349,7 @@
           labels: 
             - "{{ ISSUE_LABEL }}"
           title: "{{ ISSUE_TITLE }}"
-          body: "{{ ISSUE_BODY | replace('\\{\\{', '{{') | replace('\\}\\}', '}}') }}"
+          body: "{{ ISSUE_BODY | regex_replace('\\\\\\{\\\\([\\{%])', '{\\1') | regex_replace('\\\\([\\}%])\\\\\\}', '\\1}') }}"
       register: ISSUE_CREATE_JSON
       tags: always
     - name: Create card
@@ -352,5 +359,6 @@
         CARD_CONTENT_ID: "{{ ISSUE_CREATE_JSON.json.id }}"
       tags: always
   connection: local
+  #ignore_errors: true
   when: COLUMN_NAME is defined and MILESTONE_TITLE_JSON is not defined and (ISSUE_LABEL_JSON.json | length > 0)
   tags: always
