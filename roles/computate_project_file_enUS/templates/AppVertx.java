@@ -654,9 +654,10 @@ public class AppVertx extends AppVertxGen<AbstractVerticle> {
 		Router siteRouter = siteContextEnUS.getRouter();
 
 		StaticHandler staticHandler = StaticHandler.create().setCachingEnabled(false).setFilesReadOnly(true);
-		if("southerncoalition-dev.heytate.com".equals(siteConfig.getSiteHostName())) {
+		String staticPath = siteConfig.getStaticPath();
+		if (staticPath != null) {
 			staticHandler.setAllowRootFileSystemAccess(true);
-			staticHandler.setWebRoot("/usr/local/src/southerncoalition-static");
+			staticHandler.setWebRoot(staticPath);
 		}
 		siteRouter.route("/static/*").handler(staticHandler);
 

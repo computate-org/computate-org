@@ -825,8 +825,10 @@ public class ApiWriter extends ApiWriterGen<Object> implements Comparable<ApiWri
 					wSchemas.tl(tabsSchema + 2, "- $ref: \"#/components/schemas/", classSuperApiOperationIdMethodRequest, "\"");
 				}
 				wSchemas.tl(tabsSchema + 2, "- type: object");
-				wSchemas.tl(tabsSchema + 3, "properties:");
-				wSchemas.s(wRequestSchema.toString());
+				if(!wRequestSchema.getEmpty()) {
+					wSchemas.tl(tabsSchema + 3, "properties:");
+					wSchemas.s(wRequestSchema.toString());
+				}
 			}
 	
 	//		if(classeMotsClesTrouves && classeMotsCles.contains(classApiMethod + ".response")) {

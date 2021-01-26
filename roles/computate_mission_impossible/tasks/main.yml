@@ -540,6 +540,8 @@
 #    url: "http://localhost:8983/solr/computate/select?rows=200&q=*:*&fq=partEstClasse_indexed_boolean:true&fq=appliNom_indexed_string:opendatapolicing&fq=classeNomSimple_enUS_indexed_string:Roles_generate_static_classes_tasks_generate_static_class"
 #    url: "http://localhost:8983/solr/computate/select?rows=200&q=*:*&fq=partEstClasse_indexed_boolean:true&fq=appliNom_indexed_string:opendatapolicing&fq=classeNomEnsemble_enUS_indexed_string:com.opendatapolicing.enus.ansible&fq=classeNomSimple_enUS_indexed_string:Roles_project_openshift_templates_project_route"
 #    url: "http://localhost:8983/solr/computate/select?rows=200&q=*:*&fq=partEstClasse_indexed_boolean:true&fq=appliNom_indexed_string:opendatapolicing&fq=classeNomEnsemble_enUS_indexed_string:com.opendatapolicing.enus.ansible"
+#    url: "http://localhost:8983/solr/computate/select?rows=200&q=*:*&fq=partEstClasse_indexed_boolean:true&fq=appliNom_indexed_string:opendatapolicing&fq=classeNomEnsemble_enUS_indexed_string:com.opendatapolicing.enus.docroot"
+#    url: "http://localhost:8983/solr/computate/select?rows=200&q=*:*&fq=partEstClasse_indexed_boolean:true&fq=appliNom_indexed_string:opendatapolicing&fq=classeNomSimple_enUS_indexed_string:SiteRequestEnUS"
     url: "http://localhost:8983/solr/computate/select?rows=300&q=*:*&fq=partEstClasse_indexed_boolean:true&fq=appliNom_indexed_string:opendatapolicing&fq=classeTraduire_indexed_boolean:true"
   register: JAVA_CLASSES
 - name: "Create issues for the {{ JAVA_CLASSES.json.response.docs | length }} Java classes"
@@ -547,6 +549,7 @@
     name: mission_impossible_issue
   vars: 
     JAVA_CLASS: "{{ item }}"
-    CLASS_DISPLAY_NAME: "{{ item | json_query('classeNomAffichage_enUS_stored_string') | replace('{{', '\\{\\{') | replace('}}', '\\}\\}') | default(omit) }}"
+    CLASS_DISPLAY_NAME: "{{ item.classeNomAffichage_enUS_stored_string | default('') | regex_replace('\\{([\\{%])', '\\\\{\\\\1') | regex_replace('([\\}%])\\}', '\\\\1\\\\}') }}"
+#    CLASS_DISPLAY_NAME: "{{ item | json_query('classeNomAffichage_enUS_stored_string') | replace('{{', '\\{\\{') | replace('}}', '\\}\\}') | default(omit) }}"
   when: item.classeNomSimple_enUS_stored_string not in ['Roles_generate_static_classes_tasks_generate_static_class', 'Roles_generate_static_classes_tasks_main', 'Generate_static_classes']
   loop: "{{ JAVA_CLASSES.json.response.docs }}"

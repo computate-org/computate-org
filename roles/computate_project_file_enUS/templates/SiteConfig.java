@@ -12,6 +12,8 @@ import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.commons.lang3.math.NumberUtils;
+
+import com.redhat.rhedar.wrap.Wrap;
 import {{ PROJECT_JAVA_PACKAGE }}.wrap.Wrap;
 
 
@@ -705,6 +707,15 @@ public class SiteConfig extends SiteConfigGen<Object> implements Serializable {
 			o = System.getenv(c.var);
 		else
 			o = StringUtils.defaultIfBlank(config.getString(prefixEscaped + c.var), "/static");
+		c.o(o);
+	}
+
+	protected void _staticPath(Wrap<String> c) {
+		String o;
+		if(config == null)
+			o = System.getenv(c.var);
+		else
+			o = config.getString(prefixEscaped + c.var);
 		c.o(o);
 	}
 

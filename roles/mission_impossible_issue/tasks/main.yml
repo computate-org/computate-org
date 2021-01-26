@@ -1,7 +1,16 @@
 - name: Setup issue vars
   set_fact: 
+    ISSUE_TITLE: "{{ JAVA_CLASS.hackathonTitle_stored_string | default(CLASS_DISPLAY_NAME) }}"
+    ISSUE_MISSION: "{{ JAVA_CLASS.hackathonMission_stored_string | default(CLASS_DISPLAY_NAME) }}"
+  when: CLASS_DISPLAY_NAME
+- name: Setup issue vars
+  set_fact: 
+    ISSUE_TITLE: "{{ JAVA_CLASS.hackathonTitle_stored_string | default('Create the ' ~ JAVA_CLASS.classeNomSimple_enUS_stored_string ~ ' Java class', true) }}"
+    ISSUE_MISSION: "{{ JAVA_CLASS.hackathonMission_stored_string | default('Create the ' ~ JAVA_CLASS.classeNomSimple_enUS_stored_string ~ ' Java class', true) }}"
+  when: not CLASS_DISPLAY_NAME
+- name: Setup issue vars
+  set_fact: 
     ISSUE_LABEL: "{{ JAVA_CLASS.hackathonLabel_stored_string | default('create_java_class_' ~ JAVA_CLASS.classeNomSimple_enUS_stored_string) }}"
-    ISSUE_TITLE: "{{ JAVA_CLASS.hackathonTitle_stored_string | default(CLASS_DISPLAY_NAME) | default('Create the ' ~ JAVA_CLASS.classeNomSimple_enUS_stored_string ~ ' Java class') }}"
     MILESTONE_TITLE: "{{ JAVA_CLASS.hackathonMilestone_stored_string | default('Software Development') }}"
     COLUMN_NAME: "{{ JAVA_CLASS.hackathonColumn_stored_string | default('Software Development') }}"
 - name: "Get milestone by title: {{ MILESTONE_TITLE }}"
@@ -28,7 +37,7 @@
 - name: Setup issue body
   set_fact: 
     ISSUE_BODY: |
-      # Mission {{ CLASS_DISPLAY_NAME | default(JAVA_CLASS.classeNomSimple_enUS_stored_string ~ ' Java class') }}
+      # Mission {{ ISSUE_TITLE }}
 
       ![Mission:Impossible Open Data Policing](https://computate.neocities.org/gif/mission-impossible-opendatapolicing.gif "Mission:Impossible Open Data Policing")
 
@@ -37,7 +46,7 @@
 
       {% endif %}
 
-      Your mission, should you choose to accept it, is {{ JAVA_CLASS.hackathonMission_stored_string | default("to create a new Java class " ~ JAVA_CLASS.classeNomSimpleSuper_enUS_stored_string) }}. 
+      Your mission, should you choose to accept it, is {{ ISSUE_MISSION }}. 
 
       The [Southern Coalition for Social Justice](https://southerncoalition.org/) needs you to solve one of the world's most challenging problems: 
 
@@ -74,6 +83,10 @@
       - From every mountainside, let freedom ring.
 
       - Should you, or any of your force be taken or compromised that day, you must report back as many changes as you have made, and any knowledge of your actions, by pull request or comments on the issue on the board. 
+
+      ## How to get started: 
+
+      Follow the instructions here to setup the project: https://github.com/{{ GITHUB_ORG }}/{{ GITHUB_REPO_NAME }}
 
       ## The details of your mission: 
 
@@ -205,12 +218,12 @@
 
       {% if JAVA_CLASS.classeTypeContenu_stored_string is not defined %}
       ```java
-      	{{ CLASS_PART.methodeVar_enUS_stored_string }}({% if CLASS_PART.methodeParamsVar_enUS_stored_strings is defined %}{% for i in range( CLASS_PART.methodeParamsVar_enUS_stored_strings | length ) %}{% if i > 0 %}, {% endif %}{{ CLASS_PART.methodeParamsNomSimpleComplet_enUS_stored_strings[i] }}{% if CLASS_PART.methodeParamsArgsVariables_stored_booleans[i] == true %}...{% else %} {% endif %}{{ CLASS_PART.methodeParamsVar_enUS_stored_strings[i] }}{% endfor %}{% endif %}) {% raw %}{{% endraw %}{{ CLASS_PART.methodeCodeSource_enUS_stored_string }}{% raw %}}{% endraw %}
+      	{{ CLASS_PART.methodeVar_enUS_stored_string }}({% if CLASS_PART.methodeParamsVar_enUS_stored_strings is defined %}{% for i in range( CLASS_PART.methodeParamsVar_enUS_stored_strings | length ) %}{% if i > 0 %}, {% endif %}{{ CLASS_PART.methodeParamsNomSimpleComplet_enUS_stored_strings[i] }}{% if CLASS_PART.methodeParamsArgsVariables_stored_booleans[i] == true %}...{% else %} {% endif %}{{ CLASS_PART.methodeParamsVar_enUS_stored_strings[i] }}{% endfor %}{% endif %}) {% raw %}{{% endraw %}{{ CLASS_PART.methodeCodeSource_enUS_stored_string | default('') }}{% raw %}}{% endraw %}
 
       ```
       {% else %}
       ```{{ JAVA_CLASS.classeTypeContenu_stored_string | regex_replace('.*/', '') }}
-      {{ CLASS_PART.methodeCodeSource_enUS_stored_string | regex_replace('{([{%])', '\\{\\\1') | regex_replace('([\\\%])}', '\\\1\\}') }}
+      {{ CLASS_PART.methodeCodeSource_enUS_stored_string | default('') | regex_replace('{([{%])', '\\{\\\1') | regex_replace('([\\\%])}', '\\\1\\}') }}
       ```
       {% endif %}
       {% elif CLASS_PART.partEstChamp_stored_boolean is defined %}
@@ -237,9 +250,23 @@
   tags: 
     - "class{{ JAVA_CLASS.classeNomSimple_enUS_stored_string }}"
 
-- debug:
+- name: CLASS_DISPLAY_NAME
+  debug:
+    var: CLASS_DISPLAY_NAME
+- name: ISSUE_LABEL
+  debug:
+    var: ISSUE_LABEL
+- name: ISSUE_TITLE
+  debug:
     var: ISSUE_TITLE
-- debug:
+- name: MILESTONE_TITLE
+  debug:
+    var: MILESTONE_TITLE
+- name: COLUMN_NAME
+  debug:
+    var: COLUMN_NAME
+- name: ISSUE_BODY
+  debug:
     var: ISSUE_BODY
 - block: 
     - name: "Create issue by label {{ ISSUE_LABEL }}"
