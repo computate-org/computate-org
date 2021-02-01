@@ -16,12 +16,8 @@ import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
-import {{ PROJECT_JAVA_PACKAGE }}.config.SiteConfig;
-import {{ PROJECT_JAVA_PACKAGE }}.context.SiteContextEnUS;
-import {{ PROJECT_JAVA_PACKAGE }}.request.api.ApiRequest;
-import {{ PROJECT_JAVA_PACKAGE }}.user.SiteUser;
-import {{ PROJECT_JAVA_PACKAGE }}.wrap.Wrap;
-import {{ PROJECT_JAVA_PACKAGE }}.writer.AllWriter;
+
+import com.redhat.rhedar.wrap.Wrap;
 
 import io.vertx.core.Vertx;
 import io.vertx.core.http.CaseInsensitiveHeaders;
@@ -162,6 +158,13 @@ public class SiteRequestEnUS extends SiteRequestEnUSGen<Object> implements Seria
 	protected void _userFullName(Wrap<String> c) {
 		if(jsonPrincipal != null) {
 			String o = jsonPrincipal.getString("name");
+			c.o(o);
+		}
+	}
+
+	protected void _userEmail(Wrap<String> c) {
+		if(jsonPrincipal != null) {
+			String o = jsonPrincipal.getString("email");
 			c.o(o);
 		}
 	}
