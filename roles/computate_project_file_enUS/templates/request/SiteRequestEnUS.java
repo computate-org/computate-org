@@ -17,50 +17,40 @@ import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 
-import com.redhat.rhedar.wrap.Wrap;
+import {{ PROJECT_JAVA_PACKAGE }}.request.api.ApiRequest;
+import {{ PROJECT_JAVA_PACKAGE }}.user.SiteUser;
+import {{ PROJECT_JAVA_PACKAGE }}.wrap.Wrap;
+import {{ PROJECT_JAVA_PACKAGE }}.writer.AllWriter;
 
-import io.vertx.core.Vertx;
-import io.vertx.core.AsyncResult;
-import io.vertx.core.Handler;
 import io.vertx.core.MultiMap;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.auth.User;
 import io.vertx.ext.web.api.service.ServiceRequest;
-import io.vertx.ext.web.api.service.ServiceResponse;
+import io.vertx.ext.web.client.WebClient;
 import io.vertx.sqlclient.SqlConnection;
 
 /**
  * Keyword: classSimpleNameSiteRequest
- */      
+ */        
 public class SiteRequestEnUS extends SiteRequestEnUSGen<Object> implements Serializable {
-
-	/**	
-	 *	The site context with global site information. 
-	 **/
-	protected void _siteContext_(Wrap<SiteContextEnUS> c) {
-	}
 
 	private static final Pattern PATTERN_SESSION = Pattern.compile("vertx-web.session=(\\w+)");
 
 	/**	
 	 *	The site configuration. 
 	 **/
-	protected void _siteConfig_(Wrap<SiteConfig> c) {
-		SiteConfig o = siteContext_.getSiteConfig();
-		c.o(o);
+	protected void _config(Wrap<JsonObject> c) {
 	}
 
 	protected void _siteRequest_(Wrap<SiteRequestEnUS> c) { 
 		c.o(this);
 	}
 
-	protected void _apiRequest_(Wrap<ApiRequest> c) { 
+	protected void _webClient(Wrap<WebClient> c) { 
 	}
 
-	protected void _vertx(Wrap<Vertx> c) {
-		if(siteContext_ != null)
-			c.o(siteContext_.getVertx());
+	protected void _apiRequest_(Wrap<ApiRequest> c) { 
 	}
 
 	protected void _jsonObject(Wrap<JsonObject> c) {
@@ -70,24 +60,6 @@ public class SiteRequestEnUS extends SiteRequestEnUSGen<Object> implements Seria
 	}
 
 	protected void _serviceRequest(Wrap<ServiceRequest> c) {
-	}
-
-	protected void _queryResponse(Wrap<QueryResponse> c) {
-		if(solrQuery != null) {
-			try {
-				QueryResponse o = siteContext_.getSolrClient().query(solrQuery);
-				c.o(o);
-			} catch (SolrServerException | IOException e) {
-				ExceptionUtils.rethrow(e);
-			}
-		}
-	}
-
-	protected void _searchResults(Wrap<SolrDocumentList> c) {
-		if(queryResponse != null) {
-			SolrDocumentList o = queryResponse.getResults();
-			c.o(o);
-		}
 	}
 
 	protected void _w(Wrap<AllWriter> c) {
@@ -174,9 +146,8 @@ public class SiteRequestEnUS extends SiteRequestEnUSGen<Object> implements Seria
 	}
 
 	protected void _userResource(Wrap<JsonObject> c) {
-		JsonObject o = Optional.ofNullable(jsonPrincipal).map(p -> p.getJsonObject("resource_access")).map(o1 -> o1.getJsonObject(
-				Optional.ofNullable(siteRequest_).map(r -> r.getSiteConfig_()).map(c1 -> c1.getAuthResource()).orElse("")
-				)).orElse(new JsonObject());
+		String authResource = config.getString("authResource");
+		JsonObject o = Optional.ofNullable(jsonPrincipal).map(p -> p.getJsonObject("resource_access")).map(o1 -> o1.getJsonObject(authResource)).orElse(new JsonObject());
 		c.o(o);
 	}
 
@@ -185,17 +156,6 @@ public class SiteRequestEnUS extends SiteRequestEnUSGen<Object> implements Seria
 		roles.stream().forEach(r -> {
 			addUserResourceRoles((String)r);
 		});
-	}
-
-	protected void _siteUser(Wrap<SiteUser> c) { 
-		if(userId != null) {
-			SiteUser o = new SiteUser();
-			o.setUserName(userName);
-			o.setUserFirstName(userFirstName);
-			o.setUserLastName(userLastName);
-			o.setUserId(userId);
-			c.o(o);
-		}
 	}
 
 	protected void _xmlStack(Stack<String> o) {}
@@ -229,15 +189,14 @@ public class SiteRequestEnUS extends SiteRequestEnUSGen<Object> implements Seria
 
 	public SiteRequestEnUS copy() {
 		SiteRequestEnUS o = new SiteRequestEnUS();
-		o.setSiteContext_(siteContext_);
-		o.setJsonObject(jsonObject);
-		o.setSolrQuery(solrQuery);
-		o.setServiceRequest(serviceRequest);
-		o.setUserKey(userKey);
-		o.setSolrDocument(solrDocument);
-		o.setPageAdmin(pageAdmin);
-		o.setRequestHeaders(requestHeaders);
-		o.setRequestVars(requestVars);
+		o.setJsonObject(jsonObject); // for copying the original data in the request
+		o.setConfig(config); // for site configuration info
+		o.setWebClient(webClient); // for performing searches
+		o.setServiceRequest(serviceRequest);  // for info about the original request
+		o.setUser(user); // The user principal
+		o.setUserKey(userKey); // The user primary key
+		o.setUserId(userId); // The user identifier in the authentication system
+		o.setApiRequest_(apiRequest_); // The current API request information
 		return o;
 	}
 }

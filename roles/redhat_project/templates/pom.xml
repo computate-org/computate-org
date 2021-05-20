@@ -81,6 +81,9 @@
 {% if DEPENDENCY.scope is defined %}
                 <scope>{{ DEPENDENCY.scope }}</scope>
 {% endif %}
+{% if DEPENDENCY.classifier is defined %}
+                <classifier>{{ DEPENDENCY.classifier }}</classifier>
+{% endif %}
             </dependency>
 {% endfor %}
         </dependencies>

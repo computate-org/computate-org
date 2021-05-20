@@ -6,6 +6,7 @@ import java.util.List;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrQuery.ORDER;
 import org.apache.solr.client.solrj.response.QueryResponse;
@@ -13,19 +14,12 @@ import org.apache.solr.client.solrj.util.ClientUtils;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 
-import com.redhat.rhedar.config.SiteConfig;
-import com.redhat.rhedar.context.SiteContextEnUS;
-import com.redhat.rhedar.request.SiteRequestEnUS;
-import com.redhat.rhedar.vertx.AppSwagger2;
-import com.redhat.rhedar.wrap.Wrap;
-import com.redhat.rhedar.writer.AllWriter;
-import com.redhat.rhedar.writer.AllWriters;
-import com.redhat.rhedar.writer.ApiWriter;
-import {{ PROJECT_JAVA_PACKAGE }}.config.SiteConfig;
-import {{ PROJECT_JAVA_PACKAGE }}.context.SiteContextEnUS;
+import {{ PROJECT_JAVA_PACKAGE }}.config.ConfigKeys;
 import {{ PROJECT_JAVA_PACKAGE }}.request.SiteRequestEnUS;
 import {{ PROJECT_JAVA_PACKAGE }}.vertx.AppSwagger2;
 import {{ PROJECT_JAVA_PACKAGE }}.wrap.Wrap;
+
+import io.vertx.core.json.JsonObject;
 
 public class ApiWriter extends ApiWriterGen<Object> implements Comparable<ApiWriter> {
 

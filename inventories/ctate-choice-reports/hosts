@@ -2,9 +2,9 @@
 all: 
   vars: 
     PROJECT_LANG: enUS
-    PROJECT_SRC: /usr/local/src/opendatapolicing
-    PROJECT_POM_GROUP_ID: com.opendatapolicing
-    PROJECT_POM_ARTIFACT_ID_ROOT: opendatapolicing
+    PROJECT_SRC: /usr/local/src/choice-reports
+    PROJECT_POM_GROUP_ID: org.choicehumanitarian.reports
+    PROJECT_POM_ARTIFACT_ID_ROOT: choice-reports
     PROJECT_POM_VERSION: "${revision}"
     PROJECT_POM_VERSION_PREFIX: "1.0.0.0"
     PROJECT_POM_VERSION_SUFFIX_LOCAL: ".local"
@@ -12,7 +12,7 @@ all:
     PROJECTS: 
 
       ####################
-      # opendatapolicing #
+      # choice-reports #
       ####################
 
       - PROJECT_SRC: "{{ PROJECT_SRC }}"
@@ -20,20 +20,16 @@ all:
           template: "pom.xml"
           groupId: "{{ PROJECT_POM_GROUP_ID }}"
           artifactId: "{{ PROJECT_POM_ARTIFACT_ID_ROOT }}"
-          name: "Open Data Policing"
-          description: "To aggregate, visualize, and publish the public records related to all known traffic stops to make stop, search, and use-of-force data publicly available to ensure transparency. "
+          name: "CHOICE Humanitarian Reports"
+          description: "CHOICE Humanitarian report generation and management tool. "
           version: "{{ PROJECT_POM_VERSION }}"
           properties: 
-            - name: baseRevision
-              value: "{{ PROJECT_POM_VERSION_PREFIX }}"
-            - name: revision
-              value: "${baseRevision}{{ PROJECT_POM_VERSION_SUFFIX_LOCAL }}"
-            - name: maven.min.version
-              value: 3.3.9
             - name: project.build.sourceEncoding
               value: UTF-8
             - name: project.reporting.outputEncoding
               value: UTF-8
+            - name: maven.min.version
+              value: 3.3.9
             - name: maven.compiler.source
               value: 1.8
             - name: maven.compiler.target
@@ -70,7 +66,7 @@ all:
             - name: exec-maven-plugin.version
               value: 1.5.0
             - name: vertx.version
-              value: 3.8.5
+              value: 4.0.3
 
           dependencyManagement: 
             - groupId: io.vertx
@@ -88,6 +84,7 @@ all:
             - groupId: commons-beanutils
               artifactId: commons-beanutils
               version: 1.9.4
+              commentGroup: Apache Commons
             - groupId: org.apache.commons
               artifactId: commons-configuration2
               version: 2.7
@@ -104,12 +101,15 @@ all:
               artifactId: "postgresql"
               commentGroup: "PostgreSQL"
               version: ${postgresql.version}
+              commentGroup: PostgreSQL
             - groupId: org.apache.solr
               artifactId: solr-solrj
               version: 8.4.1
+              commentGroup: Solr
             - groupId: org.xhtmlrenderer
               artifactId: flying-saucer-core
               version: 9.1.19
+              commentGroup: Flying Saucer PDF
             - groupId: org.xhtmlrenderer
               artifactId: flying-saucer-swt
               version: 9.1.19
@@ -125,8 +125,13 @@ all:
 
             - groupId: io.vertx
               artifactId: vertx-core
+              commentGroup: Vert.X
             - groupId: io.vertx
               artifactId: vertx-web
+            - groupId: io.vertx
+              artifactId: vertx-web-templ-handlebars
+            - groupId: io.vertx
+              artifactId: vertx-zookeeper
             - groupId: io.vertx
               artifactId: vertx-pg-client
             - groupId: io.vertx
@@ -134,17 +139,22 @@ all:
             - groupId: io.vertx
               artifactId: vertx-reactive-streams
             - groupId: io.vertx
-              artifactId: vertx-sql-common
-            - groupId: io.vertx
-              artifactId: vertx-web-api-contract
+              artifactId: vertx-web-openapi
             - groupId: io.vertx
               artifactId: vertx-codegen
+              classifier: processor
             - groupId: io.vertx
               artifactId: vertx-service-proxy
             - groupId: io.vertx
               artifactId: vertx-web-api-service
             - groupId: io.vertx
+              artifactId: vertx-web-client
+            - groupId: io.vertx
               artifactId: vertx-mail-client
+            - groupId: io.vertx
+              artifactId: vertx-jdbc-client
+            - groupId: io.vertx
+              artifactId: vertx-config
             - groupId: io.vertx
               artifactId: vertx-health-check
 
@@ -157,6 +167,7 @@ all:
             - groupId: org.jfree
               artifactId: jfreechart
               version: 1.5.0
+              commentGroup: Charts
             - groupId: junit
               artifactId: junit
               version: ${junit.version}
@@ -196,54 +207,6 @@ all:
                       sources: 
                         - src/gen/java
                         - target/generated-sources/annotations
-          profiles: 
-            - id: jenkins
-              activation: 
-                property: 
-                  - name: env.BUILD_NUMBER
-              properties: 
-                - name: revision
-                  value: ${baseRevision}.${env.BUILD_NUMBER}
-            - id: openshift
-#              build:
-#                plugins:
-#                  - groupId: org.apache.maven.plugins
-#                    artifactId: maven-shade-plugin
-#                    version: ${maven-shade-plugin.version}
-#                    executions:
-#                      - phase: package
-#                        goals:
-#                          - shade
-#                        configuration:
-#                          filters:
-#                            - artifact: "*:*"
-#                              excludes:
-#                                - META-INF/*.SF
-#                                - META-INF/*.DSA
-#                                - META-INF/*.RSA
-#                          transformers:
-#                            - implementation: org.apache.maven.plugins.shade.resource.ManifestResourceTransformer
-#                  - groupId: org.apache.maven.plugins
-#                    artifactId: maven-jarsigner-plugin
-#                    version: ${maven-jarsigner-plugin.version}
-#                    executions:
-#                      - id: sign
-#                        goals:
-#                          - sign
-#                      - id: verify
-#                        goals:
-#                          - verify
-#                    configuration:
-#                      keystore: ${keystore-path}
-#                      alias: ${keystore-alias}
-#                      storepass: ${keystore-storepass}
-#                      keypass: ${keystore-keypass}
-              activation: 
-                property: 
-                  - name: env.BUILD_NUMBER
-              properties: 
-                - name: revision
-                  value: ${baseRevision}.${env.BUILD_NUMBER}
         PROJECT_FILES: 
           - path: "{{ PROJECT_SRC }}/src/main/java/{{ PROJECT_JAVA_PACKAGE | replace('.', '/') }}/config/ConfigKeys.java"
             template: config/ConfigKeys.java
@@ -279,13 +242,13 @@ all:
           - path: "{{ PROJECT_SRC }}/src/main/java/{{ PROJECT_JAVA_PACKAGE | replace('.', '/') }}/base/BaseModel.java"
             template: base/BaseModel.java
           - path: "{{ PROJECT_SRC }}/src/main/java/{{ PROJECT_JAVA_PACKAGE | replace('.', '/') }}/java/LocalDateSerializer.java"
-            template: LocalDateSerializer.java
+            template: java/LocalDateSerializer.java
           - path: "{{ PROJECT_SRC }}/src/main/java/{{ PROJECT_JAVA_PACKAGE | replace('.', '/') }}/java/LocalTimeSerializer.java"
-            template: LocalTimeSerializer.java
+            template: java/LocalTimeSerializer.java
           - path: "{{ PROJECT_SRC }}/src/main/java/{{ PROJECT_JAVA_PACKAGE | replace('.', '/') }}/java/ZonedDateTimeSerializer.java"
-            template: ZonedDateTimeSerializer.java
+            template: java/ZonedDateTimeSerializer.java
           - path: "{{ PROJECT_SRC }}/src/main/java/{{ PROJECT_JAVA_PACKAGE | replace('.', '/') }}/java/ZonedDateTimeDeserializer.java"
-            template: ZonedDateTimeDeserializer.java
+            template: java/ZonedDateTimeDeserializer.java
 redhat_project: 
   hosts: 
     localhost.localdomain: 

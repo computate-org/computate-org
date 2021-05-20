@@ -12,13 +12,13 @@ import {{ PROJECT_JAVA_PACKAGE }}.wrap.Wrap;
  * Keyword: classSimpleNameApiRequest
  */
 public class ApiRequest extends ApiRequestGen<Object> {
-
+	
 	/**
 	 * {@inheritDoc}
 	 * Ignore: true
 	 */
 	protected void _siteRequest_(Wrap<SiteRequestEnUS> c) {}
-
+	
 	protected void _created(Wrap<ZonedDateTime> c) {
 		c.o(ZonedDateTime.now());
 	}
@@ -39,10 +39,6 @@ public class ApiRequest extends ApiRequestGen<Object> {
 
 	protected void _id(Wrap<String> c) {
 		c.o("PATCH-" + uuid);
-	}
-
-	protected void _empty(Wrap<Boolean> c) {
-		c.o(Optional.ofNullable(siteRequest_).map(SiteRequestEnUS::getJsonObject).map(b -> b.size()).orElse(0) == 0);
 	}
 
 	protected void _pk(Wrap<Long> c) {

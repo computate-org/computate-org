@@ -1,4 +1,4 @@
-package {{ PROJECT_JAVA_PACKAGE }}.cluster;     
+package {{ PROJECT_JAVA_PACKAGE }}.base;
 
 import java.text.Normalizer;
 import java.time.ZoneId;
@@ -24,19 +24,6 @@ import {{ PROJECT_JAVA_PACKAGE }}.xml.UtilXml;
  * Api: true
  * Indexed: true
  * 
- * ApiTag.enUS: Cluster
- * ApiUri.enUS: /api/cluster
- * 
- * ApiMethod: POST
- * ApiMethod: PUT
- * ApiMethod: PATCH
- * ApiMethod: GET
- * ApiMethod.enUS: Search
- * 
- * ApiMethode.enUS: SearchPage
- * PageSearchPage.enUS: ClusterPage
- * ApiUriSearchPage.enUS: /cluster
- * 
  * AName.enUS: a cluster
  * Color: gray
  * IconGroup: regular
@@ -48,7 +35,7 @@ import {{ PROJECT_JAVA_PACKAGE }}.xml.UtilXml;
  * Role.enUS: SiteAdmin
  * RoleRead.enUS: User
  */  
-public class Cluster extends ClusterGen<Object> {       
+public class BaseModel extends BaseModelGen<Object> {       
 
 	/**
 	 * {@inheritDoc}
@@ -177,9 +164,9 @@ public class Cluster extends ClusterGen<Object> {
 	 */ 
 	protected void _classCanonicalNames(List<String> l) { 
 		Class<?> cl = getClass();
-		if(!cl.equals(Cluster.class))
+		if(!cl.equals(BaseModel.class))
 			l.add(cl.getCanonicalName());
-		l.add(Cluster.class.getCanonicalName());
+		l.add(BaseModel.class.getCanonicalName());
 	}
 
 	/**
@@ -357,185 +344,5 @@ public class Cluster extends ClusterGen<Object> {
 		} catch (Exception e) {
 			ExceptionUtils.rethrow(e);
 		}
-	}
-
-	public Cluster e(String localName) {
-		AllWriter w = siteRequest_.getW();
-		String localNameParent = siteRequest_.getXmlStack().isEmpty() ? null : siteRequest_.getXmlStack().peek();
-
-		boolean eNoWrapParent = localNameParent == null || PageLayout.HTML_ELEMENTS_NO_WRAP.contains(localNameParent);
-		String tabs = String.join("", Collections.nCopies(siteRequest_.getXmlStack().size(), "  "));
-
-		siteRequest_.getXmlStack().push(localName);
-		if(StringUtils.equals(localName, "html"))
-			w.s("<!DOCTYPE html>\n");
-		if(!eNoWrapParent && !tabs.isEmpty()) {
-			w.l();
-			w.s(tabs);
-		}
-		w.s("<");
-		w.s(localName);
-		
-		return this;
-	}
-
-	public Cluster a1(String attributeName, Object...objects) {
-		AllWriter w = siteRequest_.getW();
-		w.s(" ");
-		w.s(attributeName);
-		w.s("=\"");
-		for(Object object : objects) {
-			if(object != null) {
-				String s = object.toString();
-				w.s(UtilXml.escapeInQuotes(s));
-			}
-		}
-		
-		return this;
-	}
-
-	public Cluster a(String attributeName, Object...objects) {
-		AllWriter w = siteRequest_.getW();
-		w.s(" ");
-		w.s(attributeName);
-		w.s("=\"");
-		for(Object object : objects) {
-			if(object != null) {
-				String s = object.toString();
-				w.s(UtilXml.escapeInQuotes(s));
-			}
-		}
-		w.s("\"");
-		
-		return this;
-	}
-
-	public Cluster a2() {
-		AllWriter w = siteRequest_.getW();
-		w.s("\"");
-		
-		return this;
-	}
-
-	public Cluster f() {
-		AllWriter w = siteRequest_.getW();
-		w.s(">");
-		
-		return this;
-	}
-
-	public Cluster s(Object...objects) {
-		AllWriter w = siteRequest_.getW();
-		for(Object object : objects) {
-			if(object != null) {
-				String s = object.toString();
-				w.s(s);
-			}
-		}
-		
-		return this;
-	}
-
-	public Cluster t(int numberTabs, Object...objects) {
-		for(int i = 0; i < numberTabs; i++)
-			s("  ");
-		s(objects);
-		return this;
-	}
-
-	public Cluster tl(int numberTabs, Object...objects) {
-		for(int i = 0; i < numberTabs; i++)
-			s("  ");
-		s(objects);
-		s("\n");
-		return this;
-	}
-
-	public Cluster l(Object...objects) {
-		s(objects);
-		s("\n");
-		return this;
-	}
-
-	public Cluster lx(Object...objects) {
-		s(objects);
-		sx("\n");
-		return this;
-	}
-
-	public Cluster sx(Object...objects) {
-		AllWriter w = siteRequest_.getW();
-		for(Object object : objects) {
-			if(object != null) {
-				String s = object.toString();
-				w.s(UtilXml.escape(s));
-			}
-		}
-		
-		return this;
-	}
-
-	public Cluster tx(int numberTabs, Object...objects) {
-		for(int i = 0; i < numberTabs; i++)
-			sx("  ");
-		sx(objects);
-		return this;
-	}
-
-	public Cluster tlx(int numberTabs, Object...objects) {
-		for(int i = 0; i < numberTabs; i++)
-			sx("  ");
-		sx(objects);
-		sx("\n");
-		return this;
-	}
-
-	public Cluster fg() {
-		AllWriter w = siteRequest_.getW();
-		w.s("/>");
-		siteRequest_.getXmlStack().pop();
-		
-		return this;
-	}
-
-	public Cluster g(String localName) {
-		AllWriter w = siteRequest_.getW();
-		String localNameParent = siteRequest_.getXmlStack().peek();
-		boolean eNoWrap = localNameParent == null || PageLayout.HTML_ELEMENTS_NO_WRAP.contains(localName);
-
-		siteRequest_.getXmlStack().pop();
-		String tabs = String.join("", Collections.nCopies(siteRequest_.getXmlStack().size(), "  "));
-
-		if(!eNoWrap || localNameParent == null)
-			w.l();
-		if(!eNoWrap && !tabs.isEmpty())
-			w.s(tabs);
-		w.s("</");
-		w.s(localName);
-		w.s(">");
-		
-		return this;
-	}
-
-	@Override public void htmPk(String classApiMethodMethod) {
-		Cluster s = (Cluster)this;
-		{ s.e("div").a("class", "w3-cell w3-cell-top w3-center w3-mobile ").f();
-			if("Page".equals(classApiMethodMethod)) {
-				{ s.e("div").a("class", "w3-padding ").f();
-					{ s.e("div").a("class", "w3-card ").f();
-						{ s.e("div").a("class", "w3-cell-row w3- ").f();
-							s.e("label").a("class", "").f().sx("primary key").g("label");
-						} s.g("div");
-						{ s.e("div").a("class", "w3-cell-row  ").f();
-							{ s.e("div").a("class", "w3-cell ").f();
-								{ s.e("div").a("class", "w3-rest ").f();
-									s.e("a").a("href", StringUtils.substringBeforeLast(pageUrlApi, "/"), "?fq=pk:", pk).a("class", "varCluster", pk, "Pk ").f().sx(strPk()).g("a");
-								} s.g("div");
-							} s.g("div");
-						} s.g("div");
-					} s.g("div");
-				} s.g("div");
-			}
-		} s.g("div");
 	}
 }

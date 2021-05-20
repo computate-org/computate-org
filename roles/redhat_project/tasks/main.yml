@@ -2,8 +2,8 @@
   file:
     name: "{{ item.PROJECT_SRC }}"
     state: directory
-    owner: "{{ USER_NAME }}"
-    group: "{{ USER_NAME }}"
+    owner: "{{ lookup('env', 'USER') }}"
+    group: "{{ lookup('env', 'USER') }}"
   become: yes
   loop: "{{ PROJECTS }}"
 - name: Create the pom.xml

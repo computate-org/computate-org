@@ -1,3 +1,5 @@
+package {{ PROJECT_JAVA_PACKAGE }}.vertx;
+
 import java.io.File;
 import java.util.Iterator;
 
@@ -6,18 +8,13 @@ import org.apache.commons.configuration2.builder.fluent.Configurations;
 import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.apache.solr.client.solrj.impl.HttpSolrClient;
 
-import com.redhat.rhedar.context.SiteContextEnUS;
-import com.redhat.rhedar.request.SiteRequestEnUS;
-import com.redhat.rhedar.vertx.AppOpenApi3;
-
-import io.vertx.core.json.JsonObject;
-
-package {{ PROJECT_JAVA_PACKAGE }}.vertx;
-
-import {{ PROJECT_JAVA_PACKAGE }}.context.SiteContextEnUS;
+import {{ PROJECT_JAVA_PACKAGE }}.config.ConfigKeys;
 import {{ PROJECT_JAVA_PACKAGE }}.request.SiteRequestEnUS;
 import {{ PROJECT_JAVA_PACKAGE }}.wrap.Wrap;
+
+import io.vertx.core.json.JsonObject;
 
 public class AppOpenApi3 extends AppOpenApi3Gen<AppSwagger2> {
 
@@ -46,12 +43,11 @@ public class AppOpenApi3 extends AppOpenApi3Gen<AppSwagger2> {
 				}
 
 				AppOpenApi3 api = new AppOpenApi3();
-				SiteContextEnUS siteContext = api.getSiteContext();
-				siteContext.getSiteConfig().setConfig(config);
-				siteContext.initDeepSiteContextEnUS(null);
+				HttpSolrClient solrClientComputate = new HttpSolrClient.Builder(config.getString(ConfigKeys.SOLR_URL_COMPUTATE)).build();
 				SiteRequestEnUS siteRequest = new SiteRequestEnUS();
-				siteRequest.setSiteContext_(siteContext);
-				siteRequest.setSiteConfig_(siteContext.getSiteConfig());
+				siteRequest.setConfig(config);
+				api.setSolrClientComputate(solrClientComputate);
+				api.setConfig(config);
 				siteRequest.initDeepSiteRequestEnUS();
 				api.initDeepAppOpenApi3(siteRequest);
 				api.writeOpenApi();
