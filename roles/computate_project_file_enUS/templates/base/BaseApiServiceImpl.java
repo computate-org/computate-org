@@ -1,4 +1,4 @@
-package {{ PROJECT_JAVA_PACKAGE }}.cluster;     
+package {{ PROJECT_JAVA_PACKAGE }}.base;
 
 import java.util.List;
 import java.util.Optional;

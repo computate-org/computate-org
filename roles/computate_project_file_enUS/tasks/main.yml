@@ -7,7 +7,7 @@
     path: "{{ FILE.path }}"
   register: FILE_EXISTS
 - name: "Create the project file {{ FILE.template }}"
-  template:
-    src: "{{ FILE.template }}"
+  copy:
+    content: "{{ lookup('template', FILE.template) | replace('\\{\\{','{{') | replace('\\}\\}', '}}') }}"
     dest: "{{ FILE.path }}"
   when: (FILE.once is not defined or FILE.once == false) or FILE_EXISTS.stat.exists == false

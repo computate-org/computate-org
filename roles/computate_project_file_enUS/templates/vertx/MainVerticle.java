@@ -20,7 +20,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.module.SimpleModule;
-import {{ PROJECT_JAVA_PACKAGE }}.agency.SiteAgencyEnUSGenApiService;
 import {{ PROJECT_JAVA_PACKAGE }}.config.ConfigKeys;
 import {{ PROJECT_JAVA_PACKAGE }}.java.LocalDateSerializer;
 import {{ PROJECT_JAVA_PACKAGE }}.java.LocalTimeSerializer;
@@ -28,7 +27,6 @@ import {{ PROJECT_JAVA_PACKAGE }}.java.ZonedDateTimeDeserializer;
 import {{ PROJECT_JAVA_PACKAGE }}.java.ZonedDateTimeSerializer;
 import {{ PROJECT_JAVA_PACKAGE }}.request.SiteRequestEnUS;
 import {{ PROJECT_JAVA_PACKAGE }}.search.SearchList;
-import {{ PROJECT_JAVA_PACKAGE }}.searchbasis.SearchBasisEnUSGenApiService;
 import {{ PROJECT_JAVA_PACKAGE }}.user.SiteUserEnUSGenApiService;
 
 import io.vertx.config.ConfigRetriever;
@@ -87,8 +85,8 @@ import io.vertx.sqlclient.PoolOptions;
  *	A Java class to start the Vert.x application as a main method. 
  * Keyword: classSimpleNameVerticle
  **/
-public class AppVertx extends AppVertxGen<AbstractVerticle> {
-	private static final Logger LOG = LoggerFactory.getLogger(AppVertx.class);
+public class MainVerticle extends MainVerticleGen<AbstractVerticle> {
+	private static final Logger LOG = LoggerFactory.getLogger(MainVerticle.class);
 
 	public final DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
 
@@ -123,7 +121,7 @@ public class AppVertx extends AppVertxGen<AbstractVerticle> {
 
 	public static final String CONFIG_staticPath = "staticPath";
 
-	public AppVertx setSemaphore(Semaphore semaphore) {
+	public MainVerticle setSemaphore(Semaphore semaphore) {
 		this.semaphore = semaphore;
 		return this;
 	}
@@ -205,7 +203,7 @@ public class AppVertx extends AppVertxGen<AbstractVerticle> {
 
 		Consumer<Vertx> runner = vertx -> {
 			for(Integer i = 0; i < siteInstances; i++) {
-				vertx.deployVerticle(new AppVertx().setSemaphore(semaphore), deploymentOptions);
+				vertx.deployVerticle(new MainVerticle().setSemaphore(semaphore), deploymentOptions);
 			}
 			vertx.deployVerticle(new MailVerticle(), mailVerticleDeploymentOptions);
 			vertx.deployVerticle(new WorkerVerticle().setSemaphore(semaphore), workerVerticleDeploymentOptions);

@@ -16,8 +16,11 @@ import org.apache.solr.client.solrj.util.ClientUtils;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 
-import com.opendatapolicing.enus.config.ConfigKeys;
-import com.opendatapolicing.enus.wrap.Wrap;
+import {{ PROJECT_JAVA_PACKAGE }}.config.ConfigKeys;
+import {{ PROJECT_JAVA_PACKAGE }}.request.SiteRequestEnUS;
+import {{ PROJECT_JAVA_PACKAGE }}.wrap.Wrap;
+import {{ PROJECT_JAVA_PACKAGE }}.writer.AllWriter;
+import {{ PROJECT_JAVA_PACKAGE }}.writer.ApiWriter;
 
 import io.vertx.core.json.JsonObject;
 

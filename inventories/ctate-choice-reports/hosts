@@ -1,13 +1,15 @@
 
 all: 
   vars: 
+    GITHUB_ORG: CHOICE-Humanitarian
+    PROJECT_NAME: choice-reports
     PROJECT_LANG: enUS
-    PROJECT_SRC: /usr/local/src/choice-reports
+    PROJECT_SRC: "/usr/local/src/{{ PROJECT_NAME }}"
     PROJECT_POM_GROUP_ID: org.choicehumanitarian.reports
-    PROJECT_POM_ARTIFACT_ID_ROOT: choice-reports
-    PROJECT_POM_VERSION: "${revision}"
-    PROJECT_POM_VERSION_PREFIX: "1.0.0.0"
-    PROJECT_POM_VERSION_SUFFIX_LOCAL: ".local"
+    PROJECT_POM_ARTIFACT_ID_ROOT: "{{ PROJECT_NAME }}"
+    PROJECT_POM_VERSION_PREFIX: "1.0.0"
+    PROJECT_POM_VERSION_SUFFIX: "-SNAPSHOT"
+    PROJECT_POM_VERSION: "{{ PROJECT_POM_VERSION_PREFIX }}{{ PROJECT_POM_VERSION_SUFFIX }}"
     PROJECT_JAVA_PACKAGE: "{{ PROJECT_POM_GROUP_ID }}.enus"
     PROJECTS: 
 
@@ -15,7 +17,9 @@ all:
       # choice-reports #
       ####################
 
-      - PROJECT_SRC: "{{ PROJECT_SRC }}"
+      - GITHUB_ORG: "{{ GITHUB_ORG }}"
+        PROJECT_NAME: "{{ PROJECT_NAME }}"
+        PROJECT_SRC: "{{ PROJECT_SRC }}"
         PROJECT_POM: 
           template: "pom.xml"
           groupId: "{{ PROJECT_POM_GROUP_ID }}"
@@ -54,6 +58,8 @@ all:
               value: 1.0.0
             - name: postgresql.version
               value: 42.2.2.jre7
+            - name: solr.version
+              value: 8.4.1
 
             #######################
             # Vert.X dependencies #
@@ -101,11 +107,13 @@ all:
               artifactId: "postgresql"
               commentGroup: "PostgreSQL"
               version: ${postgresql.version}
-              commentGroup: PostgreSQL
+            - groupId: org.apache.solr
+              artifactId: solr-core
+              version: ${solr.version}
+              commentGroup: Solr
             - groupId: org.apache.solr
               artifactId: solr-solrj
-              version: 8.4.1
-              commentGroup: Solr
+              version: ${solr.version}
             - groupId: org.xhtmlrenderer
               artifactId: flying-saucer-core
               version: 9.1.19
@@ -208,6 +216,10 @@ all:
                         - src/gen/java
                         - target/generated-sources/annotations
         PROJECT_FILES: 
+          - path: "{{ PROJECT_SRC }}/install_project_ansible_playbook.yml"
+            template: ansible/install_project_ansible_playbook.yml
+          - path: "{{ PROJECT_SRC }}/src/main/java/{{ PROJECT_POM_GROUP_ID | replace('.', '/') }}/package-info.java"
+            template: package-info.java
           - path: "{{ PROJECT_SRC }}/src/main/java/{{ PROJECT_JAVA_PACKAGE | replace('.', '/') }}/config/ConfigKeys.java"
             template: config/ConfigKeys.java
           - path: "{{ PROJECT_SRC }}/src/main/java/{{ PROJECT_JAVA_PACKAGE | replace('.', '/') }}/vertx/MailVerticle.java"
@@ -236,6 +248,9 @@ all:
             template: vertx/AppSwagger2.java
           - path: "{{ PROJECT_SRC }}/src/main/java/{{ PROJECT_JAVA_PACKAGE | replace('.', '/') }}/vertx/MainVerticle.java"
             template: vertx/MainVerticle.java
+            once: true
+          - path: "{{ PROJECT_SRC }}/src/main/java/{{ PROJECT_JAVA_PACKAGE | replace('.', '/') }}/vertx/WorkerVerticle.java"
+            template: vertx/WorkerVerticle.java
             once: true
           - path: "{{ PROJECT_SRC }}/src/main/java/{{ PROJECT_JAVA_PACKAGE | replace('.', '/') }}/user/SiteUser.java"
             template: user/SiteUser.java
