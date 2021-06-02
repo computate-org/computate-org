@@ -1,4 +1,4 @@
-package {{ PROJECT_JAVA_PACKAGE }}.user;
+package {{ PROJECT_JAVA_PACKAGE }}.user;  
 
 import java.util.List;
 

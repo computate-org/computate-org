@@ -6,6 +6,7 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
@@ -20,14 +21,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.module.SimpleModule;
-import {{ PROJECT_JAVA_PACKAGE }}.config.ConfigKeys;
-import {{ PROJECT_JAVA_PACKAGE }}.java.LocalDateSerializer;
-import {{ PROJECT_JAVA_PACKAGE }}.java.LocalTimeSerializer;
-import {{ PROJECT_JAVA_PACKAGE }}.java.ZonedDateTimeDeserializer;
-import {{ PROJECT_JAVA_PACKAGE }}.java.ZonedDateTimeSerializer;
-import {{ PROJECT_JAVA_PACKAGE }}.request.SiteRequestEnUS;
-import {{ PROJECT_JAVA_PACKAGE }}.search.SearchList;
-import {{ PROJECT_JAVA_PACKAGE }}.user.SiteUserEnUSGenApiService;
+import com.opendatapolicing.enus.config.ConfigKeys;
 
 import io.vertx.config.ConfigRetriever;
 import io.vertx.config.ConfigRetrieverOptions;
@@ -138,15 +132,15 @@ public class MainVerticle extends MainVerticleGen<AbstractVerticle> {
 		Semaphore semaphore = new Semaphore(semaphorePermits);
 
 		JsonObject zkConfig = new JsonObject();
-		String zookeeperHostName = System.getenv("zookeeperHostName");
-		Integer zookeeperPort = Integer.parseInt(System.getenv("zookeeperPort"));
+		String zookeeperHostName = System.getenv(ConfigKeys.ZOOKEEPER_HOST_NAME);
+		Integer zookeeperPort = Integer.parseInt(Optional.ofNullable(System.getenv(ConfigKeys.ZOOKEEPER_PORT)).orElse("2181"));
+		String zookeeperHosts = zookeeperHostName + ":" + zookeeperPort;
 		Integer clusterPort = System.getenv("clusterPort") == null ? null : Integer.parseInt(System.getenv("clusterPort"));
 		String clusterHost = System.getenv("clusterHost");
 		Integer clusterPublicPort = System.getenv("clusterPublicPort") == null ? null : Integer.parseInt(System.getenv("clusterPublicPort"));
 		Integer siteInstances = System.getenv("siteInstances") == null ? 1 : Integer.parseInt(System.getenv("siteInstances"));
 		Long vertxWarningExceptionSeconds = System.getenv("vertxWarningExceptionSeconds") == null ? 10 : Long.parseLong(System.getenv("vertxWarningExceptionSeconds"));
 		String clusterPublicHost = System.getenv("clusterPublicHost");
-		String zookeeperHosts = zookeeperHostName + ":" + zookeeperPort;
 		zkConfig.put("zookeeperHosts", zookeeperHosts);
 		zkConfig.put("sessionTimeout", 20000);
 		zkConfig.put("connectTimeout", 3000);
